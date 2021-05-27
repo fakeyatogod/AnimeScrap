@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayLis
 
             val doc = Jsoup.connect(url).get()
             val allInfo = doc.getElementsByClass("ep-card")
-            println(allInfo)
+//            println(allInfo)
             for (item in allInfo) {
                 val itemImage = item.getElementsByTag("img").attr("src")
                 val itemName = item.getElementsByClass("ep-details").attr("alt")
