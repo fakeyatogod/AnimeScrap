@@ -7,31 +7,27 @@
     app:cardCornerRadius="8dp"
     app:cardElevation="5dp"
     app:cardPreventCornerOverlap="true"
-    app:cardUseCompatPadding="true"
-    android:background="@color/cardview_dark_background">
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="5dp"
         android:orientation="vertical"
-        android:background="@color/cardview_dark_background">
+        android:padding="5dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="280dp"
-            app:cardCornerRadius="8dp"
-            android:layout_margin="5dp"
+            android:layout_margin="1dp"
             android:elevation="10dp"
-            android:background="@color/cardview_dark_background">
+            app:cardCornerRadius="6dp">
 
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
                 android:layout_height="280dp"
-                android:background="@color/cardview_dark_background"
-                android:scaleType="centerCrop"
-                android:contentDescription="ImageView in Main" />
+                android:contentDescription="ImageView in Main"
+                android:scaleType="centerCrop" />
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -39,9 +35,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="4dp"
-            android:text="IMAGE TITLE"
-            android:background="@color/cardview_dark_background"
-            android:textColor="@color/design_default_color_on_primary" />
+            android:text="IMAGE TITLE" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

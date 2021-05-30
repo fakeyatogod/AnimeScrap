@@ -4,8 +4,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsets
-import android.view.WindowInsetsController
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -14,7 +12,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 
 class LinksActivity : AppCompatActivity() {
 
-    private lateinit var simpleExoPlayer : SimpleExoPlayer
+    private lateinit var simpleExoPlayer: SimpleExoPlayer
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_links)
@@ -59,8 +57,7 @@ class LinksActivity : AppCompatActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.decorView.windowInsetsController?.hide(WindowInsets.Type.navigationBars())
-        }
-        else{
+        } else {
             val decorView: View = window.decorView
 
             val uiOptions: Int = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
-import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.AppCompatActivity
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.model.AnimeDetails
@@ -65,7 +64,7 @@ class PageActivity : AppCompatActivity() {
                 textView.text = animeModel.animeName
                 textView2.text = animeModel.animeDesc
                 Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
-                    .placeholder(R.drawable.pgi2).into(coverImage)
+                    .placeholder(R.drawable.loadanime).into(coverImage)
                 progressBar.visibility = View.GONE
                 textView.visibility = View.VISIBLE
                 textView2.visibility = View.VISIBLE
@@ -91,19 +90,6 @@ class PageActivity : AppCompatActivity() {
         val episodeButtonForSpinner = findViewById<Button>(R.id.episodeButtonForSpinner)
         spinner.visibility = View.VISIBLE
         episodeButtonForSpinner.visibility = View.VISIBLE
-        spinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View,
-                position: Int,
-                id: Long
-            ) {
-                Toast.makeText(parent.context, parent.selectedItem.toString(), Toast.LENGTH_SHORT)
-                    .show()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
 
         val arrayAdapter = ArrayAdapter(
             this,
@@ -137,7 +123,7 @@ class PageActivity : AppCompatActivity() {
                         println("Try $tries")
                         tries += 1
                     } while (streamAniLink == "Null")
-                    
+
                     val goGoStreamLink = streamAniLink.replaceBefore(
                         "?id=",
                         "https://gogo-stream.com/download"

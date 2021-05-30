@@ -8,10 +8,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.talent.animescrap.model.Photos
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.PageActivity
 import com.talent.animescrap.R
+import com.talent.animescrap.model.Photos
 
 class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Photos>) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
@@ -32,7 +32,7 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
         val pic = itemList[position]
         holder.itemName.text = pic.resName
         Picasso.get().load(pic.resImage).error(R.drawable.ic_broken_image)
-            .placeholder(R.drawable.pgi2).into(holder.itemImage)
+            .placeholder(R.drawable.loadanime).into(holder.itemImage)
 
         holder.cView.setOnClickListener {
             val intent = Intent(context, PageActivity::class.java)
