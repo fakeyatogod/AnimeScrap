@@ -128,15 +128,30 @@ class PageActivity : AppCompatActivity() {
 
                     val arrayLinks: ArrayList<String> = ArrayList()
                     val arrayLinksNames: ArrayList<String> = ArrayList()
-                    val streamAniLink = Jsoup.connect(animeEpUrl)
-                        .get().getElementsByClass("anime-download").attr("href")
 
-                    val goGoStreamLink = streamAniLink.replace(
-                        "https://streamani.net/streaming.php?id=",
-                        "https://gogo-stream.com/download?id="
+                    var streamAniLink = "Null"
+                    var tries = 1
+                    do {
+                        streamAniLink = Jsoup.connect(animeEpUrl)
+                            .get().getElementsByClass("anime-download").attr("href")
+                        println("Try $tries")
+                        tries += 1
+                    } while (streamAniLink == "Null")
+                    
+                    val goGoStreamLink = streamAniLink.replaceBefore(
+                        "?id=",
+                        "https://gogo-stream.com/download"
                     )
+                    println(streamAniLink)
+                    println(goGoStreamLink)
 
-                    for (i in Jsoup.connect(goGoStreamLink).get().getElementsByClass("dowload")) {
+                    val gogoLink = Jsoup.connect(goGoStreamLink).get()
+                    val downloadLinks = gogoLink.getElementsByClass("dowload")
+
+                    println(gogoLink)
+                    println(downloadLinks)
+
+                    for (i in downloadLinks) {
                         arrayLinks.add(
                             i.getElementsByTag("a").text().toString()
                                 .replace("Download", "")

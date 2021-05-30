@@ -12,7 +12,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AnimeScrap">
-        <activity android:name=".LinksActivity"></activity>
+
+        <activity
+            android:name=".LinksActivity"
+            android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
+
         <activity android:name=".PageActivity" />
         <activity
             android:name=".MainActivity"
