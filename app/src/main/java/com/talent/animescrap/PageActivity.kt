@@ -1,14 +1,9 @@
 package com.talent.animescrap
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Looper
 import android.view.View
-import android.webkit.JavascriptInterface
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.*
 import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.AppCompatActivity
@@ -146,10 +141,11 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
             var watchLink = contentLink
             watchLink = watchLink?.replace("anime", "watch")
             val animeEpUrl = "https://yugenani.me${watchLink}${spinner.selectedItem}"
-            var streamLink = "null"
 
             Thread {
                 try {
+                    val arrayLinks: ArrayList<String> = ArrayList()
+                    val arrayLinksNames: ArrayList<String> = ArrayList()
                     val streamAniLink = Jsoup.connect(animeEpUrl)
                         .get().getElementsByClass("anime-download").attr("href")
 
@@ -157,22 +153,27 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
                         "https://streamani.net/streaming.php?id=",
                         "https://gogo-stream.com/download?id="
                     )
-                    val linksHashMap = LinkedHashMap<String, String>()
 
                     for (i in Jsoup.connect(goGoStreamLink).get().getElementsByClass("dowload")) {
-                        linksHashMap[i.getElementsByTag("a").text().toString()
-                            .replace("Download", "")] =
-                            i.getElementsByTag("a").attr("href").toString()
+                        arrayLinks.add(
+                            i.getElementsByTag("a").text().toString()
+                                .replace("Download", "")
+                        )
+                        arrayLinksNames.add(i.getElementsByTag("a").attr("href").toString())
 
                     }
-                    for (i in linksHashMap.keys) {
-                        println("$i = ${linksHashMap.get(i)}")
+                    
+                    runOnUiThread {
+                        val intent = Intent(this, LinksActivity::class.java)
+                        intent.putExtra("nameOfLinks", arrayLinks)
+                        intent.putExtra("theLinks", arrayLinksNames)
+                        startActivity(intent)
                     }
-
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }.start()
+
 
         }
     }
