@@ -11,7 +11,7 @@ class LinksActivity : AppCompatActivity() {
 
         if (intent != null) {
             val textNames = findViewById<TextView>(R.id.textNames)
-            val textLinks = findViewById<TextView>(R.id.textlinks)
+            val textLinks = findViewById<TextView>(R.id.textLinks)
             val linksNamesArray = intent.getStringArrayListExtra("nameOfLinks")
             val linksArray = intent.getStringArrayListExtra("theLinks")
             textNames.text = linksNamesArray?.toString() ?: "Nothing"
