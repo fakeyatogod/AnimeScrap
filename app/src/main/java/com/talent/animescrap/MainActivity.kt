@@ -12,14 +12,15 @@ import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.model.Photos
 import org.jsoup.Jsoup
 
-class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayList<Photos>>  {
+class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<ArrayList<Photos>> {
     private lateinit var recyclerView: RecyclerView
+
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportLoaderManager.initLoader(56,null,this)
+        supportLoaderManager.initLoader(56, null, this)
     }
 
     class AsyncScrap(context: Context) : AsyncTaskLoader<ArrayList<Photos>>(context) {

@@ -35,7 +35,7 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
             .placeholder(R.drawable.pgi2).into(holder.itemImage)
 
         holder.cView.setOnClickListener {
-            val intent = Intent(context,PageActivity::class.java)
+            val intent = Intent(context, PageActivity::class.java)
             intent.putExtra("content_link", pic.resLink)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)

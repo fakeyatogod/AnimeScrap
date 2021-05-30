@@ -29,8 +29,6 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
 
-
-
         supportLoaderManager.initLoader(56, null, this)
     }
 
@@ -76,6 +74,8 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
         val textView2 = findViewById<TextView>(R.id.content_link_2)
         val coverImage = findViewById<ImageView>(R.id.coverAnime)
         val progressBar = findViewById<ProgressBar>(R.id.progressbarInPage)
+        val spinner = findViewById<Spinner>(R.id.episodeSpinner)
+        spinner.visibility = View.GONE
         textView.visibility = View.GONE
         textView2.visibility = View.GONE
         coverImage.visibility = View.GONE
@@ -110,7 +110,6 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
         super.onBackPressed()
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     private fun setupSpinner(num: String) {
 
         val epList = arrayListOf<String>()
@@ -120,6 +119,7 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
         }
 
         val spinner = findViewById<Spinner>(R.id.episodeSpinner)
+        spinner.visibility = View.VISIBLE
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
@@ -153,15 +153,19 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
                     val streamAniLink = Jsoup.connect(animeEpUrl)
                         .get().getElementsByClass("anime-download").attr("href")
 
-                    val goGoStreamLink = streamAniLink.replace("https://streamani.net/streaming.php?id=","https://gogo-stream.com/download?id=")
-                    val linksHashMap = LinkedHashMap<String, String> ()
+                    val goGoStreamLink = streamAniLink.replace(
+                        "https://streamani.net/streaming.php?id=",
+                        "https://gogo-stream.com/download?id="
+                    )
+                    val linksHashMap = LinkedHashMap<String, String>()
 
-                    for (i in Jsoup.connect(goGoStreamLink).get().getElementsByClass("dowload")){
-                        linksHashMap[i.getElementsByTag("a").text().toString().replace("Download","")] =
+                    for (i in Jsoup.connect(goGoStreamLink).get().getElementsByClass("dowload")) {
+                        linksHashMap[i.getElementsByTag("a").text().toString()
+                            .replace("Download", "")] =
                             i.getElementsByTag("a").attr("href").toString()
 
                     }
-                    for (i in linksHashMap.keys){
+                    for (i in linksHashMap.keys) {
                         println("$i = ${linksHashMap.get(i)}")
                     }
 
@@ -170,23 +174,6 @@ class PageActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<AnimeDet
                 }
             }.start()
 
-        }
-    }
-
-    internal open class HtmlHandler {
-        @JavascriptInterface
-        fun handleHtml(html: String?) {
-            // scrape the content here
-            //println(html)
-        }
-    }
-
-    class MyJavaScriptInterface internal constructor(private val ctx: Context) {
-        var html: String? = null
-
-        @JavascriptInterface
-        fun showHTML(_html: String?) {
-            html = _html
         }
     }
 
