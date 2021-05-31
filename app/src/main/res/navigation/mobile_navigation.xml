@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_favorite">
+
+    <fragment
+        android:id="@+id/navigation_favorite"
+        android:name="com.talent.animescrap.ui.favorite.FavoriteFragment"
+        android:label="@string/title_favorite"
+        tools:layout="@layout/fragment_favorite" />
+
+    <fragment
+        android:id="@+id/navigation_latest"
+        android:name="com.talent.animescrap.ui.latest.LatestFragment"
+        android:label="@string/title_latest"
+        tools:layout="@layout/fragment_latest" />
+
+    <fragment
+        android:id="@+id/navigation_trending"
+        android:name="com.talent.animescrap.ui.trending.TrendingFragment"
+        android:label="@string/title_trending"
+        tools:layout="@layout/fragment_trending" />
+</navigation>

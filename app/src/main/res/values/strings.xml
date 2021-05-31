@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">Anime Scrap</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
     <string name="cover_of_anime">coverOfAnime</string>
+    <string name="title_activity_main_bottom_nav">MainActivity</string>
+    <string name="title_trending">Trending</string>
+    <string name="title_latest">Latest</string>
+    <string name="title_favorite">Favorite</string>
 </resources>

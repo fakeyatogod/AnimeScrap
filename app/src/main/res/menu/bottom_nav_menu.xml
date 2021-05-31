@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_favorite"
+        android:icon="@drawable/ic_favorite_black_24"
+        android:title="@string/title_favorite" />
+
+    <item
+        android:id="@+id/navigation_latest"
+        android:icon="@drawable/ic_latest_black_24"
+        android:title="@string/title_latest" />
+
+    <item
+        android:id="@+id/navigation_trending"
+        android:icon="@drawable/ic_trending_black_24"
+        android:title="@string/title_trending" />
+
+</menu>
