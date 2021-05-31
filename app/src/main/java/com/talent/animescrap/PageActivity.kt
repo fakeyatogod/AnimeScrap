@@ -1,6 +1,9 @@
 package com.talent.animescrap
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -13,7 +16,9 @@ import org.jsoup.Jsoup
 class PageActivity : AppCompatActivity() {
 
     private var contentLink: String? = "null"
+    private lateinit var favSharedPreferences: SharedPreferences
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
@@ -29,6 +34,69 @@ class PageActivity : AppCompatActivity() {
             finish()
             Toast.makeText(this, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
         }
+
+        val buttonFavorite = findViewById<Button>(R.id.button_favorite)
+
+        favSharedPreferences = getSharedPreferences(
+            getString(R.string.fav_shared_preferences_file), Context.MODE_PRIVATE
+        )
+
+        val noOfFavorites = favSharedPreferences.getInt("no_of_favorites", 0)
+        var animeFavEntry = 0
+        if (noOfFavorites != 0) {
+            var isAnimeFav = false
+            for (i in 1..noOfFavorites) {
+                val favItem = favSharedPreferences.getString("favAnime_$i", "not_available")
+                if (favItem == "not_available") {
+                    Toast.makeText(
+                        this,
+                        "Favorite List is corrupted, Resetting Favorites, Sorry for inconvenience",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    favSharedPreferences.edit().clear().apply()
+                    break
+                }
+                if (favItem == contentLink) {
+                    isAnimeFav = true
+                    animeFavEntry = i
+                    break
+                }
+            }
+            if (isAnimeFav) {
+                buttonFavorite.text = "Remove from Favorite"
+                buttonFavorite.setOnClickListener {
+                    val noOfFavoritesIsHere = favSharedPreferences.getInt("no_of_favorites", 0)
+                    favSharedPreferences.edit().putInt("no_of_favorites", noOfFavoritesIsHere - 1)
+                        .apply()
+                    favSharedPreferences.edit().remove("favAnime_${animeFavEntry}").apply()
+                    buttonFavorite.text = "Add from Favorite"
+
+                }
+            } else {
+                buttonFavorite.text = "Add to Favorite"
+                buttonFavorite.setOnClickListener {
+                    val noOfFavoritesIsHere = favSharedPreferences.getInt("no_of_favorites", 0)
+                    favSharedPreferences.edit().putInt("no_of_favorites", noOfFavoritesIsHere + 1)
+                        .apply()
+                    favSharedPreferences.edit()
+                        .putString("favAnime_${noOfFavoritesIsHere + 1}", contentLink).apply()
+                    buttonFavorite.text = "Remove from Favorite"
+
+                }
+            }
+        } else {
+            buttonFavorite.text = "Add to Favorite"
+            buttonFavorite.setOnClickListener {
+                val noOfFavoritesIsHere = favSharedPreferences.getInt("no_of_favorites", 0)
+                favSharedPreferences.edit().putInt("no_of_favorites", noOfFavoritesIsHere + 1)
+                    .apply()
+                favSharedPreferences.edit()
+                    .putString("favAnime_${noOfFavoritesIsHere + 1}", contentLink).apply()
+                buttonFavorite.text = "Remove from Favorite"
+            }
+        }
+
+
         val textView = findViewById<TextView>(R.id.content_link)
         val textView2 = findViewById<TextView>(R.id.content_link_2)
         val coverImage = findViewById<ImageView>(R.id.coverAnime)
@@ -115,14 +183,14 @@ class PageActivity : AppCompatActivity() {
                     val arrayLinks: ArrayList<String> = ArrayList()
                     val arrayLinksNames: ArrayList<String> = ArrayList()
 
-                    var streamAniLink = "Null"
+                    var streamAniLink : String?
                     var tries = 1
                     do {
                         streamAniLink = Jsoup.connect(animeEpUrl)
                             .get().getElementsByClass("anime-download").attr("href")
                         println("Try $tries")
                         tries += 1
-                    } while (streamAniLink == "Null")
+                    } while (streamAniLink == null)
 
                     val goGoStreamLink = streamAniLink.replaceBefore(
                         "?id=",

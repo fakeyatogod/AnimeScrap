@@ -58,6 +58,14 @@
                     android:text="Watch" />
             </LinearLayout>
 
+            <Button
+                android:id="@+id/button_favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add to Favorite"
+                android:layout_margin="4dp"
+                android:layout_gravity="center"/>
+
             <TextView
                 android:id="@+id/content_link_2"
                 android:layout_width="wrap_content"

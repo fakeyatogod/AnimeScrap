@@ -5,4 +5,5 @@
     <string name="title_trending">Trending</string>
     <string name="title_latest">Latest</string>
     <string name="title_favorite">Favorite</string>
+    <string name="fav_shared_preferences_file">favorites_shared_prefs</string>
 </resources>
