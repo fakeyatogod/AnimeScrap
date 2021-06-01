@@ -8,8 +8,11 @@ import android.os.Bundle
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.room.Room
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.model.AnimeDetails
+import com.talent.animescrap.room.FavLinks
+import com.talent.animescrap.room.LinksRoomDatabase
 import org.jsoup.Jsoup
 
 
@@ -40,62 +43,54 @@ class PageActivity : AppCompatActivity() {
         favSharedPreferences = getSharedPreferences(
             getString(R.string.fav_shared_preferences_file), Context.MODE_PRIVATE
         )
+        favSharedPreferences.edit().clear().apply()
 
-        val noOfFavorites = favSharedPreferences.getInt("no_of_favorites", 0)
-        var animeFavEntry = 0
-        if (noOfFavorites != 0) {
-            var isAnimeFav = false
-            for (i in 1..noOfFavorites) {
-                val favItem = favSharedPreferences.getString("favAnime_$i", "not_available")
-                if (favItem == "not_available") {
-                    Toast.makeText(
-                        this,
-                        "Favorite List is corrupted, Resetting Favorites, Sorry for inconvenience",
-                        Toast.LENGTH_LONG
-                    ).show()
-                    favSharedPreferences.edit().clear().apply()
-                    break
-                }
-                if (favItem == contentLink) {
-                    isAnimeFav = true
-                    animeFavEntry = i
+        val db = Room.databaseBuilder(
+            applicationContext,
+            LinksRoomDatabase::class.java, "link-db"
+        ).build()
+        val linkDao = db.linkDao()
+
+        Thread {
+
+            val favLinks = linkDao.getLinks()
+            println(favLinks)
+            var isFav = false
+            var foundFav: FavLinks = FavLinks("null")
+            for (i in favLinks) {
+                if (i.linkString == contentLink) {
+                    isFav = true
+                    foundFav = i
                     break
                 }
             }
-            if (isAnimeFav) {
-                buttonFavorite.text = "Remove from Favorite"
-                buttonFavorite.setOnClickListener {
-                    val noOfFavoritesIsHere = favSharedPreferences.getInt("no_of_favorites", 0)
-                    favSharedPreferences.edit().putInt("no_of_favorites", noOfFavoritesIsHere - 1)
-                        .apply()
-                    favSharedPreferences.edit().remove("favAnime_${animeFavEntry}").apply()
-                    buttonFavorite.text = "Add from Favorite"
 
-                }
-            } else {
-                buttonFavorite.text = "Add to Favorite"
-                buttonFavorite.setOnClickListener {
-                    val noOfFavoritesIsHere = favSharedPreferences.getInt("no_of_favorites", 0)
-                    favSharedPreferences.edit().putInt("no_of_favorites", noOfFavoritesIsHere + 1)
-                        .apply()
-                    favSharedPreferences.edit()
-                        .putString("favAnime_${noOfFavoritesIsHere + 1}", contentLink).apply()
+            runOnUiThread {
+                if (isFav) {
                     buttonFavorite.text = "Remove from Favorite"
-
+                    buttonFavorite.setOnClickListener {
+                        Thread {
+                            linkDao.deleteOne(foundFav)
+                            runOnUiThread {
+                                buttonFavorite.text = "Add from Favorite"
+                            }
+                        }.start()
+                    }
+                } else {
+                    buttonFavorite.text = "Add from Favorite"
+                    buttonFavorite.setOnClickListener {
+                        Thread {
+                            linkDao.insert(FavLinks(contentLink.toString()))
+                            runOnUiThread {
+                                buttonFavorite.text = "Remove from Favorite"
+                            }
+                        }.start()
+                    }
                 }
-            }
-        } else {
-            buttonFavorite.text = "Add to Favorite"
-            buttonFavorite.setOnClickListener {
-                val noOfFavoritesIsHere = favSharedPreferences.getInt("no_of_favorites", 0)
-                favSharedPreferences.edit().putInt("no_of_favorites", noOfFavoritesIsHere + 1)
-                    .apply()
-                favSharedPreferences.edit()
-                    .putString("favAnime_${noOfFavoritesIsHere + 1}", contentLink).apply()
-                buttonFavorite.text = "Remove from Favorite"
-            }
-        }
 
+            }
+
+        }.start()
 
         val textView = findViewById<TextView>(R.id.content_link)
         val textView2 = findViewById<TextView>(R.id.content_link_2)
@@ -110,6 +105,7 @@ class PageActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
         spinner.visibility = View.GONE
         episodeButtonForSpinner.visibility = View.GONE
+        buttonFavorite.visibility = View.GONE
 
         Thread {
 
@@ -137,6 +133,7 @@ class PageActivity : AppCompatActivity() {
                 textView.visibility = View.VISIBLE
                 textView2.visibility = View.VISIBLE
                 coverImage.visibility = View.VISIBLE
+                buttonFavorite.visibility = View.VISIBLE
                 setupSpinner(animeModel.animeEpisodes)
 
             }
@@ -183,7 +180,7 @@ class PageActivity : AppCompatActivity() {
                     val arrayLinks: ArrayList<String> = ArrayList()
                     val arrayLinksNames: ArrayList<String> = ArrayList()
 
-                    var streamAniLink : String?
+                    var streamAniLink: String?
                     var tries = 1
                     do {
                         streamAniLink = Jsoup.connect(animeEpUrl)

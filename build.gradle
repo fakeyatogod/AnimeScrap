@@ -1,6 +1,8 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext.kotlin_version = "1.5.10"
+    ext.roomVersion = '2.2.5'
+
     repositories {
         google()
         mavenCentral()

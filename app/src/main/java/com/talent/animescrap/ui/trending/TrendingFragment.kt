@@ -16,7 +16,6 @@ import org.jsoup.Jsoup
 
 class TrendingFragment : Fragment() {
 
-    private lateinit var trendingViewModel: TrendingViewModel
     private var _binding: FragmentTrendingBinding? = null
 
     // This property is only valid between onCreateView and
@@ -27,17 +26,9 @@ class TrendingFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        trendingViewModel =
-            ViewModelProvider(this).get(TrendingViewModel::class.java)
+    ): View {
 
         _binding = FragmentTrendingBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-
-        val textView: TextView = binding.textTrending
-        trendingViewModel.text.observe(viewLifecycleOwner, {
-            textView.text = it
-        })
 
         _binding!!.progressbarInMain.visibility = View.VISIBLE
         _binding!!.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
@@ -64,7 +55,7 @@ class TrendingFragment : Fragment() {
             }
         }.start()
 
-        return root
+        return binding.root
     }
 
     override fun onDestroyView() {
