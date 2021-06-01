@@ -27,6 +27,7 @@ class LinksActivity : AppCompatActivity() {
             simpleExoPlayer = SimpleExoPlayer.Builder(this).build()
 
             val playerView = findViewById<PlayerView>(R.id.exoPlayerView)
+            playerView.keepScreenOn = true
             playerView.player = simpleExoPlayer
 
             val mediaItem: MediaItem = MediaItem.fromUri(linksArray?.get(0)?.toString().toString())
