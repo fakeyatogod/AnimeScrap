@@ -1,0 +1,34 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "1481ce57d78c039fc2dc3f35286e9f58",
+    "entities": [
+      {
+        "tableName": "fav_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fav` TEXT NOT NULL, PRIMARY KEY(`fav`))",
+        "fields": [
+          {
+            "fieldPath": "linkString",
+            "columnName": "fav",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "fav"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1481ce57d78c039fc2dc3f35286e9f58')"
+    ]
+  }
+}
