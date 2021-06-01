@@ -153,6 +153,7 @@ class PageActivity : AppCompatActivity() {
         val progressBar = findViewById<ProgressBar>(R.id.progressbarInPage)
         val spinner = findViewById<Spinner>(R.id.episodeSpinner)
         val episodeButtonForSpinner = findViewById<Button>(R.id.episodeButtonForSpinner)
+        val buttonFavorite = findViewById<Button>(R.id.button_favorite)
         spinner.visibility = View.VISIBLE
         episodeButtonForSpinner.visibility = View.VISIBLE
 
@@ -170,6 +171,7 @@ class PageActivity : AppCompatActivity() {
             progressBar.visibility = View.VISIBLE
             episodeButtonForSpinner.visibility = View.GONE
             spinner.visibility = View.GONE
+            buttonFavorite.visibility = View.GONE
             var watchLink = contentLink
             watchLink = watchLink?.replace("anime", "watch")
             val animeEpUrl = "https://yugenani.me${watchLink}${spinner.selectedItem}"
@@ -218,6 +220,7 @@ class PageActivity : AppCompatActivity() {
                         coverImage.visibility = View.VISIBLE
                         episodeButtonForSpinner.visibility = View.VISIBLE
                         spinner.visibility = View.VISIBLE
+                        buttonFavorite.visibility = View.VISIBLE
 
                         val intent = Intent(this, LinksActivity::class.java)
                         intent.putExtra("nameOfLinks", arrayLinks)
