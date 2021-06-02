@@ -1,10 +1,8 @@
 package com.talent.animescrap
 
-import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.SearchView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -23,7 +21,7 @@ import java.util.*
 class MainBottomNav : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBottomNavBinding
-    lateinit var searchView: SearchView
+    private lateinit var searchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
