@@ -7,4 +7,7 @@
     <string name="title_favorite">Favorite</string>
     <string name="fav_shared_preferences_file">favorites_shared_prefs</string>
     <string name="title_search">Search</string>
+    <string name="watch">Watch</string>
+    <string name="add_to_favorite">Add to Favorite</string>
+    <string name="remove_from_favorite">Remove from Favorite</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.talent.animescrap
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -21,7 +20,6 @@ class PageActivity : AppCompatActivity() {
     private var contentLink: String? = "null"
     private lateinit var favSharedPreferences: SharedPreferences
 
-    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
@@ -56,7 +54,7 @@ class PageActivity : AppCompatActivity() {
             val favLinks = linkDao.getLinks()
             println(favLinks)
             var isFav = false
-            var foundFav: FavLinks = FavLinks("null")
+            var foundFav = FavLinks("null")
             for (i in favLinks) {
                 if (i.linkString == contentLink) {
                     isFav = true
@@ -67,22 +65,22 @@ class PageActivity : AppCompatActivity() {
 
             runOnUiThread {
                 if (isFav) {
-                    buttonFavorite.text = "Remove from Favorite"
+                    buttonFavorite.text = getString(R.string.remove_from_favorite)
                     buttonFavorite.setOnClickListener {
                         Thread {
                             linkDao.deleteOne(foundFav)
                             runOnUiThread {
-                                buttonFavorite.text = "Add from Favorite"
+                                buttonFavorite.text = getString(R.string.add_to_favorite)
                             }
                         }.start()
                     }
                 } else {
-                    buttonFavorite.text = "Add from Favorite"
+                    buttonFavorite.text = getString(R.string.add_to_favorite)
                     buttonFavorite.setOnClickListener {
                         Thread {
                             linkDao.insert(FavLinks(contentLink.toString()))
                             runOnUiThread {
-                                buttonFavorite.text = "Remove from Favorite"
+                                buttonFavorite.text = getString(R.string.remove_from_favorite)
                             }
                         }.start()
                     }

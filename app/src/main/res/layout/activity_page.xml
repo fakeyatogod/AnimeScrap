@@ -55,14 +55,14 @@
                     android:id="@+id/episodeButtonForSpinner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Watch" />
+                    android:text="@string/watch" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/button_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add to Favorite"
+                android:text="@string/add_to_favorite"
                 android:layout_margin="4dp"
                 android:layout_gravity="center"/>
 
