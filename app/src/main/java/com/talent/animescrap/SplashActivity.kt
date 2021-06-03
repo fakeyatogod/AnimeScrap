@@ -14,7 +14,7 @@ class SplashActivity : AppCompatActivity() {
         var isConnected = false
         Thread {
             try {
-                val google = connect("https://www.google.com").get()
+                connect("https://www.google.com").get()
                 isConnected = true
             } catch (e: Exception) {
                 runOnUiThread {
