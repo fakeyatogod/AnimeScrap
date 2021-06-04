@@ -19,7 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainBottomNav"></activity>
+        <activity android:name=".MainBottomNav" />
         <activity
             android:name=".LinksActivity"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden"

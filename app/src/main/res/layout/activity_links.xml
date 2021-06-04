@@ -7,7 +7,8 @@
     android:background="@color/black"
     android:orientation="vertical"
     tools:context=".LinksActivity"
-    tools:viewBindingIgnore="true">
+    tools:viewBindingIgnore="true"
+    tools:ignore="Overdraw">
 
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/exoPlayerView"

@@ -13,7 +13,7 @@ interface LinkDao {
     @Query("DELETE FROM fav_table")
     fun deleteAll()
 
-    @Delete()
+    @Delete
     fun deleteOne(fav: FavLinks)
 
 }
