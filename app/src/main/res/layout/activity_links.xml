@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:background="@color/black"
     android:orientation="vertical"
-    tools:context=".LinksActivity">
+    tools:context=".LinksActivity"
+    tools:viewBindingIgnore="true">
 
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/exoPlayerView"
