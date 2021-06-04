@@ -136,6 +136,7 @@ class PageActivity : AppCompatActivity() {
 
             }
         }.start()
+        db.close()
     }
 
     private fun setupSpinner(num: String) {

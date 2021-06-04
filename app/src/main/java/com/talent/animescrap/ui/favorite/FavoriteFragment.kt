@@ -61,7 +61,7 @@ class FavoriteFragment : Fragment() {
             }
         }.start()
 
-
+        db.close()
         return binding.root
     }
 
