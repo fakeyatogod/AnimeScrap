@@ -19,7 +19,7 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
 
         val itemName: TextView = itemView.findViewById(R.id.name)
         val itemImage: ImageView = itemView.findViewById(R.id.imageView)
-        val cView: androidx.cardview.widget.CardView = itemView.findViewById(R.id.cView)
+        val cView: com.google.android.material.card.MaterialCardView  = itemView.findViewById(R.id.cView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

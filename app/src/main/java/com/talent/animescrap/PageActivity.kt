@@ -190,14 +190,14 @@ class PageActivity : AppCompatActivity() {
                         tries += 1
                     } while (streamAniLink == null)
 
-                    val goGoStreamLink = streamAniLink.replaceBefore(
+                    val downloadStreamAniLink = streamAniLink.replaceBefore(
                         "?id=",
-                        "https://gogo-stream.com/download"
+                        "https://streamani.net/download"
                     )
                     println(streamAniLink)
-                    println(goGoStreamLink)
+                    println(downloadStreamAniLink)
 
-                    val gogoLink = Jsoup.connect(goGoStreamLink).get()
+                    val gogoLink = Jsoup.connect(downloadStreamAniLink).get()
                     val downloadLinks = gogoLink.getElementsByClass("dowload")
 
                     println(gogoLink)
