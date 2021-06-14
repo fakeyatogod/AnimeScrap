@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AnimeScrap">
         <activity
             android:name=".SplashActivity"
-            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+            android:theme="@style/Theme.AnimeScrap.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -23,8 +23,10 @@
         <activity
             android:name=".LinksActivity"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen" />
-        <activity android:name=".PageActivity" />
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen"
+            android:screenOrientation="landscape"/>
+        <activity android:name=".PageActivity"
+            android:theme="@style/Theme.AnimeScrap.Page"/>
     </application>
 
 </manifest>

@@ -12,4 +12,5 @@
     <string name="imageview_in_main">ImageView in Main</string>
     <string name="image_title">IMAGE TITLE</string>
     <string name="splash_c2_image">Splash C2 Image</string>
+    <string name="synopsis_header_title">Synopsis:</string>
 </resources>

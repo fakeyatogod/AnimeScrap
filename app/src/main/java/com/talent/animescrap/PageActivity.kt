@@ -1,13 +1,14 @@
 package com.talent.animescrap
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.room.Room
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.room.FavLinks
@@ -18,12 +19,13 @@ import org.jsoup.Jsoup
 class PageActivity : AppCompatActivity() {
 
     private var contentLink: String? = "null"
-    private lateinit var favSharedPreferences: SharedPreferences
+    private lateinit var pageLayout: ConstraintLayout
+    private lateinit var progressBar: CircularProgressIndicator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
-
+        supportActionBar?.title = "Anime Details"
         if (intent != null) {
             contentLink = intent.getStringExtra("content_link")
             if (contentLink == "null") {
@@ -36,12 +38,8 @@ class PageActivity : AppCompatActivity() {
             Toast.makeText(this, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
         }
 
+        pageLayout = findViewById(R.id.pageLayout)
         val buttonFavorite = findViewById<Button>(R.id.button_favorite)
-
-        favSharedPreferences = getSharedPreferences(
-            getString(R.string.fav_shared_preferences_file), Context.MODE_PRIVATE
-        )
-        favSharedPreferences.edit().clear().apply()
 
         val db = Room.databaseBuilder(
             applicationContext,
@@ -93,17 +91,10 @@ class PageActivity : AppCompatActivity() {
         val textView = findViewById<TextView>(R.id.content_link)
         val textView2 = findViewById<TextView>(R.id.content_link_2)
         val coverImage = findViewById<ImageView>(R.id.coverAnime)
-        val progressBar = findViewById<ProgressBar>(R.id.progressbarInPage)
-        val spinner = findViewById<Spinner>(R.id.episodeSpinner)
-        val episodeButtonForSpinner = findViewById<Button>(R.id.episodeButtonForSpinner)
+        progressBar = findViewById(R.id.progressbarInPage)
 
-        textView.visibility = View.GONE
-        textView2.visibility = View.GONE
-        coverImage.visibility = View.GONE
+        pageLayout.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
-        spinner.visibility = View.GONE
-        episodeButtonForSpinner.visibility = View.GONE
-        buttonFavorite.visibility = View.GONE
 
         Thread {
 
@@ -128,10 +119,7 @@ class PageActivity : AppCompatActivity() {
                 Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
                     .placeholder(R.drawable.loadanime).into(coverImage)
                 progressBar.visibility = View.GONE
-                textView.visibility = View.VISIBLE
-                textView2.visibility = View.VISIBLE
-                coverImage.visibility = View.VISIBLE
-                buttonFavorite.visibility = View.VISIBLE
+                pageLayout.visibility = View.VISIBLE
                 setupSpinner(animeModel.animeEpisodes)
 
             }
@@ -146,13 +134,16 @@ class PageActivity : AppCompatActivity() {
         for (i in num.toInt() downTo 1) {
             epList.add(i.toString())
         }
-        val textView = findViewById<TextView>(R.id.content_link)
+        pageLayout = findViewById(R.id.pageLayout)
+
         val textView2 = findViewById<TextView>(R.id.content_link_2)
-        val coverImage = findViewById<ImageView>(R.id.coverAnime)
-        val progressBar = findViewById<ProgressBar>(R.id.progressbarInPage)
+        textView2.movementMethod = ScrollingMovementMethod()
+
+        progressBar = findViewById(R.id.progressbarInPage)
+
         val spinner = findViewById<Spinner>(R.id.episodeSpinner)
         val episodeButtonForSpinner = findViewById<Button>(R.id.episodeButtonForSpinner)
-        val buttonFavorite = findViewById<Button>(R.id.button_favorite)
+
         spinner.visibility = View.VISIBLE
         episodeButtonForSpinner.visibility = View.VISIBLE
 
@@ -164,13 +155,9 @@ class PageActivity : AppCompatActivity() {
         spinner.adapter = arrayAdapter
 
         episodeButtonForSpinner.setOnClickListener {
-            textView.visibility = View.GONE
-            textView2.visibility = View.GONE
-            coverImage.visibility = View.GONE
+            pageLayout.visibility = View.GONE
             progressBar.visibility = View.VISIBLE
-            episodeButtonForSpinner.visibility = View.GONE
-            spinner.visibility = View.GONE
-            buttonFavorite.visibility = View.GONE
+
             var watchLink = contentLink
             watchLink = watchLink?.replace("anime", "watch")
             val animeEpUrl = "https://yugenani.me${watchLink}${spinner.selectedItem}"
@@ -213,18 +200,14 @@ class PageActivity : AppCompatActivity() {
                     }
 
                     runOnUiThread {
-                        progressBar.visibility = View.GONE
-                        textView.visibility = View.VISIBLE
-                        textView2.visibility = View.VISIBLE
-                        coverImage.visibility = View.VISIBLE
-                        episodeButtonForSpinner.visibility = View.VISIBLE
-                        spinner.visibility = View.VISIBLE
-                        buttonFavorite.visibility = View.VISIBLE
-
                         val intent = Intent(this, LinksActivity::class.java)
                         intent.putExtra("nameOfLinks", arrayLinks)
                         intent.putExtra("theLinks", arrayLinksNames)
                         startActivity(intent)
+
+                        progressBar.visibility = View.GONE
+                        pageLayout.visibility = View.VISIBLE
+
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
