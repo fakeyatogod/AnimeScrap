@@ -117,7 +117,7 @@ class PageActivity : AppCompatActivity() {
                 textView.text = animeModel.animeName
                 textView2.text = animeModel.animeDesc
                 Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
-                    .placeholder(R.drawable.loadanime).into(coverImage)
+                    .into(coverImage)
                 progressBar.visibility = View.GONE
                 pageLayout.visibility = View.VISIBLE
                 setupSpinner(animeModel.animeEpisodes)

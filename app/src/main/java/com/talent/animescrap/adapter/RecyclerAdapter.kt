@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.progressindicator.CircularProgressIndicator
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.PageActivity
 import com.talent.animescrap.R
@@ -19,7 +21,9 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
 
         val itemName: TextView = itemView.findViewById(R.id.name)
         val itemImage: ImageView = itemView.findViewById(R.id.imageView)
-        val cView: com.google.android.material.card.MaterialCardView  = itemView.findViewById(R.id.cView)
+        val cView: com.google.android.material.card.MaterialCardView =
+            itemView.findViewById(R.id.cView)
+        val progressInCard = itemView.findViewById<CircularProgressIndicator>(R.id.progressInCard)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -31,8 +35,21 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val pic = itemList[position]
         holder.itemName.text = pic.resName
+
+
         Picasso.get().load(pic.resImage).error(R.drawable.ic_broken_image)
-            .placeholder(R.drawable.loadanime).into(holder.itemImage)
+            .into(
+                holder.itemImage, object : Callback {
+                    override fun onSuccess() {
+                        holder.progressInCard.visibility = View.GONE
+                    }
+
+                    override fun onError(e: Exception?) {
+                    }
+
+                }
+            )
+
 
         holder.cView.setOnClickListener {
             val intent = Intent(context, PageActivity::class.java)
