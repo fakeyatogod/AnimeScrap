@@ -19,7 +19,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainBottomNav" />
+        <activity
+            android:name=".MainBottomNav"
+            android:theme="@style/Theme.AnimeScrap" />
         <activity
             android:name=".LinksActivity"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden"

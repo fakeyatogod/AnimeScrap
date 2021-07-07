@@ -23,7 +23,7 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
         val itemImage: ImageView = itemView.findViewById(R.id.imageView)
         val cView: com.google.android.material.card.MaterialCardView =
             itemView.findViewById(R.id.cView)
-        val progressInCard = itemView.findViewById<CircularProgressIndicator>(R.id.progressInCard)
+        val progressInCard: CircularProgressIndicator = itemView.findViewById(R.id.progressInCard)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
