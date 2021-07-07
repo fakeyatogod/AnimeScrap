@@ -30,8 +30,8 @@ class FavoriteFragment : Fragment() {
 
         _binding = FragmentFavoriteBinding.inflate(inflater, container, false)
 
-        _binding!!.progressbarInMain.visibility = View.VISIBLE
-        _binding!!.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+        binding.progressbarInMain.visibility = View.VISIBLE
+        binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
         val db = Room.databaseBuilder(
             activity as Context, LinksRoomDatabase::class.java, "link-db"
@@ -55,9 +55,9 @@ class FavoriteFragment : Fragment() {
             }
 
             activity?.runOnUiThread {
-                _binding!!.progressbarInMain.visibility = View.GONE
-                _binding!!.recyclerView.adapter = RecyclerAdapter(activity as Context, picInfo)
-                _binding!!.recyclerView.setHasFixedSize(true)
+                binding.progressbarInMain.visibility = View.GONE
+                binding.recyclerView.adapter = RecyclerAdapter(activity as Context, picInfo)
+                binding.recyclerView.setHasFixedSize(true)
             }
         }.start()
 

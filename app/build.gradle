@@ -62,10 +62,14 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.14.1'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.1")
+    implementation('com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4')
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
+
     // Room components
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
