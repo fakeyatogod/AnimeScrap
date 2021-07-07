@@ -7,9 +7,9 @@
     tools:viewBindingIgnore="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pageLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/pageLayout">
+        android:layout_height="match_parent">
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/coverAnimeCard"

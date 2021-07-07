@@ -8,6 +8,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.room.Room
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.core.Headers
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.model.AnimeDetails
@@ -168,47 +171,61 @@ class PageActivity : AppCompatActivity() {
                     val arrayLinks: ArrayList<String> = ArrayList()
                     val arrayLinksNames: ArrayList<String> = ArrayList()
 
-                    var streamAniLink: String?
-                    var tries = 1
-                    do {
-                        streamAniLink = Jsoup.connect(animeEpUrl)
-                            .get().getElementsByClass("anime-download").attr("href")
-                        println("Try $tries")
-                        tries += 1
-                    } while (streamAniLink == null)
-
-                    val downloadStreamAniLink = streamAniLink.replaceBefore(
-                        "?id=",
-                        "https://streamani.net/download"
-                    )
+                    val streamAniLink = "https:" + Jsoup.connect(animeEpUrl)
+                        .get().getElementById("main-embed").attr("src")
                     println(streamAniLink)
-                    println(downloadStreamAniLink)
 
-                    val gogoLink = Jsoup.connect(downloadStreamAniLink).get()
-                    val downloadLinks = gogoLink.getElementsByClass("dowload")
+                    val mapOfHeaders = mutableMapOf(
+                        "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                        "Accept-Encoding" to "gzip, deflate, br",
+                        "Accept-Language" to "en-US,en;q=0.5",
+                        "Connection" to "keep-alive",
+                        "Upgrade-Insecure-Requests" to "1",
+                        "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
+                        "Host" to "yugenani.me",
+                        "TE" to "Trailers",
+                        "Origin" to "https://yugenani.me",
+                        "X-Requested-With" to "XMLHttpRequest",
+                        "Referer" to streamAniLink
+                    )
 
-                    println(gogoLink)
-                    println(downloadLinks)
+                    val apiRequest = "https://yugenani.me/api/embed/"
 
-                    for (i in downloadLinks) {
-                        arrayLinks.add(
-                            i.getElementsByTag("a").text().toString()
-                                .replace("Download", "")
-                        )
-                        arrayLinksNames.add(i.getElementsByTag("a").attr("href").toString())
+                    Fuel.get(streamAniLink).header(mapOfHeaders)
+                        .response { _, response, _ ->
+                            val cookie = response.headers["Set-Cookie"].first()
+                            val id = streamAniLink.split("/")
+                            val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
+                            println(dataMap)
 
-                    }
+                            Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
+                                .header(Headers.COOKIE to cookie)
+                                .response { _, _, results ->
+                                    val (bytes, _) = results
+                                    if (bytes != null) {
+                                        val json = ObjectMapper().readTree(String(bytes))
+                                        println(json)
+                                        val link = json["multi"][0]["src"].asText()
+                                        val linkName = json["multi"][0]["size"].asText()
+                                        arrayLinks.add(link)
+                                        arrayLinksNames.add(linkName)
+                                        println(arrayLinks)
+                                        println(arrayLinksNames)
+                                        runOnUiThread {
+                                            Intent(this, LinksActivity::class.java).apply {
+                                                putExtra("nameOfLinks", arrayLinksNames)
+                                                putExtra("theLinks", arrayLinks)
+                                                startActivity(this)
+                                                progressBar.visibility = View.GONE
+                                                pageLayout.visibility = View.VISIBLE
+                                            }
 
-                    runOnUiThread {
-                        val intent = Intent(this, LinksActivity::class.java)
-                        intent.putExtra("nameOfLinks", arrayLinks)
-                        intent.putExtra("theLinks", arrayLinksNames)
-                        startActivity(intent)
+                                        }
+                                    }
+                                }
 
-                        progressBar.visibility = View.GONE
-                        pageLayout.visibility = View.VISIBLE
+                        }
 
-                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

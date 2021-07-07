@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/myExoPlayerLayout"
     android:layout_width="match_parent"
@@ -7,14 +8,23 @@
     android:background="@color/black"
     android:orientation="vertical"
     tools:context=".LinksActivity"
-    tools:viewBindingIgnore="true"
-    tools:ignore="Overdraw">
+    tools:ignore="Overdraw"
+    tools:viewBindingIgnore="true">
 
     <com.google.android.exoplayer2.ui.PlayerView
         android:id="@+id/exoPlayerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:background="@android:color/background_dark"
+        app:controller_layout_id="@layout/custom_controller"
+        app:fastforward_increment="10000"
+        app:hide_on_touch="true"
+        app:player_layout_id="@layout/exo_player_view"
+        app:resize_mode="fit"
+        app:rewind_increment="10000"
+        app:show_timeout="5000"
+        app:use_controller="true" />
 
 </LinearLayout>
 

@@ -14,7 +14,7 @@
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/bg_color</item>
     </style>
-    
+
     <style name="Theme.AnimeScrap.Page" parent="Theme.AnimeScrap">
         <item name="android:navigationBarColor">@color/black</item>
     </style>

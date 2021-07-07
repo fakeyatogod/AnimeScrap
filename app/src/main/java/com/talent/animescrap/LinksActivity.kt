@@ -19,10 +19,10 @@ class LinksActivity : AppCompatActivity() {
 
         if (intent != null) {
 
-            val linksNamesArray = intent.getStringArrayListExtra("nameOfLinks")
-            val linksArray = intent.getStringArrayListExtra("theLinks")
+            val linksNamesArray = intent.getStringArrayListExtra("nameOfLinks") as ArrayList<String>
+            val linksArray = intent.getStringArrayListExtra("theLinks") as ArrayList<String>
             println(linksNamesArray)
-            println(linksArray?.get(0))
+            println(linksArray[0])
 
             simpleExoPlayer = SimpleExoPlayer.Builder(this).build()
 
@@ -30,7 +30,7 @@ class LinksActivity : AppCompatActivity() {
             playerView.keepScreenOn = true
             playerView.player = simpleExoPlayer
 
-            val mediaItem: MediaItem = MediaItem.fromUri(linksArray?.get(0)?.toString().toString())
+            val mediaItem: MediaItem = MediaItem.fromUri(linksArray[0])
             simpleExoPlayer.setMediaItem(mediaItem)
             simpleExoPlayer.prepare()
             simpleExoPlayer.play()

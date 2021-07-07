@@ -23,10 +23,11 @@
         <activity
             android:name=".LinksActivity"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden"
-            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen"
-            android:screenOrientation="landscape"/>
-        <activity android:name=".PageActivity"
-            android:theme="@style/Theme.AnimeScrap.Page"/>
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen" />
+        <activity
+            android:name=".PageActivity"
+            android:theme="@style/Theme.AnimeScrap.Page" />
     </application>
 
 </manifest>

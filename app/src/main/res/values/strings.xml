@@ -13,4 +13,9 @@
     <string name="image_title">IMAGE TITLE</string>
     <string name="splash_c2_image">Splash C2 Image</string>
     <string name="synopsis_header_title">Synopsis:</string>
+    <string name="video_name">videoName</string>
+    <string name="back_to_home">back to home</string>
+    <string name="rotate_display">rotate display</string>
+    <string name="display_scale">Display scale</string>
+    <string name="unlock">unlock</string>
 </resources>
