@@ -14,7 +14,7 @@ import com.github.kittinunf.fuel.core.Headers
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.room.FavLinks
+import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinksRoomDatabase
 import org.jsoup.Jsoup
 
@@ -24,6 +24,7 @@ class PageActivity : AppCompatActivity() {
     private var contentLink: String? = "null"
     private lateinit var pageLayout: ConstraintLayout
     private lateinit var progressBar: CircularProgressIndicator
+    private lateinit var animeModel: AnimeDetails
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,20 +47,20 @@ class PageActivity : AppCompatActivity() {
 
         val db = Room.databaseBuilder(
             applicationContext,
-            LinksRoomDatabase::class.java, "link-db"
+            LinksRoomDatabase::class.java, "fav-db"
         ).build()
         val linkDao = db.linkDao()
 
         Thread {
 
-            val favLinks = linkDao.getLinks()
-            println(favLinks)
+            val favList = linkDao.getLinks()
+            println(favList)
             var isFav = false
-            var foundFav = FavLinks("null")
-            for (i in favLinks) {
-                if (i.linkString == contentLink) {
+            var foundFav = FavRoomModel("null", "null", "null")
+            for (fav in favList) {
+                if (fav.linkString == contentLink) {
                     isFav = true
-                    foundFav = i
+                    foundFav = fav
                     break
                 }
             }
@@ -79,7 +80,13 @@ class PageActivity : AppCompatActivity() {
                     buttonFavorite.text = getString(R.string.add_to_favorite)
                     buttonFavorite.setOnClickListener {
                         Thread {
-                            linkDao.insert(FavLinks(contentLink.toString()))
+                            linkDao.insert(
+                                FavRoomModel(
+                                    contentLink.toString(),
+                                    animeModel.animeCover,
+                                    animeModel.animeName
+                                )
+                            )
                             runOnUiThread {
                                 buttonFavorite.text = getString(R.string.remove_from_favorite)
                             }
@@ -107,13 +114,13 @@ class PageActivity : AppCompatActivity() {
             val animeEpContent = doc.getElementsByClass("box p-10 p-15 m-15-b anime-metadetails")
                 .select("div:nth-child(6)").select("span").text()
             val animeCover = doc.getElementsByClass("cover").attr("src")
-            val animeDetails = arrayListOf<String>()
-            for (element in animeContent) {
-                animeDetails.add(element.text())
-            }
+            val animeName = animeContent.first().text()
+            val animDesc = animeContent[1].text()
 
-            val animeModel =
-                AnimeDetails(animeDetails[0], animeDetails[1], animeCover, animeEpContent)
+            println(animeContent)
+
+            animeModel =
+                AnimeDetails(animeName, animDesc, animeCover, animeEpContent)
 
             runOnUiThread {
 

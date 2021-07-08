@@ -5,15 +5,12 @@ import androidx.room.*
 @Dao
 interface LinkDao {
     @Query("SELECT * FROM fav_table")
-    fun getLinks(): List<FavLinks>
+    fun getLinks(): List<FavRoomModel>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(fav: FavLinks)
-
-    @Query("DELETE FROM fav_table")
-    fun deleteAll()
+    fun insert(fav: FavRoomModel)
 
     @Delete
-    fun deleteOne(fav: FavLinks)
+    fun deleteOne(fav: FavRoomModel)
 
 }

@@ -1,0 +1,46 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "3faf319f6e2d4a27d936dc0c9ea3a5ef",
+    "entities": [
+      {
+        "tableName": "fav_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`favLink` TEXT NOT NULL, `favPic` TEXT NOT NULL, `favName` TEXT NOT NULL, PRIMARY KEY(`favLink`))",
+        "fields": [
+          {
+            "fieldPath": "linkString",
+            "columnName": "favLink",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "picLinkString",
+            "columnName": "favPic",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nameString",
+            "columnName": "favName",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "favLink"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3faf319f6e2d4a27d936dc0c9ea3a5ef')"
+    ]
+  }
+}

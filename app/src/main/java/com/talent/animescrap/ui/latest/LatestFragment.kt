@@ -33,7 +33,7 @@ class LatestFragment : Fragment() {
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        latestViewModel.animeLatestList.observe(viewLifecycleOwner,{
+        latestViewModel.animeLatestList.observe(viewLifecycleOwner, {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)

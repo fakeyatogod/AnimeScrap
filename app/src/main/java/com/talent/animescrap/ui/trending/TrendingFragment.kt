@@ -33,7 +33,7 @@ class TrendingFragment : Fragment() {
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        trendingViewModel.animeTrendingList.observe(viewLifecycleOwner,{
+        trendingViewModel.animeTrendingList.observe(viewLifecycleOwner, {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
