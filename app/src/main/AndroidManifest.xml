@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AnimeScrap">
         <activity
-            android:name=".SplashActivity"
+            android:name=".ui.activities.SplashActivity"
             android:theme="@style/Theme.AnimeScrap.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -20,15 +20,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainBottomNav"
+            android:name=".ui.activities.MainActivity"
             android:theme="@style/Theme.AnimeScrap" />
         <activity
-            android:name=".LinksActivity"
+            android:name=".ui.activities.PlayerActivity"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden"
-            android:screenOrientation="landscape"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen" />
         <activity
-            android:name=".PageActivity"
+            android:name=".ui.activities.PageActivity"
             android:theme="@style/Theme.AnimeScrap.Page" />
     </application>
 

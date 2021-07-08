@@ -1,5 +1,7 @@
-package com.talent.animescrap
+package com.talent.animescrap.ui.activities
 
+import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -8,19 +10,34 @@ import android.view.WindowInsets
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
+import com.talent.animescrap.R
 
 
-class LinksActivity : AppCompatActivity() {
+class PlayerActivity : AppCompatActivity() {
 
     private lateinit var simpleExoPlayer: SimpleExoPlayer
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_links)
+        setContentView(R.layout.activity_player)
+        val youTubeDoubleTap : YouTubeOverlay = findViewById(R.id.youtube_overlay)
+        youTubeDoubleTap
+            .performListener(object : YouTubeOverlay.PerformListener {
+                override fun onAnimationStart() {
+                    // Do UI changes when circle scaling animation starts (e.g. hide controller views)
+                    youTubeDoubleTap.visibility = View.VISIBLE
+                }
 
+                override fun onAnimationEnd() {
+                    // Do UI changes when circle scaling animation starts (e.g. show controller views)
+                    youTubeDoubleTap.visibility = View.GONE
+                }
+            })
         val linksNamesArray = intent.getStringArrayListExtra("nameOfLinks") as ArrayList<String>
         val linksArray = intent.getStringArrayListExtra("theLinks") as ArrayList<String>
         println(linksNamesArray)
@@ -34,90 +51,72 @@ class LinksActivity : AppCompatActivity() {
 
         val btnScale = playerView.findViewById<ImageView>(R.id.btn_fullscreen)
         val centerText = playerView.findViewById<TextView>(R.id.centerText)
+        val rotate = playerView.findViewById<ImageView>(R.id.rotate)
 
+        // Back Button
+        playerView.findViewById<ImageView>(R.id.back).apply {
+            setOnClickListener {
+                onBackPressed()
+            }
+        }
         val mediaItem: MediaItem = MediaItem.fromUri(linksArray[0])
         simpleExoPlayer.setMediaItem(mediaItem)
         simpleExoPlayer.prepare()
         simpleExoPlayer.play()
+        youTubeDoubleTap.player(simpleExoPlayer)
 
+        // For Screen Rotation
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        var flag = false
+        rotate.setOnClickListener {
 
+            if (flag) {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                flag = false
+            } else {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                flag = true
+
+            }
+        }
+
+        // Fullscreen controls
         var clickCount = 0
         btnScale.setOnClickListener {
+            val centerTextTimer = object : CountDownTimer(500, 1000) {
+                override fun onTick(millisUntilFinished: Long) {}
+                override fun onFinish() {
+                    centerText.visibility = View.GONE
+                }
+            }
             when (clickCount) {
                 0 -> {
                     playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                     centerText.visibility = View.VISIBLE
                     centerText.text = getString(R.string.zoom)
-                    object : CountDownTimer(500, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {//running functionality for now its no use
-                        }
-
-                        override fun onFinish() {
-                            centerText.visibility = View.GONE
-                        }
-                    }.start()
+                    centerTextTimer.start()
                     btnScale.setImageResource(R.drawable.ic_baseline_zoom_out_map_24)
-
-
                 }
                 1 -> {
                     playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
                     centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.fillToScreen)
-                    object : CountDownTimer(500, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {//running functionality for now its no use
-                        }
-
-                        override fun onFinish() {
-                            centerText.visibility = View.GONE
-                        }
-                    }.start()
+                    centerText.text = getString(R.string.stretched)
+                    centerTextTimer.start()
                     btnScale.setImageResource(R.drawable.ic_baseline_fullscreen_24)
                 }
                 2 -> {
                     playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
                     centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.stretched)
-                    object : CountDownTimer(500, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {//running functionality for now its no use
-                        }
-
-                        override fun onFinish() {
-                            centerText.visibility = View.GONE
-                        }
-                    }.start()
-                    btnScale.setImageResource(R.drawable.ic_baseline_open_with_24)
-
-                }
-                3 -> {
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-                    centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.hundred)
-                    object : CountDownTimer(500, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {//running functionality for now its no use
-                        }
-
-                        override fun onFinish() {
-                            centerText.visibility = View.GONE
-                        }
-                    }.start()
+                    centerText.text = getString(R.string.height_fit)
+                    centerTextTimer.start()
                     btnScale.setImageResource(R.drawable.ic_baseline_height_24)
 
                 }
-                4 -> {
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                3 -> {
                     playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
                     centerText.visibility = View.VISIBLE
                     centerText.text = getString(R.string.width)
-                    object : CountDownTimer(500, 1000) {
-                        override fun onTick(millisUntilFinished: Long) {//running functionality for now its no use
-                        }
-
-                        override fun onFinish() {
-                            centerText.visibility = View.GONE
-                        }
-                    }.start()
+                    centerTextTimer.start()
                     btnScale.setImageResource(R.drawable.ic_baseline_switch_video_24)
                 }
                 else -> {

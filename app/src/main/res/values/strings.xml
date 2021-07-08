@@ -21,6 +21,6 @@
     <string name="zoom">ZOOM</string>
     <string name="fillToScreen">FILL TO SCREEN</string>
     <string name="stretched">STRETCHED</string>
-    <string name="hundred">100%</string>
+    <string name="height_fit">HEIGHT FIT</string>
     <string name="width">WIDTH FIT</string>
 </resources>

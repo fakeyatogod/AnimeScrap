@@ -1,4 +1,4 @@
-package com.talent.animescrap
+package com.talent.animescrap.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +13,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.core.Headers
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Picasso
+import com.talent.animescrap.R
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinksRoomDatabase
@@ -180,6 +181,7 @@ class PageActivity : AppCompatActivity() {
 
                     val streamAniLink = "https:" + Jsoup.connect(animeEpUrl)
                         .get().getElementById("main-embed").attr("src")
+
                     println(streamAniLink)
 
                     val mapOfHeaders = mutableMapOf(
@@ -219,7 +221,7 @@ class PageActivity : AppCompatActivity() {
                                         println(arrayLinks)
                                         println(arrayLinksNames)
                                         runOnUiThread {
-                                            Intent(this, LinksActivity::class.java).apply {
+                                            Intent(this, PlayerActivity::class.java).apply {
                                                 putExtra("nameOfLinks", arrayLinksNames)
                                                 putExtra("theLinks", arrayLinks)
                                                 startActivity(this)

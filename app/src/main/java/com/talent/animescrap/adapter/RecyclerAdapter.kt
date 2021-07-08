@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import com.talent.animescrap.PageActivity
+import com.talent.animescrap.ui.activities.PageActivity
 import com.talent.animescrap.R
 import com.talent.animescrap.model.Photos
 

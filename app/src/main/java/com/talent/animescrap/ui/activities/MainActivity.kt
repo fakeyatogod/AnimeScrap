@@ -1,4 +1,4 @@
-package com.talent.animescrap
+package com.talent.animescrap.ui.activities
 
 import android.os.Bundle
 import android.view.Menu
@@ -11,6 +11,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.talent.animescrap.R
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.ActivityMainBottomNavBinding
 import com.talent.animescrap.model.Photos
@@ -18,7 +19,7 @@ import org.jsoup.Jsoup
 import java.util.*
 
 
-class MainBottomNav : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBottomNavBinding
     private lateinit var searchView: SearchView
@@ -65,7 +66,7 @@ class MainBottomNav : AppCompatActivity() {
                     findViewById<BottomNavigationView>(R.id.nav_view).visibility = View.GONE
                     val recyclerView = binding.recyclerView2
                     recyclerView.visibility = View.VISIBLE
-                    recyclerView.layoutManager = GridLayoutManager(this@MainBottomNav, 2)
+                    recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 2)
                     val searchUrl = "https://yugenani.me/search/?q=${newText2.replace(" ", "+")}"
                     println(searchUrl)
                     Thread {
@@ -81,7 +82,7 @@ class MainBottomNav : AppCompatActivity() {
                         }
 
                         runOnUiThread {
-                            recyclerView.adapter = RecyclerAdapter(this@MainBottomNav, picInfo)
+                            recyclerView.adapter = RecyclerAdapter(this@MainActivity, picInfo)
                             recyclerView.setHasFixedSize(true)
                         }
                     }.start()

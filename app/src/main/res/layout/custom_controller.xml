@@ -168,6 +168,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
         android:contentDescription="@string/unlock"
+        android:visibility="invisible"
         android:src="@drawable/ic_baseline_lock_open_24" />
 
 </RelativeLayout>
