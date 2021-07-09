@@ -25,19 +25,6 @@
         app:rewind_increment="10000"
         app:show_timeout="5000"
         app:use_controller="true" />
-
-    <com.github.vkay94.dtpv.DoubleTapPlayerView
-        android:id="@+id/playerView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:dtpv_controller="@+id/youtube_overlay" />
-
-    <com.github.vkay94.dtpv.youtube.YouTubeOverlay
-        android:id="@+id/youtube_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:yt_playerView="@+id/playerView" />
 </LinearLayout>
 
 

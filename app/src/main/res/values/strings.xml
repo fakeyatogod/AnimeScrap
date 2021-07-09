@@ -4,7 +4,6 @@
     <string name="title_trending">Trending</string>
     <string name="title_latest">Latest</string>
     <string name="title_favorite">Favorite</string>
-    <string name="fav_shared_preferences_file">favorites_shared_prefs</string>
     <string name="title_search">Search</string>
     <string name="watch">Watch</string>
     <string name="add_to_favorite">Add to Favorite</string>
@@ -13,14 +12,11 @@
     <string name="image_title">IMAGE TITLE</string>
     <string name="splash_c2_image">Splash C2 Image</string>
     <string name="synopsis_header_title">Synopsis:</string>
-    <string name="video_name">videoName</string>
     <string name="back_to_home">back to home</string>
     <string name="rotate_display">rotate display</string>
     <string name="display_scale">Display scale</string>
     <string name="unlock">unlock</string>
     <string name="zoom">ZOOM</string>
-    <string name="fillToScreen">FILL TO SCREEN</string>
     <string name="stretched">STRETCHED</string>
-    <string name="height_fit">HEIGHT FIT</string>
-    <string name="width">WIDTH FIT</string>
+    <string name="height_fit">FIT</string>
 </resources>

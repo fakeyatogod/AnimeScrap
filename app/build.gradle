@@ -69,7 +69,6 @@ dependencies {
     implementation('com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4')
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
-    implementation 'com.github.vkay94:DoubleTapPlayerView:1.0.2'
     // Room components
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"

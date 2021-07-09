@@ -10,7 +10,6 @@ import android.view.WindowInsets
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.github.vkay94.dtpv.youtube.YouTubeOverlay
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
@@ -25,19 +24,7 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-        val youTubeDoubleTap : YouTubeOverlay = findViewById(R.id.youtube_overlay)
-        youTubeDoubleTap
-            .performListener(object : YouTubeOverlay.PerformListener {
-                override fun onAnimationStart() {
-                    // Do UI changes when circle scaling animation starts (e.g. hide controller views)
-                    youTubeDoubleTap.visibility = View.VISIBLE
-                }
 
-                override fun onAnimationEnd() {
-                    // Do UI changes when circle scaling animation starts (e.g. show controller views)
-                    youTubeDoubleTap.visibility = View.GONE
-                }
-            })
         val linksNamesArray = intent.getStringArrayListExtra("nameOfLinks") as ArrayList<String>
         val linksArray = intent.getStringArrayListExtra("theLinks") as ArrayList<String>
         println(linksNamesArray)
@@ -63,7 +50,6 @@ class PlayerActivity : AppCompatActivity() {
         simpleExoPlayer.setMediaItem(mediaItem)
         simpleExoPlayer.prepare()
         simpleExoPlayer.play()
-        youTubeDoubleTap.player(simpleExoPlayer)
 
         // For Screen Rotation
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
@@ -110,14 +96,6 @@ class PlayerActivity : AppCompatActivity() {
                     centerText.text = getString(R.string.height_fit)
                     centerTextTimer.start()
                     btnScale.setImageResource(R.drawable.ic_baseline_height_24)
-
-                }
-                3 -> {
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
-                    centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.width)
-                    centerTextTimer.start()
-                    btnScale.setImageResource(R.drawable.ic_baseline_switch_video_24)
                 }
                 else -> {
                     clickCount = -1
