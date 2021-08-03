@@ -32,7 +32,7 @@ class LatestViewModel : ViewModel() {
         val doc = Jsoup.connect(url).get()
         val allInfo = doc.getElementsByClass("ep-card")
         for (item in allInfo) {
-            val itemImage = item.getElementsByTag("img").attr("src")
+            val itemImage = item.getElementsByClass("ep-origin-img")[0].getElementsByTag("img").attr("data-src")
             val itemName = item.getElementsByClass("ep-details").attr("alt")
             val itemLink = item.getElementsByClass("ep-details").attr("href")
             val picObject = Photos(itemName, itemImage, itemLink)
