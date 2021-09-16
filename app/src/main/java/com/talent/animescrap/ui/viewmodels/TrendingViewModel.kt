@@ -27,7 +27,7 @@ class TrendingViewModel : ViewModel() {
 
     private fun getTrendingAnime() {
         val picInfo = arrayListOf<Photos>()
-        val url = "https://yugenani.me/trending/"
+        val url = "https://yugen.to/trending/"
 
         val doc = Jsoup.connect(url).get()
         val allInfo = doc.getElementsByClass("anime-meta")

@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                     val recyclerView = binding.recyclerView2
                     recyclerView.visibility = View.VISIBLE
                     recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 2)
-                    val searchUrl = "https://yugenani.me/search/?q=${newText2.replace(" ", "+")}"
+                    val searchUrl = "https://yugen.to/search/?q=${newText2.replace(" ", "+")}"
                     println(searchUrl)
                     Thread {
                         val picInfo = arrayListOf<Photos>()

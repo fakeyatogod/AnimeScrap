@@ -109,7 +109,7 @@ class PageActivity : AppCompatActivity() {
 
         Thread {
 
-            val url = "https://yugenani.me${contentLink}watch/?sort=episode"
+            val url = "https://yugen.to${contentLink}watch/?sort=episode"
             val doc = Jsoup.connect(url).get()
             val animeContent = doc.getElementsByClass("p-10-t")
             val animeEpContent = doc.getElementsByClass("box p-10 p-15 m-15-b anime-metadetails")
@@ -175,7 +175,7 @@ class PageActivity : AppCompatActivity() {
 
             var watchLink = contentLink
             watchLink = watchLink?.replace("anime", "watch")
-            val animeEpUrl = "https://yugenani.me${watchLink}${spinner.selectedItem}"
+            val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"
 
             Thread {
                 try {
@@ -183,31 +183,31 @@ class PageActivity : AppCompatActivity() {
                     val arrayLinks: ArrayList<String> = ArrayList()
                     val arrayLinksNames: ArrayList<String> = ArrayList()
 
-                    val streamAniLink = "https:" + Jsoup.connect(animeEpUrl)
+                    val yugenEmbedLink = "https:" + Jsoup.connect(animeEpUrl)
                         .get().getElementById("main-embed").attr("src")
 
-                    println(streamAniLink)
+                    println(yugenEmbedLink)
 
                     val mapOfHeaders = mutableMapOf(
                         "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                        "Accept-Encoding" to "gzip, deflate, br",
+                        "Accept-Encoding" to "gzip, deflate",
                         "Accept-Language" to "en-US,en;q=0.5",
                         "Connection" to "keep-alive",
                         "Upgrade-Insecure-Requests" to "1",
                         "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
-                        "Host" to "yugenani.me",
+                        "Host" to "yugen.to",
                         "TE" to "Trailers",
-                        "Origin" to "https://yugenani.me",
+                        "Origin" to "https://yugen.to",
                         "X-Requested-With" to "XMLHttpRequest",
-                        "Referer" to streamAniLink
+                        "Referer" to yugenEmbedLink
                     )
 
-                    val apiRequest = "https://yugenani.me/api/embed/"
+                    val apiRequest = "https://yugen.to/api/embed/"
 
-                    Fuel.get(streamAniLink).header(mapOfHeaders)
+                    Fuel.get(yugenEmbedLink).header(mapOfHeaders)
                         .response { _, response, _ ->
                             val cookie = response.headers["Set-Cookie"].first()
-                            val id = streamAniLink.split("/")
+                            val id = yugenEmbedLink.split("/")
                             val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
                             println(dataMap)
 

@@ -27,7 +27,7 @@ class LatestViewModel : ViewModel() {
 
     private fun getLatestAnime() {
         val picInfo = arrayListOf<Photos>()
-        val url = "https://yugenani.me/latest/"
+        val url = "https://yugen.to/latest/"
 
         val doc = Jsoup.connect(url).get()
         val allInfo = doc.getElementsByClass("ep-card")
