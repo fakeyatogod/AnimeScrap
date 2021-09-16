@@ -19,4 +19,5 @@
     <string name="zoom">ZOOM</string>
     <string name="stretched">STRETCHED</string>
     <string name="height_fit">FIT</string>
+    <string name="not_started_yet">Not Started Yet</string>
 </resources>

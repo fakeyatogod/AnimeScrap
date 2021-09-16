@@ -1,6 +1,7 @@
 package com.talent.animescrap.ui.activities
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.View
@@ -26,7 +27,7 @@ class PageActivity : AppCompatActivity() {
     private lateinit var pageLayout: ConstraintLayout
     private lateinit var progressBar: CircularProgressIndicator
     private lateinit var animeModel: AnimeDetails
-
+    private lateinit var sharedPreferences : SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
@@ -42,6 +43,12 @@ class PageActivity : AppCompatActivity() {
             finish()
             Toast.makeText(this, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
         }
+
+        sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
+        val lastWatchedText = findViewById<TextView>(R.id.lastWatched)
+        val lastWatchedPref = sharedPreferences.getString(contentLink, "Not Started Yet")
+        lastWatchedText.text =
+            if (lastWatchedPref == "Not Started Yet") lastWatchedPref else "Last Watched : $lastWatchedPref"
 
         pageLayout = findViewById(R.id.pageLayout)
         val buttonFavorite = findViewById<Button>(R.id.button_favorite)
@@ -173,6 +180,8 @@ class PageActivity : AppCompatActivity() {
             pageLayout.visibility = View.GONE
             progressBar.visibility = View.VISIBLE
 
+            sharedPreferences.edit()
+                .putString(contentLink, spinner.selectedItem.toString()).apply()
             var watchLink = contentLink
             watchLink = watchLink?.replace("anime", "watch")
             val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"
@@ -247,6 +256,5 @@ class PageActivity : AppCompatActivity() {
 
         }
     }
-
 
 }
