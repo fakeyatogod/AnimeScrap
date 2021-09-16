@@ -182,6 +182,13 @@ class PageActivity : AppCompatActivity() {
 
             sharedPreferences.edit()
                 .putString(contentLink, spinner.selectedItem.toString()).apply()
+
+            sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
+            val lastWatchedText = findViewById<TextView>(R.id.lastWatched)
+            val lastWatchedPref = sharedPreferences.getString(contentLink, "Not Started Yet")
+            lastWatchedText.text =
+                if (lastWatchedPref == "Not Started Yet") lastWatchedPref else "Last Watched : $lastWatchedPref"
+
             var watchLink = contentLink
             watchLink = watchLink?.replace("anime", "watch")
             val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"

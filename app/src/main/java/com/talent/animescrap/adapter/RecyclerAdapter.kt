@@ -1,5 +1,6 @@
 package com.talent.animescrap.adapter
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -56,6 +57,7 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
             intent.putExtra("content_link", pic.resLink)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             context.startActivity(intent)
+            (context as Activity).overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out)
         }
 
     }
