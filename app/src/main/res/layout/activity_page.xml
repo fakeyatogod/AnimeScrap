@@ -50,7 +50,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:orientation="horizontal"
             android:padding="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -60,6 +59,7 @@
                 android:id="@+id/episodeSpinner"
                 android:layout_width="150dp"
                 android:layout_height="50dp"
+                android:contentDescription="@string/select_episode"
                 android:textAlignment="center" />
 
             <Button
