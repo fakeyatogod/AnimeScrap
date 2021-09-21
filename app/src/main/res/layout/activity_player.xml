@@ -24,7 +24,9 @@
         app:resize_mode="fit"
         app:rewind_increment="10000"
         app:show_timeout="5000"
-        app:use_controller="true" />
+        app:use_controller="true"
+        app:show_buffering="always"
+        android:animateLayoutChanges="true"/>
 </LinearLayout>
 
 

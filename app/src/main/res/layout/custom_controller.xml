@@ -6,6 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/gradient_shape" />
+
     <RelativeLayout
         android:id="@+id/root"
         android:layout_width="match_parent"
@@ -18,9 +23,9 @@
             android:layout_centerInParent="true"
             android:fontFamily="sans-serif-condensed-medium"
             android:text="@string/app_name"
+            android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="35sp"
-            android:textAllCaps="true"
             android:textStyle="bold"
             android:visibility="gone" />
 
@@ -52,15 +57,6 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/rotate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginStart="10dp"
-            android:contentDescription="@string/rotate_display"
-            android:src="@drawable/ic_baseline_screen_rotation_24" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,6 +73,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="10dp"
+                    android:text="@string/_0_00"
                     android:textColor="@android:color/white" />
 
                 <TextView
@@ -85,7 +82,8 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="10dp"
-                    android:textColor="#CBCDC8"
+                    android:text="@string/_0_00"
+                    android:textColor="@android:color/white"
                     tools:ignore="RelativeOverlap" />
             </RelativeLayout>
 
@@ -96,7 +94,8 @@
                 android:layout_marginTop="8dp"
                 app:buffered_color="#A4A4A4"
                 app:played_color="#FF0000"
-                app:unplayed_color="#444444" />
+                app:unplayed_color="#444444"
+                android:contentDescription="@string/timer_bar"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -147,6 +146,16 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:id="@+id/rotate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginTop="10dp"
+                    android:contentDescription="@string/rotate_display"
+                    android:src="@drawable/ic_baseline_screen_rotation_24" />
+
+                <ImageView
                     android:id="@+id/btn_fullscreen"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -168,7 +177,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginBottom="20dp"
         android:contentDescription="@string/unlock"
-        android:visibility="invisible"
-        android:src="@drawable/ic_baseline_lock_open_24" />
+        android:src="@drawable/ic_baseline_lock_open_24"
+        android:visibility="invisible" />
 
 </RelativeLayout>

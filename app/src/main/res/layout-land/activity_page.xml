@@ -11,125 +11,134 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/coverAnimeCard"
-            android:layout_width="150dp"
-            android:layout_height="200dp"
-            android:layout_margin="50dp"
-            app:cardCornerRadius="8dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:gravity="center">
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/coverAnimeCard"
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:id="@+id/coverAnime"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:contentDescription="@string/cover_of_anime"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_broken_image" />
+        <ImageView
+            android:id="@+id/coverAnime"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:contentDescription="@string/cover_of_anime"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_broken_image" />
 
-        </com.google.android.material.card.MaterialCardView>
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintStart_toEndOf="@id/coverAnimeCard"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/linearLayoutE">
+
+        <TextView
+            android:id="@+id/content_link"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="5dp"
+            android:padding="10dp"
+            android:text="@string/app_name"
+            android:textAlignment="center"
+            android:fontFamily="sans-serif-black"/>
+
         <LinearLayout
+            android:id="@+id/linearLayout5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintStart_toEndOf="@id/coverAnimeCard"
-            android:gravity="center"
-            app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/linearLayoutE">
+            android:layout_gravity="center"
+            android:padding="4dp">
 
-            <TextView
-                android:id="@+id/content_link"
-                android:layout_width="200dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="5dp"
-                android:padding="10dp"
-                android:text="@string/app_name"
-                android:textAlignment="center"
-                android:textSize="30sp"/>
-
-            <LinearLayout
-                android:id="@+id/linearLayout5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:padding="4dp">
-
-                <Spinner
-                    android:id="@+id/episodeSpinner"
-                    android:layout_width="150dp"
-                    android:layout_height="50dp"
-                    android:contentDescription="@string/select_episode"
-                    android:textAlignment="center" />
-
-                <Button
-                    android:id="@+id/episodeButtonForSpinner"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/watch" />
-            </LinearLayout>
+            <Spinner
+                android:id="@+id/episodeSpinner"
+                android:layout_width="150dp"
+                android:layout_height="50dp"
+                android:contentDescription="@string/select_episode"
+                android:textAlignment="center" />
 
             <Button
-                android:id="@+id/button_favorite"
+                android:id="@+id/episodeButtonForSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:text="@string/add_to_favorite" />
-
-            <TextView
-                android:id="@+id/lastWatched"
-                android:padding="4dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/not_started_yet"
-                android:textAllCaps="true"
-                android:fontFamily="sans-serif-condensed-medium"/>
+                android:text="@string/watch" />
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="240dp"
+        <Button
+            android:id="@+id/button_favorite"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:layout_margin="4dp"
+            android:text="@string/add_to_favorite" />
+
+        <TextView
+            android:id="@+id/lastWatched"
+            android:padding="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_started_yet"
+            android:textAllCaps="true"
+            android:fontFamily="sans-serif-condensed-medium"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="240dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_margin="10dp"
+        app:layout_constraintStart_toEndOf="@id/linearLayoutE"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/animeSynopsisHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:text="@string/synopsis_header_title"
+            android:layout_margin="5dp"
+            android:padding="10dp"
+            android:textAlignment="center" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
             android:layout_margin="10dp"
-            app:layout_constraintStart_toEndOf="@id/linearLayoutE"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:padding="10dp"
+            app:cardCornerRadius="8dp">
 
             <TextView
-                android:id="@+id/animeSynopsisHeader"
+                android:id="@+id/content_link_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:text="@string/synopsis_header_title"
-                android:layout_margin="5dp"
+                android:maxLines="10"
                 android:padding="10dp"
-                android:textAlignment="center"
-                android:textSize="20sp" />
+                android:scrollbars="vertical"
+                android:text="@string/app_name"
+                android:textAlignment="center" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_margin="10dp"
-                android:padding="10dp"
-                app:cardCornerRadius="8dp">
+        </com.google.android.material.card.MaterialCardView>
 
-                <TextView
-                    android:id="@+id/content_link_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="10"
-                    android:padding="10dp"
-                    android:scrollbars="vertical"
-                    android:text="@string/app_name"
-                    android:textAlignment="center"
-                    android:textSize="15sp" />
+    </LinearLayout>
 
-            </com.google.android.material.card.MaterialCardView>
+</LinearLayout>
 
-        </LinearLayout>
+
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -21,4 +21,6 @@
     <string name="height_fit">FIT</string>
     <string name="not_started_yet">Not Started Yet</string>
     <string name="select_episode">Select Episode</string>
+    <string name="_0_00">0:00</string>
+    <string name="timer_bar">timer bar</string>
 </resources>

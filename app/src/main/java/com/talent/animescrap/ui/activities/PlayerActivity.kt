@@ -50,7 +50,6 @@ class PlayerActivity : AppCompatActivity() {
         simpleExoPlayer.setMediaItem(mediaItem)
         simpleExoPlayer.prepare()
         simpleExoPlayer.play()
-
         // For Screen Rotation
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         var flag = false
@@ -76,32 +75,35 @@ class PlayerActivity : AppCompatActivity() {
                 }
             }
             when (clickCount) {
-                0 -> {
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                    centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.zoom)
-                    centerTextTimer.start()
-                    btnScale.setImageResource(R.drawable.ic_baseline_zoom_out_map_24)
-                }
                 1 -> {
                     playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
                     centerText.visibility = View.VISIBLE
                     centerText.text = getString(R.string.stretched)
                     centerTextTimer.start()
                     btnScale.setImageResource(R.drawable.ic_baseline_fullscreen_24)
+                    clickCount=2
                 }
                 2 -> {
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                    if(requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
+                        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                    }else{
+                        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+                    }
                     centerText.visibility = View.VISIBLE
                     centerText.text = getString(R.string.height_fit)
                     centerTextTimer.start()
                     btnScale.setImageResource(R.drawable.ic_baseline_height_24)
+                    clickCount=3
                 }
                 else -> {
-                    clickCount = -1
+                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                    centerText.visibility = View.VISIBLE
+                    centerText.text = getString(R.string.zoom)
+                    centerTextTimer.start()
+                    btnScale.setImageResource(R.drawable.ic_baseline_zoom_out_map_24)
+                    clickCount=1
                 }
             }
-            clickCount++
         }
 
     }
