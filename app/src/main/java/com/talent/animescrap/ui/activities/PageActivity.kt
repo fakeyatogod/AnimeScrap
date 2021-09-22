@@ -199,8 +199,11 @@ class PageActivity : AppCompatActivity() {
                     val arrayLinks: ArrayList<String> = ArrayList()
                     val arrayLinksNames: ArrayList<String> = ArrayList()
 
-                    val yugenEmbedLink = "https:" + Jsoup.connect(animeEpUrl)
+                    var yugenEmbedLink = Jsoup.connect(animeEpUrl)
                         .get().getElementById("main-embed").attr("src")
+                    if(!yugenEmbedLink.contains("https:")){
+                       yugenEmbedLink = "https:$yugenEmbedLink"
+                    }
 
                     println(yugenEmbedLink)
 
