@@ -27,7 +27,8 @@
                 android:layout_height="fill_parent"
                 android:contentDescription="@string/cover_of_anime"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_broken_image" />
+                android:src="@drawable/ic_broken_image"
+                android:transitionName="pageImageT"/>
 
         </com.google.android.material.card.MaterialCardView>
 

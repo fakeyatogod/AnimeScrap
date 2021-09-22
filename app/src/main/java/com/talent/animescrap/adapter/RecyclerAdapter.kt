@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.app.ActivityOptionsCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Callback
@@ -55,9 +56,9 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
         holder.cView.setOnClickListener {
             val intent = Intent(context, PageActivity::class.java)
             intent.putExtra("content_link", pic.resLink)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(intent)
-            (context as Activity).overridePendingTransition(R.anim.zoom_in, R.anim.zoom_out)
+
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation((context as Activity),holder.itemImage, "pageImageT")
+            context.startActivity(intent, options.toBundle())
         }
 
     }
