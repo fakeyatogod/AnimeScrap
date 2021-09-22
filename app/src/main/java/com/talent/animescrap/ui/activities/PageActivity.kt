@@ -11,7 +11,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.room.Room
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.core.Headers
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.R
@@ -27,7 +26,7 @@ class PageActivity : AppCompatActivity() {
     private lateinit var pageLayout: ConstraintLayout
     private lateinit var progressBar: CircularProgressIndicator
     private lateinit var animeModel: AnimeDetails
-    private lateinit var sharedPreferences : SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
@@ -121,7 +120,9 @@ class PageActivity : AppCompatActivity() {
             val animeContent = doc.getElementsByClass("p-10-t")
             val animeEpContent = doc.getElementsByClass("box p-10 p-15 m-15-b anime-metadetails")
                 .select("div:nth-child(6)").select("span").text()
-            val animeCover = doc.getElementsByClass("page-cover-inner").first().getElementsByTag("img").attr("data-src")
+            val animeCover =
+                doc.getElementsByClass("page-cover-inner").first().getElementsByTag("img")
+                    .attr("data-src")
             val animeName = animeContent.first().text()
             val animDesc = animeContent[1].text()
 
@@ -201,8 +202,8 @@ class PageActivity : AppCompatActivity() {
 
                     var yugenEmbedLink = Jsoup.connect(animeEpUrl)
                         .get().getElementById("main-embed").attr("src")
-                    if(!yugenEmbedLink.contains("https:")){
-                       yugenEmbedLink = "https:$yugenEmbedLink"
+                    if (!yugenEmbedLink.contains("https:")) {
+                        yugenEmbedLink = "https:$yugenEmbedLink"
                     }
 
                     println(yugenEmbedLink)
@@ -223,39 +224,36 @@ class PageActivity : AppCompatActivity() {
 
                     val apiRequest = "https://yugen.to/api/embed/"
 
-                    Fuel.get(yugenEmbedLink).header(mapOfHeaders)
+/*                    Fuel.get(yugenEmbedLink).header(mapOfHeaders)
                         .response { _, response, _ ->
                             val cookie = response.headers["Set-Cookie"].first()
-                            val id = yugenEmbedLink.split("/")
-                            val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
-                            println(dataMap)
-
-                            Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
-                                .header(Headers.COOKIE to cookie)
-                                .response { _, _, results ->
-                                    val (bytes, _) = results
-                                    if (bytes != null) {
-                                        val json = ObjectMapper().readTree(String(bytes))
-                                        println(json)
-                                        val link = json["multi"][0]["src"].asText()
-                                        val linkName = json["multi"][0]["size"].asText()
-                                        arrayLinks.add(link)
-                                        arrayLinksNames.add(linkName)
-                                        println(arrayLinks)
-                                        println(arrayLinksNames)
-                                        runOnUiThread {
-                                            Intent(this, PlayerActivity::class.java).apply {
-                                                putExtra("nameOfLinks", arrayLinksNames)
-                                                putExtra("theLinks", arrayLinks)
-                                                startActivity(this)
-                                                progressBar.visibility = View.GONE
-                                                pageLayout.visibility = View.VISIBLE
-                                            }
-
-                                        }
+                        }*/
+                    val id = yugenEmbedLink.split("/")
+                    val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
+                    println(dataMap)
+                    Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
+                        .response { _, _, results ->
+                            val (bytes, _) = results
+                            if (bytes != null) {
+                                val json = ObjectMapper().readTree(String(bytes))
+                                println(json)
+                                val link = json["multi"][0]["src"].asText()
+                                val linkName = json["multi"][0]["size"].asText()
+                                arrayLinks.add(link)
+                                arrayLinksNames.add(linkName)
+                                println(arrayLinks)
+                                println(arrayLinksNames)
+                                runOnUiThread {
+                                    Intent(this, PlayerActivity::class.java).apply {
+                                        putExtra("nameOfLinks", arrayLinksNames)
+                                        putExtra("theLinks", arrayLinks)
+                                        startActivity(this)
+                                        progressBar.visibility = View.GONE
+                                        pageLayout.visibility = View.VISIBLE
                                     }
-                                }
 
+                                }
+                            }
                         }
 
                 } catch (e: Exception) {
