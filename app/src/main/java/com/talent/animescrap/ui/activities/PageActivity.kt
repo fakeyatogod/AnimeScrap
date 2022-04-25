@@ -193,7 +193,7 @@ class PageActivity : AppCompatActivity() {
             var watchLink = contentLink
             watchLink = watchLink?.replace("anime", "watch")
             val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"
-
+            println(animeEpUrl)
             Thread {
                 try {
 

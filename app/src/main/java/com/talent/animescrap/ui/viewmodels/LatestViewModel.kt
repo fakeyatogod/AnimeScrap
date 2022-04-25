@@ -33,7 +33,7 @@ class LatestViewModel : ViewModel() {
         val allInfo = doc.getElementsByClass("ep-card")
         for (item in allInfo) {
             val itemImage = item.getElementsByClass("ep-origin-img")[0].getElementsByTag("img").attr("data-src")
-            val itemName = item.getElementsByClass("ep-details").attr("alt")
+            val itemName = item.getElementsByClass("ep-origin-name").text()
             val itemLink = item.getElementsByClass("ep-details").attr("href")
             val picObject = Photos(itemName, itemImage, itemLink)
             picInfo.add(picObject)
