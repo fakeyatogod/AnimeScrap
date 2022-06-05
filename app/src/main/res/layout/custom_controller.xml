@@ -46,14 +46,27 @@
                 android:contentDescription="@string/back_to_home"
                 android:src="@drawable/ic_baseline_arrow_back_24" />
 
-            <TextView
-                android:id="@+id/videoName"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="7"
-                android:maxLines="1"
-                android:textColor="@color/white" />
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/videoName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="Anime Name"
+                    android:textColor="@color/white" />
+                <TextView
+                    android:id="@+id/videoEpisode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:text="Episode 100"
+                    android:textColor="@color/teal_200" />
+            </LinearLayout>
 
         </LinearLayout>
 

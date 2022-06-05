@@ -12,16 +12,27 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.talent.animescrap.R
+import java.net.CookieHandler
+import java.net.CookieManager
+import java.net.CookiePolicy
 
 
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var simpleExoPlayer: SimpleExoPlayer
+    private val mCookieManager = CookieManager()
+
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
+        CookieHandler.setDefault(mCookieManager)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
@@ -40,6 +51,12 @@ class PlayerActivity : AppCompatActivity() {
         val centerText = playerView.findViewById<TextView>(R.id.centerText)
         val rotate = playerView.findViewById<ImageView>(R.id.rotate)
 
+        // Set Video Name
+        val videoNameTextView = playerView.findViewById<TextView>(R.id.videoName)
+        videoNameTextView.text = linksNamesArray[0]
+        val videoEpTextView = playerView.findViewById<TextView>(R.id.videoEpisode)
+        videoEpTextView.text = linksNamesArray[1]
+
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
@@ -47,7 +64,16 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
         val mediaItem: MediaItem = MediaItem.fromUri(linksArray[0])
-        simpleExoPlayer.setMediaItem(mediaItem)
+
+        val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+            .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
+            .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
+        val mediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(mediaItem)
+
+        simpleExoPlayer.setMediaSource(mediaSource)
+
+//        simpleExoPlayer.setMediaItem(mediaItem)
         simpleExoPlayer.prepare()
         simpleExoPlayer.play()
         // For Screen Rotation

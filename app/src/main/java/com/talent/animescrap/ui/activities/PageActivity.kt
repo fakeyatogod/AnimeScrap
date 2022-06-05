@@ -143,14 +143,14 @@ class PageActivity : AppCompatActivity() {
                     .into(coverImage)
                 progressBar.visibility = View.GONE
                 pageLayout.visibility = View.VISIBLE
-                setupSpinner(animeModel.animeEpisodes)
+                setupSpinner(animeModel.animeEpisodes, animeName)
 
             }
         }.start()
         db.close()
     }
 
-    private fun setupSpinner(num: String) {
+    private fun setupSpinner(num: String, animeName: String) {
 
         val epList = arrayListOf<String>()
 
@@ -237,10 +237,16 @@ class PageActivity : AppCompatActivity() {
                             if (bytes != null) {
                                 val json = ObjectMapper().readTree(String(bytes))
                                 println(json)
-                                val link = json["multi"][0]["src"].asText()
-                                val linkName = json["multi"][0]["size"].asText()
+                                println(json.get("hls"))
+                                val link = json.get("hls").asText()
+//                                val link = json["multi"][0]["src"].asText()
+//                                val linkName = json["multi"][0]["size"].asText()
+
                                 arrayLinks.add(link)
-                                arrayLinksNames.add(linkName)
+
+                                arrayLinksNames.add(animeName)
+                                arrayLinksNames.add("Episode ${spinner.selectedItem}")
+
                                 println(arrayLinks)
                                 println(arrayLinksNames)
                                 runOnUiThread {
