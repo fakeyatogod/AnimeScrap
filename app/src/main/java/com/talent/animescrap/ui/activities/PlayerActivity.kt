@@ -41,7 +41,10 @@ class PlayerActivity : AppCompatActivity() {
         println(linksNamesArray)
         println(linksArray[0])
 
-        simpleExoPlayer = SimpleExoPlayer.Builder(this).build()
+        simpleExoPlayer = SimpleExoPlayer.Builder(this)
+            .setSeekForwardIncrementMs(10000)
+            .setSeekBackIncrementMs(10000)
+            .build()
 
         val playerView = findViewById<PlayerView>(R.id.exoPlayerView)
         playerView.keepScreenOn = true

@@ -121,9 +121,9 @@ class PageActivity : AppCompatActivity() {
             val animeEpContent = doc.getElementsByClass("box p-10 p-15 m-15-b anime-metadetails")
                 .select("div:nth-child(6)").select("span").text()
             val animeCover =
-                doc.getElementsByClass("page-cover-inner").first().getElementsByTag("img")
+                doc.getElementsByClass("page-cover-inner").first()!!.getElementsByTag("img")
                     .attr("data-src")
-            val animeName = animeContent.first().text()
+            val animeName = animeContent.first()!!.text()
             val animDesc = animeContent[1].text()
 
             println(animeContent)
@@ -201,7 +201,7 @@ class PageActivity : AppCompatActivity() {
                     val arrayLinksNames: ArrayList<String> = ArrayList()
 
                     var yugenEmbedLink = Jsoup.connect(animeEpUrl)
-                        .get().getElementById("main-embed").attr("src")
+                        .get().getElementById("main-embed")!!.attr("src")
                     if (!yugenEmbedLink.contains("https:")) {
                         yugenEmbedLink = "https:$yugenEmbedLink"
                     }
