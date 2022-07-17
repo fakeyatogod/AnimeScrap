@@ -26,18 +26,28 @@ class LatestFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-        latestViewModel = ViewModelProvider(this).get(LatestViewModel::class.java)
+        latestViewModel = ViewModelProvider(this)[LatestViewModel::class.java]
 
         _binding = FragmentLatestBinding.inflate(inflater, container, false)
 
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+        binding.swipeContainer.setOnRefreshListener {
+            binding.recyclerView.visibility = View.GONE
+            latestViewModel.animeLatestList.observe(viewLifecycleOwner) {
+                binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
+                binding.recyclerView.setHasFixedSize(true)
+                binding.swipeContainer.isRefreshing = false
+                binding.recyclerView.visibility = View.VISIBLE
+            }
 
-        latestViewModel.animeLatestList.observe(viewLifecycleOwner, {
+        }
+
+        latestViewModel.animeLatestList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
-        })
+        }
 
         return binding.root
     }

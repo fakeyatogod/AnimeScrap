@@ -38,7 +38,6 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
         val pic = itemList[position]
         holder.itemName.text = pic.resName
 
-
         Picasso.get().load(pic.resImage).error(R.drawable.ic_broken_image)
             .into(
                 holder.itemImage, object : Callback {

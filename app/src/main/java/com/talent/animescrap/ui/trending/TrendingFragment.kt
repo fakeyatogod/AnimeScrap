@@ -28,16 +28,27 @@ class TrendingFragment : Fragment() {
     ): View {
 
         _binding = FragmentTrendingBinding.inflate(inflater, container, false)
-        trendingViewModel = ViewModelProvider(this).get(TrendingViewModel::class.java)
+        trendingViewModel = ViewModelProvider(this)[TrendingViewModel::class.java]
 
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        trendingViewModel.animeTrendingList.observe(viewLifecycleOwner, {
+        binding.swipeContainer.setOnRefreshListener {
+            binding.recyclerView.visibility = View.GONE
+            trendingViewModel.animeTrendingList.observe(viewLifecycleOwner) {
+                binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
+                binding.recyclerView.setHasFixedSize(true)
+                binding.swipeContainer.isRefreshing = false
+                binding.recyclerView.visibility = View.VISIBLE
+            }
+
+        }
+
+        trendingViewModel.animeTrendingList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
-        })
+        }
 
         return binding.root
     }
