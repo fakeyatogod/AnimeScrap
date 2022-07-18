@@ -37,15 +37,15 @@
                     android:layout_height="180dp"
                     android:background="@drawable/shadow_gradient" />
 
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
                     android:layout_marginTop="156dp">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="95dp"
-                        android:layout_height="95dp"
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="96dp"
+                        android:layout_height="140dp"
                         android:layout_margin="5dp"
                         android:elevation="10dp"
                         app:cardCornerRadius="8dp">
@@ -58,43 +58,46 @@
                             android:background="@color/white"
                             android:scaleType="centerCrop"
                             android:transitionName="pageImageT"
-                            tools:ignore="ContentDescription" />
+                            android:contentDescription="@string/cover_of_anime"/>
 
-                    </androidx.cardview.widget.CardView>
+                    </com.google.android.material.card.MaterialCardView>
 
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </LinearLayout>
 
                 <!-- Anime title -->
-                <androidx.appcompat.widget.LinearLayoutCompat
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
                     android:layout_marginStart="124dp"
-                    android:layout_marginTop="185dp">
+                    android:layout_marginTop="185dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="4dp"
+                    android:orientation="vertical">
 
                     <TextView
-                        android:layout_gravity="center"
                         android:id="@+id/content_link"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="start"
                         android:ellipsize="end"
-                        android:maxLines="2"
+                        android:maxLines="4"
                         android:paddingStart="8dp"
                         android:paddingEnd="8dp"
-                        android:textAlignment="center"
+                        android:textAlignment="textStart"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        tools:text="wonder egg priority" />
+                        tools:text="Wonder Egg Priority" />
 
                     <!-- Last watched text -->
                     <TextView
                         android:id="@+id/lastWatched"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:padding="4dp"
+                        android:layout_gravity="start"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
                         android:text="@string/not_started_yet" />
-                </androidx.appcompat.widget.LinearLayoutCompat>
+                </LinearLayout>
 
             </FrameLayout>
 
@@ -107,34 +110,6 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_weight="1" />
-
-                <!-- Play button -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="15dp"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageButton
-                        android:id="@+id/episodeButtonForSpinner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/round_image_button"
-                        android:padding="4dp"
-                        android:src="@drawable/ic_play"
-                        tools:ignore="ContentDescription" />
-
-                    <TextView
-                        android:id="@+id/playButtonText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/play_button_text"
-                        android:textAlignment="center" />
-
-                </LinearLayout>
 
                 <!-- Favourites button -->
                 <LinearLayout
@@ -169,13 +144,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
+                    android:gravity="center"
                     android:paddingStart="15dp"
                     android:paddingEnd="8dp">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:ignore="UseCompoundDrawables">
+                        android:layout_height="wrap_content">
 
                         <ImageView
                             android:layout_width="wrap_content"
@@ -187,7 +162,7 @@
 
                         <Spinner
                             android:id="@+id/episodeSpinner"
-                            android:layout_width="wrap_content"
+                            android:layout_width="100dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:contentDescription="@string/select_episode"
@@ -203,6 +178,33 @@
 
                 </LinearLayout>
 
+                <!-- Play button -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="15dp"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageButton
+                        android:id="@+id/episodeButtonForSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/round_image_button"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_play"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/playButtonText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/play_button_text"
+                        android:textAlignment="center" />
+
+                </LinearLayout>
 
                 <View
                     android:layout_width="0dp"
