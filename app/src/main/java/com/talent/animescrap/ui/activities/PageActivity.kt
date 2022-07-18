@@ -2,12 +2,14 @@ package com.talent.animescrap.ui.activities
 
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.TypedValue
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.room.Room
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.kittinunf.fuel.Fuel
@@ -23,10 +25,11 @@ import org.jsoup.Jsoup
 class PageActivity : AppCompatActivity() {
 
     private var contentLink: String? = "null"
-    private lateinit var pageLayout: ConstraintLayout
+    private lateinit var pageLayout: LinearLayout
     private lateinit var progressBar: CircularProgressIndicator
     private lateinit var animeModel: AnimeDetails
     private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_page)
@@ -50,7 +53,11 @@ class PageActivity : AppCompatActivity() {
             if (lastWatchedPref == "Not Started Yet") lastWatchedPref else "Last Watched : $lastWatchedPref"
 
         pageLayout = findViewById(R.id.pageLayout)
-        val buttonFavorite = findViewById<Button>(R.id.button_favorite)
+        val buttonFavorite = findViewById<ImageButton>(R.id.button_favorite)
+
+        // get values of system color attrs based on theme.
+        val colorAttrValue = TypedValue()
+        theme.resolveAttribute(R.attr.colorControlNormal, colorAttrValue, true)
 
         val db = Room.databaseBuilder(
             applicationContext,
@@ -74,17 +81,41 @@ class PageActivity : AppCompatActivity() {
 
             runOnUiThread {
                 if (isFav) {
-                    buttonFavorite.text = getString(R.string.remove_from_favorite)
+                    buttonFavorite.setImageResource(R.drawable.ic_heart_minus)
+                    if (isDarkModeOn()) buttonFavorite.setColorFilter(
+                        ContextCompat.getColor(
+                            this,
+                            R.color.red_200
+                        )
+                    ) else buttonFavorite.setColorFilter(
+                        ContextCompat.getColor(
+                            this,
+                            R.color.red_500
+                        )
+                    )
+
                     buttonFavorite.setOnClickListener {
                         Thread {
                             linkDao.deleteOne(foundFav)
                             runOnUiThread {
-                                buttonFavorite.text = getString(R.string.add_to_favorite)
+                                buttonFavorite.setImageResource(R.drawable.ic_heart_plus)
+                                buttonFavorite.setColorFilter(
+                                    ContextCompat.getColor(
+                                        this,
+                                        colorAttrValue.resourceId
+                                    )
+                                )
                             }
                         }.start()
                     }
                 } else {
-                    buttonFavorite.text = getString(R.string.add_to_favorite)
+                    buttonFavorite.setImageResource(R.drawable.ic_heart_plus)
+                    buttonFavorite.setColorFilter(
+                        ContextCompat.getColor(
+                            this,
+                            colorAttrValue.resourceId
+                        )
+                    )
                     buttonFavorite.setOnClickListener {
                         Thread {
                             linkDao.insert(
@@ -95,7 +126,18 @@ class PageActivity : AppCompatActivity() {
                                 )
                             )
                             runOnUiThread {
-                                buttonFavorite.text = getString(R.string.remove_from_favorite)
+                                buttonFavorite.setImageResource(R.drawable.ic_heart_minus)
+                                if (isDarkModeOn()) buttonFavorite.setColorFilter(
+                                    ContextCompat.getColor(
+                                        this,
+                                        R.color.red_200
+                                    )
+                                ) else buttonFavorite.setColorFilter(
+                                    ContextCompat.getColor(
+                                        this,
+                                        R.color.red_500
+                                    )
+                                )
                             }
                         }.start()
                     }
@@ -108,6 +150,7 @@ class PageActivity : AppCompatActivity() {
         val textView = findViewById<TextView>(R.id.content_link)
         val textView2 = findViewById<TextView>(R.id.content_link_2)
         val coverImage = findViewById<ImageView>(R.id.coverAnime)
+        val backgroundImage = findViewById<ImageView>(R.id.backgroundImage)
         progressBar = findViewById(R.id.progressbarInPage)
 
         pageLayout.visibility = View.GONE
@@ -139,6 +182,10 @@ class PageActivity : AppCompatActivity() {
 
                 textView.text = animeModel.animeName
                 textView2.text = animeModel.animeDesc
+                // load background image.
+                Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
+                    .into(backgroundImage)
+                // load cover image.
                 Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
                     .into(coverImage)
                 progressBar.visibility = View.GONE
@@ -165,7 +212,7 @@ class PageActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progressbarInPage)
 
         val spinner = findViewById<Spinner>(R.id.episodeSpinner)
-        val episodeButtonForSpinner = findViewById<Button>(R.id.episodeButtonForSpinner)
+        val episodeButtonForSpinner = findViewById<ImageButton>(R.id.episodeButtonForSpinner)
 
         spinner.visibility = View.VISIBLE
         episodeButtonForSpinner.visibility = View.VISIBLE
@@ -268,6 +315,23 @@ class PageActivity : AppCompatActivity() {
             }.start()
 
 
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (progressBar.visibility == View.VISIBLE) {
+            progressBar.visibility = View.GONE
+        }
+    }
+
+    private fun isDarkModeOn(): Boolean {
+        return when (resources.configuration.uiMode and
+                Configuration.UI_MODE_NIGHT_MASK) {
+            Configuration.UI_MODE_NIGHT_YES -> true
+            Configuration.UI_MODE_NIGHT_NO -> false
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> false
+            else -> false
         }
     }
 
