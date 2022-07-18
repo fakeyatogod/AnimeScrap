@@ -5,9 +5,8 @@
     <string name="title_latest">Latest</string>
     <string name="title_favorite">Favorite</string>
     <string name="title_search">Search</string>
-    <string name="watch">Watch</string>
-    <string name="add_to_favorite">Add to Favorite</string>
-    <string name="remove_from_favorite">Remove from Favorite</string>
+    <string name="play_button_text">Play</string>
+    <string name="favourite_button_text">Favorite</string>
     <string name="imageview_in_main">ImageView in Main</string>
     <string name="image_title">IMAGE TITLE</string>
     <string name="splash_c2_image">Splash C2 Image</string>
