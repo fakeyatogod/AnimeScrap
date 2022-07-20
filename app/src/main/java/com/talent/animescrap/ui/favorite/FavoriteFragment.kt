@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 class FavoriteFragment : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null
-
+    private val favoriteViewModel: FavoriteViewModel by viewModels()
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -32,32 +32,8 @@ class FavoriteFragment : Fragment() {
 
         _binding = FragmentFavoriteBinding.inflate(inflater, container, false)
 
-        val favoriteViewModel: FavoriteViewModel by viewModels()
-
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
-
-        binding.swipeContainer.setOnRefreshListener {
-
-            CoroutineScope(Dispatchers.IO).launch {
-                val list = favoriteViewModel.getLatestAnime(requireContext())
-                withContext(Dispatchers.Main) {
-                    binding.recyclerView.visibility = View.GONE
-
-                    binding.recyclerView.adapter = RecyclerAdapter(
-                        activity as Context,
-                        list
-                    )
-                    binding.recyclerView.setHasFixedSize(true)
-                    binding.swipeContainer.isRefreshing = false
-                    binding.recyclerView.visibility = View.VISIBLE
-
-
-                }
-            }
-
-
-        }
 
         favoriteViewModel.animeFavoriteList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
@@ -65,7 +41,25 @@ class FavoriteFragment : Fragment() {
             binding.recyclerView.setHasFixedSize(true)
         }
 
+        binding.swipeContainer.setOnRefreshListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                favoriteViewModel.getLatestAnime(requireContext())
+                withContext(Dispatchers.Main) {
+                    binding.swipeContainer.isRefreshing = false
+                }
+            }
+
+        }
+
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        CoroutineScope(Dispatchers.IO).launch {
+            favoriteViewModel.getLatestAnime(requireContext())
+        }
+
     }
 
     override fun onDestroyView() {

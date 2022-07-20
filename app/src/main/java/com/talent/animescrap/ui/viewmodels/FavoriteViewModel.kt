@@ -11,24 +11,17 @@ import com.talent.animescrap.room.LinksRoomDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FavoriteViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var aList1 = arrayListOf<Photos>()
 
     private val _animeList1 = MutableLiveData<ArrayList<Photos>>().apply {
-
         CoroutineScope(Dispatchers.IO).launch {
             getLatestAnime(application.applicationContext)
-            withContext(Dispatchers.Main) {
-                value = aList1
-
-            }
         }
     }
 
-    fun getLatestAnime(context: Context): ArrayList<Photos> {
+    fun getLatestAnime(context: Context) {
         println("GET FAV")
         val db = Room.databaseBuilder(
             context, LinksRoomDatabase::class.java, "fav-db"
@@ -43,8 +36,9 @@ class FavoriteViewModel(application: Application) : AndroidViewModel(application
         }
 
         db.close()
-        aList1 = picInfo
-        return picInfo
+        CoroutineScope(Dispatchers.Main).launch {
+            _animeList1.value = picInfo
+        }
     }
 
     val animeFavoriteList: LiveData<ArrayList<Photos>> = _animeList1
