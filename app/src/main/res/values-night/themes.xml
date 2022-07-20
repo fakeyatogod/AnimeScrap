@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryDark</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryDark</item>
         <!-- Customize your theme here. -->
         <item name="android:navigationBarColor">@color/bg_color</item>
     </style>
@@ -20,8 +20,7 @@
     </style>
 
     <style name="Theme.AnimeScrap.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-
-        <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
+        <item name="android:statusBarColor" >@color/black</item>
         <item name="android:navigationBarColor">@color/black</item>
     </style>
 </resources>

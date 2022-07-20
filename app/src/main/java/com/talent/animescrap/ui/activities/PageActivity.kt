@@ -2,14 +2,11 @@ package com.talent.animescrap.ui.activities
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.util.TypedValue
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.room.Room
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.kittinunf.fuel.Fuel
@@ -19,6 +16,10 @@ import com.talent.animescrap.R
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinksRoomDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
 
@@ -55,69 +56,87 @@ class PageActivity : AppCompatActivity() {
         pageLayout = findViewById(R.id.pageLayout)
         val buttonFavorite = findViewById<ImageButton>(R.id.button_favorite)
 
-        // get values of system color attrs based on theme.
-        val colorAttrValue = TypedValue()
-        theme.resolveAttribute(R.attr.colorControlNormal, colorAttrValue, true)
-
-        val db = Room.databaseBuilder(
+        // open DB
+        var db = Room.databaseBuilder(
             applicationContext,
             LinksRoomDatabase::class.java, "fav-db"
         ).build()
-        val linkDao = db.linkDao()
+        var linkDao = db.linkDao()
 
-        Thread {
-
+        CoroutineScope(Dispatchers.IO).launch {
+            // get fav list
             val favList = linkDao.getLinks()
-            println(favList)
-            var isFav = false
-            var foundFav = FavRoomModel("null", "null", "null")
-            for (fav in favList) {
-                if (fav.linkString == contentLink) {
-                    isFav = true
-                    foundFav = fav
-                    break
+            db.close()
+            withContext(Dispatchers.Main) {
+                // check Fav
+                var isFav = false
+                for (fav in favList) {
+                    if (fav.linkString == contentLink) {
+                        isFav = true
+                        break
+                    }
                 }
+
+                if (isFav) {
+                    inFav(buttonFavorite)
+                } else {
+                    notInFav(buttonFavorite)
+                }
+
+                // end of main thread
             }
 
-            runOnUiThread {
-                if (isFav) {
-                    buttonFavorite.setImageResource(R.drawable.ic_heart_minus)
-                    if (isDarkModeOn()) buttonFavorite.setColorFilter(
-                        ContextCompat.getColor(
-                            this,
-                            R.color.red_200
-                        )
-                    ) else buttonFavorite.setColorFilter(
-                        ContextCompat.getColor(
-                            this,
-                            R.color.red_500
-                        )
-                    )
+            // end of io thread
+        }
 
-                    buttonFavorite.setOnClickListener {
-                        Thread {
+        /*
+        btn on click ->
+            open db
+            check is fav
+            if fav ->
+                remove from fav
+                set icon
+            not fav
+                add to fav
+                set icon
+            close db
+        */
+
+        buttonFavorite.setOnClickListener {
+            // open DB
+            db = Room.databaseBuilder(
+                applicationContext,
+                LinksRoomDatabase::class.java, "fav-db"
+            ).build()
+            linkDao = db.linkDao()
+
+            CoroutineScope(Dispatchers.IO).launch {
+                // get fav list
+                val favList = linkDao.getLinks()
+                withContext(Dispatchers.Main) {
+                    // check Fav
+                    var isFav = false
+                    var foundFav = FavRoomModel("null", "null", "null")
+                    for (fav in favList) {
+                        if (fav.linkString == contentLink) {
+                            isFav = true
+                            foundFav = fav
+                            break
+                        }
+                    }
+
+                    if (isFav) {
+                        inFav(buttonFavorite)
+                        CoroutineScope(Dispatchers.IO).launch {
                             linkDao.deleteOne(foundFav)
-                            runOnUiThread {
-                                buttonFavorite.setImageResource(R.drawable.ic_heart_plus)
-                                buttonFavorite.setColorFilter(
-                                    ContextCompat.getColor(
-                                        this,
-                                        colorAttrValue.resourceId
-                                    )
-                                )
+                            withContext(Dispatchers.Main) {
+                                notInFav(buttonFavorite)
                             }
                         }.start()
-                    }
-                } else {
-                    buttonFavorite.setImageResource(R.drawable.ic_heart_plus)
-                    buttonFavorite.setColorFilter(
-                        ContextCompat.getColor(
-                            this,
-                            colorAttrValue.resourceId
-                        )
-                    )
-                    buttonFavorite.setOnClickListener {
-                        Thread {
+
+                    } else {
+                        notInFav(buttonFavorite)
+                        CoroutineScope(Dispatchers.IO).launch {
                             linkDao.insert(
                                 FavRoomModel(
                                     contentLink.toString(),
@@ -125,27 +144,20 @@ class PageActivity : AppCompatActivity() {
                                     animeModel.animeName
                                 )
                             )
-                            runOnUiThread {
-                                buttonFavorite.setImageResource(R.drawable.ic_heart_minus)
-                                if (isDarkModeOn()) buttonFavorite.setColorFilter(
-                                    ContextCompat.getColor(
-                                        this,
-                                        R.color.red_200
-                                    )
-                                ) else buttonFavorite.setColorFilter(
-                                    ContextCompat.getColor(
-                                        this,
-                                        R.color.red_500
-                                    )
-                                )
+                            withContext(Dispatchers.Main) {
+                                inFav(buttonFavorite)
                             }
                         }.start()
                     }
+
+                    // end of main thread
                 }
 
+                // end of io thread
             }
+            db.close()
+        }
 
-        }.start()
 
         val textView = findViewById<TextView>(R.id.content_link)
         val textView2 = findViewById<TextView>(R.id.content_link_2)
@@ -194,7 +206,6 @@ class PageActivity : AppCompatActivity() {
 
             }
         }.start()
-        db.close()
     }
 
     private fun setupSpinner(num: String, animeName: String) {
@@ -275,6 +286,7 @@ class PageActivity : AppCompatActivity() {
                         .response { _, response, _ ->
                             val cookie = response.headers["Set-Cookie"].first()
                         }*/
+
                     val id = yugenEmbedLink.split("/")
                     val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
                     println(dataMap)
@@ -320,19 +332,21 @@ class PageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (progressBar.visibility == View.VISIBLE) {
+        if(pageLayout.visibility == View.VISIBLE){
             progressBar.visibility = View.GONE
         }
     }
 
-    private fun isDarkModeOn(): Boolean {
-        return when (resources.configuration.uiMode and
-                Configuration.UI_MODE_NIGHT_MASK) {
-            Configuration.UI_MODE_NIGHT_YES -> true
-            Configuration.UI_MODE_NIGHT_NO -> false
-            Configuration.UI_MODE_NIGHT_UNDEFINED -> false
-            else -> false
-        }
+
+    private fun inFav(buttonFavorite: ImageButton) {
+        println("In Fav")
+        buttonFavorite.setImageResource(R.drawable.ic_heart_minus)
+    }
+
+    private fun notInFav(buttonFavorite: ImageButton) {
+        println("Not in Fav")
+        buttonFavorite.setImageResource(R.drawable.ic_heart_plus)
+
     }
 
 }

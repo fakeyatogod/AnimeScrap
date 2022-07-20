@@ -20,7 +20,7 @@
     </style>
 
     <style name="Theme.AnimeScrap.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor" tools:targetApi="l">@color/red_700</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/white</item>
         <item name="android:navigationBarColor">@color/white</item>
     </style>
 </resources>
