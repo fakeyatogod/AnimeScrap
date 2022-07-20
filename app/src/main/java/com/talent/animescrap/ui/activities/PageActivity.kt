@@ -332,7 +332,7 @@ class PageActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        if(pageLayout.visibility == View.VISIBLE){
+        if (pageLayout.visibility == View.VISIBLE) {
             progressBar.visibility = View.GONE
         }
     }
