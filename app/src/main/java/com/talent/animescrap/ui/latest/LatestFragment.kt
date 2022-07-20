@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.FragmentLatestBinding
 import com.talent.animescrap.ui.viewmodels.LatestViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LatestFragment : Fragment() {
 
@@ -32,21 +36,21 @@ class LatestFragment : Fragment() {
 
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
-        binding.swipeContainer.setOnRefreshListener {
-            binding.recyclerView.visibility = View.GONE
-            latestViewModel.animeLatestList.observe(viewLifecycleOwner) {
-                binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
-                binding.recyclerView.setHasFixedSize(true)
-                binding.swipeContainer.isRefreshing = false
-                binding.recyclerView.visibility = View.VISIBLE
-            }
-
-        }
 
         latestViewModel.animeLatestList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
+        }
+
+        binding.swipeContainer.setOnRefreshListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                latestViewModel.getLatestAnime()
+                withContext(Dispatchers.Main) {
+                    binding.swipeContainer.isRefreshing = false
+                }
+            }
+
         }
 
         return binding.root

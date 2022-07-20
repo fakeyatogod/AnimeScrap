@@ -11,6 +11,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.FragmentTrendingBinding
 import com.talent.animescrap.ui.viewmodels.TrendingViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class TrendingFragment : Fragment() {
 
@@ -33,21 +37,19 @@ class TrendingFragment : Fragment() {
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        binding.swipeContainer.setOnRefreshListener {
-            binding.recyclerView.visibility = View.GONE
-            trendingViewModel.animeTrendingList.observe(viewLifecycleOwner) {
-                binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
-                binding.recyclerView.setHasFixedSize(true)
-                binding.swipeContainer.isRefreshing = false
-                binding.recyclerView.visibility = View.VISIBLE
-            }
-
-        }
-
         trendingViewModel.animeTrendingList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
+        }
+
+        binding.swipeContainer.setOnRefreshListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                trendingViewModel.getTrendingAnime()
+                withContext(Dispatchers.Main) {
+                    binding.swipeContainer.isRefreshing = false
+                }
+            }
         }
 
         return binding.root
