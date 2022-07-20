@@ -51,6 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed-medium"
+            android:maxLines="3"
             android:padding="6dp"
             android:text="@string/image_title"
             android:textAlignment="center" />
