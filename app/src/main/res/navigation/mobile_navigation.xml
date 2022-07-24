@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_favorite"
-        android:name="com.talent.animescrap.ui.favorite.FavoriteFragment"
+        android:name="com.talent.animescrap.ui.fragments.FavoriteFragment"
         android:label="@string/title_favorite"
         tools:layout="@layout/fragment_favorite" />
 
     <fragment
         android:id="@+id/navigation_latest"
-        android:name="com.talent.animescrap.ui.latest.LatestFragment"
+        android:name="com.talent.animescrap.ui.fragments.LatestFragment"
         android:label="@string/title_latest"
         tools:layout="@layout/fragment_latest" />
 
     <fragment
         android:id="@+id/navigation_trending"
-        android:name="com.talent.animescrap.ui.trending.TrendingFragment"
+        android:name="com.talent.animescrap.ui.fragments.TrendingFragment"
         android:label="@string/title_trending"
         tools:layout="@layout/fragment_trending" />
 </navigation>

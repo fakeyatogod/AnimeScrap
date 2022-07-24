@@ -1,4 +1,4 @@
-package com.talent.animescrap.ui.latest
+package com.talent.animescrap.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -9,35 +9,35 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
-import com.talent.animescrap.databinding.FragmentLatestBinding
-import com.talent.animescrap.ui.viewmodels.LatestViewModel
+import com.talent.animescrap.databinding.FragmentTrendingBinding
+import com.talent.animescrap.ui.viewmodels.TrendingViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LatestFragment : Fragment() {
+class TrendingFragment : Fragment() {
 
-    private var _binding: FragmentLatestBinding? = null
-    private lateinit var latestViewModel: LatestViewModel
+    private var _binding: FragmentTrendingBinding? = null
+    private lateinit var trendingViewModel: TrendingViewModel
 
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
 
-        latestViewModel = ViewModelProvider(this)[LatestViewModel::class.java]
-
-        _binding = FragmentLatestBinding.inflate(inflater, container, false)
+        _binding = FragmentTrendingBinding.inflate(inflater, container, false)
+        trendingViewModel = ViewModelProvider(this)[TrendingViewModel::class.java]
 
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        latestViewModel.animeLatestList.observe(viewLifecycleOwner) {
+        trendingViewModel.animeTrendingList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
@@ -45,12 +45,11 @@ class LatestFragment : Fragment() {
 
         binding.swipeContainer.setOnRefreshListener {
             CoroutineScope(Dispatchers.IO).launch {
-                latestViewModel.getLatestAnime()
+                trendingViewModel.getTrendingAnime()
                 withContext(Dispatchers.Main) {
                     binding.swipeContainer.isRefreshing = false
                 }
             }
-
         }
 
         return binding.root
