@@ -9,17 +9,55 @@
         android:id="@+id/navigation_favorite"
         android:name="com.talent.animescrap.ui.fragments.FavoriteFragment"
         android:label="@string/title_favorite"
-        tools:layout="@layout/fragment_favorite" />
+        tools:layout="@layout/fragment_favorite">
+        <action
+            android:id="@+id/action_navigation_favorite_to_navigation_anime"
+            app:destination="@id/navigation_anime">
+            <argument
+                android:name="animeLink"
+                android:defaultValue="null"
+                app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_latest"
         android:name="com.talent.animescrap.ui.fragments.LatestFragment"
         android:label="@string/title_latest"
-        tools:layout="@layout/fragment_latest" />
+        tools:layout="@layout/fragment_latest">
+        <action
+            android:id="@+id/action_navigation_latest_to_navigation_anime"
+            app:destination="@id/navigation_anime">
+            <argument
+                android:name="animeLink"
+                android:defaultValue="null"
+                app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_trending"
         android:name="com.talent.animescrap.ui.fragments.TrendingFragment"
         android:label="@string/title_trending"
-        tools:layout="@layout/fragment_trending" />
+        tools:layout="@layout/fragment_trending">
+        <action
+            android:id="@+id/action_navigation_trending_to_navigation_anime"
+            app:destination="@id/navigation_anime">
+            <argument
+                android:name="animeLink"
+                android:defaultValue="null"
+                app:argType="string" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_anime"
+        android:name="com.talent.animescrap.ui.fragments.AnimeFragment"
+        android:label="Anime Details"
+        tools:layout="@layout/fragment_anime">
+        <argument
+            android:name="animeLink"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
 </navigation>

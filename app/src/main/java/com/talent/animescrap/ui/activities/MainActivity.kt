@@ -39,6 +39,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_favorite, R.id.navigation_latest, R.id.navigation_trending
             )
         )
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if(destination.id == R.id.navigation_anime) {
+                navView.visibility = View.GONE
+            } else {
+
+                navView.visibility = View.VISIBLE
+            }
+        }
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }

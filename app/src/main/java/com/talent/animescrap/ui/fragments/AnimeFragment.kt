@@ -1,20 +1,27 @@
-package com.talent.animescrap.ui.activities
+package com.talent.animescrap.ui.fragments
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.room.Room
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.R
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinksRoomDatabase
+import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +29,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class PageActivity : AppCompatActivity() {
+class AnimeFragment : Fragment() {
+
 
     private var contentLink: String? = "null"
     private lateinit var pageLayout: LinearLayout
@@ -39,36 +47,37 @@ class PageActivity : AppCompatActivity() {
     private lateinit var spinner: Spinner
     private lateinit var playAnimeButton: ImageButton
 
+    private val args: AnimeFragmentArgs by navArgs()
     private val animeDetailsViewModel: AnimeDetailsViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_page)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_anime, container, false)
 
-        supportActionBar?.title = "Anime Details"
-
-        animeNameTxt = findViewById(R.id.anime_name_txt)
-        animeDetailsTxt = findViewById(R.id.anime_details_txt)
-        coverImage = findViewById(R.id.coverAnime)
-        backgroundImage = findViewById(R.id.backgroundImage)
-        progressBar = findViewById(R.id.progressbarInPage)
-        lastWatchedText = findViewById(R.id.last_watched_txt)
-        pageLayout = findViewById(R.id.pageLayout)
-        buttonFavorite = findViewById(R.id.button_favorite)
-        spinner = findViewById(R.id.episodeSpinner)
-        playAnimeButton = findViewById(R.id.episodeButtonForSpinner)
+        animeNameTxt = view.findViewById(R.id.anime_name_txt)
+        animeDetailsTxt = view.findViewById(R.id.anime_details_txt)
+        coverImage = view.findViewById(R.id.coverAnime)
+        backgroundImage = view.findViewById(R.id.backgroundImage)
+        progressBar = view.findViewById(R.id.progressbarInPage)
+        lastWatchedText = view.findViewById(R.id.last_watched_txt)
+        pageLayout = view.findViewById(R.id.pageLayout)
+        buttonFavorite = view.findViewById(R.id.button_favorite)
+        spinner = view.findViewById(R.id.episodeSpinner)
+        playAnimeButton = view.findViewById(R.id.episodeButtonForSpinner)
 
         animeDetailsTxt.movementMethod = ScrollingMovementMethod()
 
+        contentLink = args.animeLink
 
-        if (intent == null || intent.getStringExtra("content_link") == null) {
-            finish()
-            Toast.makeText(this, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
-        } else {
-            contentLink = intent.getStringExtra("content_link")
+        if (contentLink == "null") {
+            activity?.onBackPressed()
+            Toast.makeText(activity, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
         }
 
-        sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
+        sharedPreferences =
+            activity!!.getSharedPreferences("LastWatchedPref", AppCompatActivity.MODE_PRIVATE)
         lastWatchedPrefString =
             sharedPreferences.getString(contentLink, "Not Started Yet").toString()
         lastWatchedText.text =
@@ -80,7 +89,7 @@ class PageActivity : AppCompatActivity() {
         pageLayout.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
 
-        animeDetailsViewModel.animeDetails.observe(this@PageActivity) {
+        animeDetailsViewModel.animeDetails.observe(viewLifecycleOwner) {
             animeModel = it
             animeNameTxt.text = animeModel.animeName
             animeDetailsTxt.text = animeModel.animeDesc
@@ -98,13 +107,15 @@ class PageActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             contentLink?.let { animeDetailsViewModel.getAnimeDetails(it) }
         }
-    }
 
+        return view
+    }
 
     private fun setupSpinner(num: String, animeName: String) {
 
         val epList = (num.toInt() downTo 1).map { it.toString() }
-        val arrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, epList)
+        val arrayAdapter =
+            ArrayAdapter(activity as Context, android.R.layout.simple_spinner_item, epList)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = arrayAdapter
 
@@ -115,7 +126,10 @@ class PageActivity : AppCompatActivity() {
                 .putString(contentLink, spinner.selectedItem.toString()).apply()
 
             // Update to new value
-            sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
+            sharedPreferences = activity!!.getSharedPreferences(
+                "LastWatchedPref",
+                AppCompatActivity.MODE_PRIVATE
+            )
             sharedPreferences.getString(contentLink, "Not Started Yet").apply {
                 lastWatchedText.text =
                     if (this == "Not Started Yet") this else "Last Watched : $this"
@@ -127,7 +141,7 @@ class PageActivity : AppCompatActivity() {
             val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"
             println(animeEpUrl)
 
-            Intent(this@PageActivity, PlayerActivity::class.java).apply {
+            Intent(activity, PlayerActivity::class.java).apply {
                 putExtra("anime_name", animeName)
                 putExtra("anime_episode", "Episode ${spinner.selectedItem}")
                 putExtra("anime_url", animeEpUrl)
@@ -139,17 +153,10 @@ class PageActivity : AppCompatActivity() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (pageLayout.visibility == View.VISIBLE) {
-            progressBar.visibility = View.GONE
-        }
-    }
-
     private fun handleFavorite() {
         // open DB
         var db = Room.databaseBuilder(
-            applicationContext,
+            activity as Context,
             LinksRoomDatabase::class.java, "fav-db"
         ).build()
         var linkDao = db.linkDao()
@@ -160,24 +167,12 @@ class PageActivity : AppCompatActivity() {
             db.close()
             withContext(Dispatchers.Main) {
                 // check Fav
-                var isFav = false
-                for (fav in favList) {
-                    if (fav.linkString == contentLink) {
-                        isFav = true
-                        break
-                    }
-                }
-
-                if (isFav) {
+                val isFav = favList.any { it.linkString == contentLink }
+                if (isFav)
                     inFav(buttonFavorite)
-                } else {
+                else
                     notInFav(buttonFavorite)
-                }
-
-                // end of main thread
             }
-
-            // end of io thread
         }
 
         /*
@@ -196,7 +191,7 @@ class PageActivity : AppCompatActivity() {
         buttonFavorite.setOnClickListener {
             // open DB
             db = Room.databaseBuilder(
-                applicationContext,
+                activity as Context,
                 LinksRoomDatabase::class.java, "fav-db"
             ).build()
             linkDao = db.linkDao()

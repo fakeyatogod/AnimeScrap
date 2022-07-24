@@ -26,9 +26,6 @@
             android:name=".ui.activities.PlayerActivity"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen" />
-        <activity
-            android:name=".ui.activities.PageActivity"
-            android:theme="@style/Theme.AnimeScrap.Page" />
     </application>
 
 </manifest>
