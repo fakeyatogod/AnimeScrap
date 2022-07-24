@@ -9,15 +9,22 @@ import android.view.View
 import android.view.WindowInsets
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.talent.animescrap.R
+import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
@@ -25,40 +32,43 @@ import java.net.CookiePolicy
 
 class PlayerActivity : AppCompatActivity() {
 
-    private lateinit var simpleExoPlayer: SimpleExoPlayer
+    private lateinit var simpleExoPlayer: ExoPlayer
     private val mCookieManager = CookieManager()
+    private val animeDetailsViewModel by viewModels<AnimeDetailsViewModel>()
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
-        CookieHandler.setDefault(mCookieManager)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
-        val linksNamesArray = intent.getStringArrayListExtra("nameOfLinks") as ArrayList<String>
-        val linksArray = intent.getStringArrayListExtra("theLinks") as ArrayList<String>
-        println(linksNamesArray)
-        println(linksArray[0])
+        mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
+        CookieHandler.setDefault(mCookieManager)
 
-        simpleExoPlayer = SimpleExoPlayer.Builder(this)
-            .setSeekForwardIncrementMs(10000)
-            .setSeekBackIncrementMs(10000)
-            .build()
+        // Intent Arguments
+        val animeName = intent.getStringExtra("anime_name")
+        val animeEpisode = intent.getStringExtra("anime_episode")
+        val animeUrl = intent.getStringExtra("anime_url")
 
+        /// Player Views
         val playerView = findViewById<PlayerView>(R.id.exoPlayerView)
-        playerView.keepScreenOn = true
-        playerView.player = simpleExoPlayer
-
         val btnScale = playerView.findViewById<ImageView>(R.id.btn_fullscreen)
         val centerText = playerView.findViewById<TextView>(R.id.centerText)
         val rotate = playerView.findViewById<ImageView>(R.id.rotate)
 
         // Set Video Name
         val videoNameTextView = playerView.findViewById<TextView>(R.id.videoName)
-        videoNameTextView.text = linksNamesArray[0]
+        videoNameTextView.text = animeName
         val videoEpTextView = playerView.findViewById<TextView>(R.id.videoEpisode)
-        videoEpTextView.text = linksNamesArray[1]
+        videoEpTextView.text = animeEpisode
+
+        simpleExoPlayer = ExoPlayer.Builder(this)
+            .setSeekForwardIncrementMs(10000)
+            .setSeekBackIncrementMs(10000)
+            .build()
+
+        playerView.keepScreenOn = true
+        playerView.player = simpleExoPlayer
+
 
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
@@ -66,24 +76,34 @@ class PlayerActivity : AppCompatActivity() {
                 onBackPressed()
             }
         }
-        val mediaItem: MediaItem = MediaItem.fromUri(linksArray[0])
 
-        val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-            .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
-            .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
-        val mediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
-            .createMediaSource(mediaItem)
+        CoroutineScope(Dispatchers.IO).launch {
+            if (animeUrl != null) {
+                animeDetailsViewModel.getStreamLink(animeUrl)
+                withContext(Dispatchers.Main) {
+                    animeDetailsViewModel.animeStreamLink.observe(this@PlayerActivity) {
+                        val mediaItem: MediaItem = MediaItem.fromUri(it)
+                        val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+                            .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
+                            .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
+                        val mediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(mediaItem)
+                        simpleExoPlayer.setMediaSource(mediaSource)
+                        simpleExoPlayer.prepare()
+                        simpleExoPlayer.play()
+                    }
+                }
+            } else {
+                Toast.makeText(this@PlayerActivity, "No Anime Website Url Found", Toast.LENGTH_LONG)
+                    .show()
+            }
 
-        simpleExoPlayer.setMediaSource(mediaSource)
+        }
 
-//        simpleExoPlayer.setMediaItem(mediaItem)
-        simpleExoPlayer.prepare()
-        simpleExoPlayer.play()
         // For Screen Rotation
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         var flag = false
         rotate.setOnClickListener {
-
             if (flag) {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 flag = false

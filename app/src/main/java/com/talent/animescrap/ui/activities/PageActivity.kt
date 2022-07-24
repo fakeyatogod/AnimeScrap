@@ -109,18 +109,17 @@ class PageActivity : AppCompatActivity() {
         spinner.adapter = arrayAdapter
 
         playAnimeButton.setOnClickListener {
-            // Show progressbar
-            pageLayout.visibility = View.GONE
-            progressBar.visibility = View.VISIBLE
 
             // Store Last Watched Episode
             sharedPreferences.edit()
                 .putString(contentLink, spinner.selectedItem.toString()).apply()
+
+            // Update to new value
             sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
-            val lastWatchedText = findViewById<TextView>(R.id.last_watched_txt)
-            val lastWatchedPref = sharedPreferences.getString(contentLink, "Not Started Yet")
-            lastWatchedText.text =
-                if (lastWatchedPref == "Not Started Yet") lastWatchedPref else "Last Watched : $lastWatchedPref"
+            sharedPreferences.getString(contentLink, "Not Started Yet").apply {
+                lastWatchedText.text =
+                    if (this == "Not Started Yet") this else "Last Watched : $this"
+            }
 
             // Get the link of episode
             var watchLink = contentLink
@@ -128,23 +127,11 @@ class PageActivity : AppCompatActivity() {
             val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"
             println(animeEpUrl)
 
-            // Observe anime link
-            animeDetailsViewModel.animeStreamLink.observe(this@PageActivity) {
-                Intent(this, PlayerActivity::class.java).apply {
-                    putExtra(
-                        "nameOfLinks",
-                        arrayListOf(animeName, "Episode ${spinner.selectedItem}")
-                    )
-                    putExtra("theLinks", arrayListOf(it))
-                    startActivity(this)
-                    progressBar.visibility = View.GONE
-                    pageLayout.visibility = View.VISIBLE
-                }
-            }
-
-            // Get the anime link
-            CoroutineScope(Dispatchers.IO).launch {
-                animeDetailsViewModel.getStreamLink(animeEpUrl)
+            Intent(this@PageActivity, PlayerActivity::class.java).apply {
+                putExtra("anime_name", animeName)
+                putExtra("anime_episode", "Episode ${spinner.selectedItem}")
+                putExtra("anime_url", animeEpUrl)
+                startActivity(this)
             }
 
         }
@@ -158,7 +145,6 @@ class PageActivity : AppCompatActivity() {
             progressBar.visibility = View.GONE
         }
     }
-
 
     private fun handleFavorite() {
         // open DB
