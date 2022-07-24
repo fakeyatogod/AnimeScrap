@@ -29,6 +29,16 @@ class PageActivity : AppCompatActivity() {
     private lateinit var progressBar: CircularProgressIndicator
     private lateinit var animeModel: AnimeDetails
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var animeNameTxt: TextView
+    private lateinit var animeDetailsTxt: TextView
+    private lateinit var lastWatchedText: TextView
+    private lateinit var coverImage: ImageView
+    private lateinit var backgroundImage: ImageView
+    private lateinit var lastWatchedPrefString: String
+    private lateinit var buttonFavorite: ImageButton
+    private lateinit var spinner: Spinner
+    private lateinit var playAnimeButton: ImageButton
+
     private val animeDetailsViewModel: AnimeDetailsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,42 +46,44 @@ class PageActivity : AppCompatActivity() {
         setContentView(R.layout.activity_page)
 
         supportActionBar?.title = "Anime Details"
-        if (intent != null) {
-            contentLink = intent.getStringExtra("content_link")
-            if (contentLink == "null") {
-                finish()
-                Toast.makeText(this, "Some Unexpected error occurred", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        } else {
+
+        animeNameTxt = findViewById(R.id.anime_name_txt)
+        animeDetailsTxt = findViewById(R.id.anime_details_txt)
+        coverImage = findViewById(R.id.coverAnime)
+        backgroundImage = findViewById(R.id.backgroundImage)
+        progressBar = findViewById(R.id.progressbarInPage)
+        lastWatchedText = findViewById(R.id.last_watched_txt)
+        pageLayout = findViewById(R.id.pageLayout)
+        buttonFavorite = findViewById(R.id.button_favorite)
+        spinner = findViewById(R.id.episodeSpinner)
+        playAnimeButton = findViewById(R.id.episodeButtonForSpinner)
+
+        animeDetailsTxt.movementMethod = ScrollingMovementMethod()
+
+
+        if (intent == null || intent.getStringExtra("content_link") == null) {
             finish()
             Toast.makeText(this, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
+        } else {
+            contentLink = intent.getStringExtra("content_link")
         }
 
         sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
-        val lastWatchedText = findViewById<TextView>(R.id.lastWatched)
-        val lastWatchedPref = sharedPreferences.getString(contentLink, "Not Started Yet")
+        lastWatchedPrefString =
+            sharedPreferences.getString(contentLink, "Not Started Yet").toString()
         lastWatchedText.text =
-            if (lastWatchedPref == "Not Started Yet") lastWatchedPref else "Last Watched : $lastWatchedPref"
+            if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString else "Last Watched : $lastWatchedPrefString"
 
-        pageLayout = findViewById(R.id.pageLayout)
-        val buttonFavorite = findViewById<ImageButton>(R.id.button_favorite)
-
-        handleFavorite(buttonFavorite)
-
-        val textView = findViewById<TextView>(R.id.content_link)
-        val textView2 = findViewById<TextView>(R.id.content_link_2)
-        val coverImage = findViewById<ImageView>(R.id.coverAnime)
-        val backgroundImage = findViewById<ImageView>(R.id.backgroundImage)
-        progressBar = findViewById(R.id.progressbarInPage)
+        // Check Favorite
+        handleFavorite()
 
         pageLayout.visibility = View.GONE
         progressBar.visibility = View.VISIBLE
 
         animeDetailsViewModel.animeDetails.observe(this@PageActivity) {
             animeModel = it
-            textView.text = animeModel.animeName
-            textView2.text = animeModel.animeDesc
+            animeNameTxt.text = animeModel.animeName
+            animeDetailsTxt.text = animeModel.animeDesc
             // load background image.
             Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
                 .into(backgroundImage)
@@ -91,19 +103,7 @@ class PageActivity : AppCompatActivity() {
 
     private fun setupSpinner(num: String, animeName: String) {
 
-        pageLayout = findViewById(R.id.pageLayout)
-        val textView2 = findViewById<TextView>(R.id.content_link_2)
-        textView2.movementMethod = ScrollingMovementMethod()
-        progressBar = findViewById(R.id.progressbarInPage)
-        val spinner = findViewById<Spinner>(R.id.episodeSpinner)
-        val playAnimeButton = findViewById<ImageButton>(R.id.episodeButtonForSpinner)
-
-        val epList = arrayListOf<String>()
-
-        for (i in num.toInt() downTo 1) {
-            epList.add(i.toString())
-        }
-
+        val epList = (num.toInt() downTo 1).map { it.toString() }
         val arrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, epList)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = arrayAdapter
@@ -117,7 +117,7 @@ class PageActivity : AppCompatActivity() {
             sharedPreferences.edit()
                 .putString(contentLink, spinner.selectedItem.toString()).apply()
             sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
-            val lastWatchedText = findViewById<TextView>(R.id.lastWatched)
+            val lastWatchedText = findViewById<TextView>(R.id.last_watched_txt)
             val lastWatchedPref = sharedPreferences.getString(contentLink, "Not Started Yet")
             lastWatchedText.text =
                 if (lastWatchedPref == "Not Started Yet") lastWatchedPref else "Last Watched : $lastWatchedPref"
@@ -160,7 +160,7 @@ class PageActivity : AppCompatActivity() {
     }
 
 
-    private fun handleFavorite(buttonFavorite: ImageButton) {
+    private fun handleFavorite() {
         // open DB
         var db = Room.databaseBuilder(
             applicationContext,

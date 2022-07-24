@@ -75,7 +75,7 @@
                     android:paddingEnd="4dp">
 
                     <TextView
-                        android:id="@+id/content_link"
+                        android:id="@+id/anime_name_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
@@ -90,7 +90,7 @@
 
                     <!-- Last watched text -->
                     <TextView
-                        android:id="@+id/lastWatched"
+                        android:id="@+id/last_watched_txt"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
@@ -216,7 +216,7 @@
 
             <!-- Synopsis -->
             <TextView
-                android:id="@+id/content_link_2"
+                android:id="@+id/anime_details_txt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="18dp"
