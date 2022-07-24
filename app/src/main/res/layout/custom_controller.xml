@@ -33,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
             android:orientation="horizontal"
             android:weightSum="8">
 
@@ -41,7 +42,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
-                android:layout_marginStart="10dp"
                 android:layout_weight="1"
                 android:contentDescription="@string/back_to_home"
                 android:src="@drawable/ic_baseline_arrow_back_24" />
@@ -58,16 +58,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="Anime Name"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    tools:text="Anime Name" />
 
                 <TextView
                     android:id="@+id/videoEpisode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLines="1"
-                    android:text="Episode 100"
-                    android:textColor="@color/teal_200" />
+                    android:textColor="@color/teal_200"
+                    tools:text="Episode 100" />
             </LinearLayout>
 
         </LinearLayout>
@@ -80,37 +80,43 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10dp">
 
                 <TextView
                     android:id="@+id/exo_position"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
-                    android:layout_marginStart="10dp"
+                    android:layout_centerVertical="true"
                     android:text="@string/_0_00"
                     android:textColor="@android:color/white" />
+
+                <com.google.android.exoplayer2.ui.DefaultTimeBar
+                    android:id="@+id/exo_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toStartOf="@+id/exo_duration"
+                    android:layout_toEndOf="@+id/exo_position"
+                    android:contentDescription="@string/timer_bar"
+                    app:buffered_color="#BCB9B9"
+                    app:played_color="#FF0000"
+                    app:unplayed_color="#6A6767"
+                    android:padding="4dp"/>
 
                 <TextView
                     android:id="@+id/exo_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="10dp"
+                    android:layout_centerVertical="true"
                     android:text="@string/_0_00"
                     android:textColor="@android:color/white"
                     tools:ignore="RelativeOverlap" />
             </RelativeLayout>
 
-            <com.google.android.exoplayer2.ui.DefaultTimeBar
-                android:id="@+id/exo_progress"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:contentDescription="@string/timer_bar"
-                app:buffered_color="#A4A4A4"
-                app:played_color="#FF0000"
-                app:unplayed_color="#444444" />
 
             <RelativeLayout
                 android:layout_width="match_parent"
