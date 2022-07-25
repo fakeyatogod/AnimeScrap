@@ -36,15 +36,12 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.navigation_anime -> {
                     navView.visibility = View.GONE
-                    supportActionBar?.hide()
                 }
                 R.id.navigation_search -> {
                     navView.visibility = View.GONE
-                    supportActionBar?.show()
                 }
                 else -> {
                     navView.visibility = View.VISIBLE
-                    supportActionBar?.show()
                 }
             }
         }
@@ -62,6 +59,11 @@ class MainActivity : AppCompatActivity() {
             navController.popBackStack(R.id.navigation_latest,false)
             navController.navigate(R.id.navigation_search)
             return@setOnMenuItemClickListener true
+        }
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.navigation_anime) {
+                search.isVisible = false
+            }
         }
         return super.onCreateOptionsMenu(menu)
     }
