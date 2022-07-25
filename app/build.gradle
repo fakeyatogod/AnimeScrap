@@ -60,19 +60,19 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'io.coil-kt:coil:2.1.0'
-    implementation 'org.jsoup:jsoup:1.14.3'
+    implementation 'org.jsoup:jsoup:1.15.2'
 
     implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
 
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.0'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.0'
 
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1'
-    implementation('com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4')
+    implementation('com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3')
 
     // Room components
     implementation "androidx.room:room-ktx:$rootProject.roomVersion"
