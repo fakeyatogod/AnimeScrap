@@ -27,12 +27,18 @@
   - [ViewBinding](https://developer.android.com/topic/libraries/view-binding) - Generates a binding class for each XML layout file present in that module and allows you to more easily write code that interacts with views.
 - [Room database](https://developer.android.com/jetpack/androidx/releases/room) - Persistence library provides an abstraction layer over SQLite to allow for more robust database access while harnessing the full power of SQLite.
 - [Material Components for Android](https://github.com/material-components/material-components-android) - Modular and customizable Material Design UI components for Android.
+- [Jsoup](https://jsoup.org/) - Very cool library to scrape and parse HTML from a URL, file, or string.
+- [Picasso](https://square.github.io/) - Images add much-needed context and visual flair to Android applications. Picasso allows for hassle-free image loading in your application—often in one line of code.
+- [Fuel](https://github.com/kittinunf/fuel) - The easiest HTTP networking library for Kotlin/Android.
+- [Jackson](https://github.com/FasterXML/jackson) - Useful to parse JSON without the need of data class.
+- [Swiperefreshlayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - For swipe to refresh layouts
+
 
 ### 🤝 Thanks
 - To me for being so dumb
 
 ### ♥️ Donations
-If this project helped you a little bit, please consider donating to support further development. You can do that just it my treating yourself with a ice cream. Cheers
+If this project helped you a little bit, please consider donating to support further development. You can do that just that by treating yourself with a ice cream. Cheers
 
 
 ### ©️ License
@@ -61,4 +67,4 @@ SOFTWARE.
 ```
 
 Have any suggestions? found a bug? Feel free to create an [issue](https://github.com/fakeyatogod/AnimeScrap/issues/new) with detailed description.
-<p align="center">Made with ❤ by <a href="https://github.com/fakeyatod">Yato</a></p>
+<p align="center">Made with ❤ by <a href="https://github.com/fakeyatogod">Yato</a></p>
