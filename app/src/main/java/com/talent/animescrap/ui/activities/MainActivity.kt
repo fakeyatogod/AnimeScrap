@@ -1,6 +1,10 @@
 package com.talent.animescrap.ui.activities
 
 import android.os.Bundle
+import android.transition.Fade
+import android.transition.Slide
+import android.transition.TransitionManager
+import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -33,8 +37,14 @@ class MainActivity : AppCompatActivity() {
             )
         )
         navController.addOnDestinationChangedListener { _, destination, _ ->
+            val transition = Slide(Gravity.BOTTOM).apply {
+                duration = 200
+                addTarget(navView)
+            }
+            TransitionManager.beginDelayedTransition(navView,transition)
             when (destination.id) {
                 R.id.navigation_anime -> {
+
                     navView.visibility = View.GONE
                 }
                 R.id.navigation_search -> {
