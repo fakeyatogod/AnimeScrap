@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.room.Room
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.squareup.picasso.Picasso
 import com.talent.animescrap.R
@@ -118,6 +117,10 @@ class AnimeFragment : Fragment() {
             ArrayAdapter(activity as Context, android.R.layout.simple_spinner_item, epList)
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = arrayAdapter
+
+        // Remember Last watched in Spinner
+        if (lastWatchedPrefString in epList)
+            spinner.setSelection(epList.indexOf(lastWatchedPrefString))
 
         playAnimeButton.setOnClickListener {
 
