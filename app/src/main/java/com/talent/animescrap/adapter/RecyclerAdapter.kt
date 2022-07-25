@@ -17,6 +17,7 @@ import com.talent.animescrap.model.Photos
 import com.talent.animescrap.ui.fragments.FavoriteFragmentDirections
 import com.talent.animescrap.ui.fragments.LatestFragmentDirections
 import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
+import com.talent.animescrap.ui.fragments.SearchFragmentDirections
 
 class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Photos>) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
@@ -72,6 +73,12 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
                 R.id.navigation_trending -> {
                     val action =
                         TrendingFragmentDirections.actionNavigationTrendingToNavigationAnime()
+                            .setAnimeLink(pic.resLink)
+                    navController.navigate(action)
+                }
+                R.id.navigation_search -> {
+                    val action =
+                        SearchFragmentDirections.actionNavigationSearchToNavigationAnime()
                             .setAnimeLink(pic.resLink)
                     navController.navigate(action)
                 }

@@ -28,10 +28,12 @@
         <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.34739583333333335" />
         <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.34739583333333335" />
         <entry key="app/src/main/res/layout/fragment_latest.xml" value="0.196875" />
+        <entry key="app/src/main/res/layout/fragment_search.xml" value="0.28541666666666665" />
         <entry key="app/src/main/res/layout/fragment_trending.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/layout/main_cardview_item.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/menu/topbar_menu.xml" value="0.16822916666666668" />
+        <entry key="app/src/main/res/menu/topbar_menu_search.xml" value="0.225" />
       </map>
     </option>
   </component>

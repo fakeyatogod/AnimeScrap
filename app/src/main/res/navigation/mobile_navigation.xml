@@ -49,6 +49,20 @@
                 app:argType="string" />
         </action>
     </fragment>
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.talent.animescrap.ui.fragments.SearchFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/fragment_search">
+        <action
+            android:id="@+id/action_navigation_search_to_navigation_anime"
+            app:destination="@id/navigation_anime">
+            <argument
+                android:name="animeLink"
+                android:defaultValue="null"
+                app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_anime"

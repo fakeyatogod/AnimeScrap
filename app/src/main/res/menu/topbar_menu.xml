@@ -3,9 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/search_nav"
+        android:id="@+id/navigation_search"
         android:icon="@drawable/ic_search_black_24"
         android:title="@string/title_search"
-        app:actionViewClass="android.widget.SearchView"
         app:showAsAction="ifRoom|withText" />
 </menu>
