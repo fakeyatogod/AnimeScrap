@@ -9,15 +9,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 import com.talent.animescrap.R
 import com.talent.animescrap.model.Photos
 import com.talent.animescrap.ui.fragments.FavoriteFragmentDirections
 import com.talent.animescrap.ui.fragments.LatestFragmentDirections
-import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
 import com.talent.animescrap.ui.fragments.SearchFragmentDirections
+import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
 
 class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Photos>) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
@@ -40,18 +39,16 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
         val pic = itemList[position]
         holder.itemName.text = pic.resName
 
-        Picasso.get().load(pic.resImage).error(R.drawable.ic_broken_image)
-            .into(
-                holder.itemImage, object : Callback {
-                    override fun onSuccess() {
-                        holder.progressInCard.visibility = View.GONE
-                    }
-
-                    override fun onError(e: Exception?) {
-                    }
-
+        holder.itemImage.load(pic.resImage){
+            error(R.drawable.ic_broken_image)
+            listener(
+                onSuccess = { _,_->
+                    holder.progressInCard.visibility = View.GONE
                 }
             )
+            build()
+        }
+
 
 
         holder.cView.setOnClickListener {

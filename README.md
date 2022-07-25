@@ -28,7 +28,7 @@
 - [Room database](https://developer.android.com/jetpack/androidx/releases/room) - Persistence library provides an abstraction layer over SQLite to allow for more robust database access while harnessing the full power of SQLite.
 - [Material Components for Android](https://github.com/material-components/material-components-android) - Modular and customizable Material Design UI components for Android.
 - [Jsoup](https://jsoup.org/) - Very cool library to scrape and parse HTML from a URL, file, or string.
-- [Picasso](https://square.github.io/) - Images add much-needed context and visual flair to Android applications. Picasso allows for hassle-free image loading in your application—often in one line of code.
+- [Coil](https://coil-kt.github.io/coil/) - An image loading library for Android backed by Kotlin Coroutines.
 - [Fuel](https://github.com/kittinunf/fuel) - The easiest HTTP networking library for Kotlin/Android.
 - [Jackson](https://github.com/FasterXML/jackson) - Useful to parse JSON without the need of data class.
 - [Swiperefreshlayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - For swipe to refresh layouts

@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import androidx.room.Room
+import coil.load
 import com.google.android.material.progressindicator.CircularProgressIndicator
-import com.squareup.picasso.Picasso
 import com.talent.animescrap.R
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.room.FavRoomModel
@@ -93,11 +93,13 @@ class AnimeFragment : Fragment() {
             animeNameTxt.text = animeModel.animeName
             animeDetailsTxt.text = animeModel.animeDesc
             // load background image.
-            Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
-                .into(backgroundImage)
+            backgroundImage.load(animeModel.animeCover){
+                error(R.drawable.ic_broken_image)
+            }
             // load cover image.
-            Picasso.get().load(animeModel.animeCover).error(R.drawable.ic_broken_image)
-                .into(coverImage)
+            coverImage.load(animeModel.animeCover){
+                error(R.drawable.ic_broken_image)
+            }
             progressBar.visibility = View.GONE
             pageLayout.visibility = View.VISIBLE
             setupSpinner(animeModel.animeEpisodes, animeModel.animeName)
