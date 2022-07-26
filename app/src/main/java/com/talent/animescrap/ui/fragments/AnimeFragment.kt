@@ -12,11 +12,13 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.room.Room
 import coil.load
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.talent.animescrap.R
+import com.talent.animescrap.databinding.FragmentAnimeBinding
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinksRoomDatabase
@@ -30,6 +32,12 @@ import kotlinx.coroutines.withContext
 
 class AnimeFragment : Fragment() {
 
+
+    private var _binding: FragmentAnimeBinding? = null
+
+    // This property is only valid between onCreateView and
+    // onDestroyView.
+    private val binding get() = _binding!!
 
     private var contentLink: String? = "null"
     private lateinit var pageLayout: LinearLayout
@@ -52,26 +60,26 @@ class AnimeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_anime, container, false)
+    ): View {
+        _binding = FragmentAnimeBinding.inflate(inflater, container, false)
 
-        animeNameTxt = view.findViewById(R.id.anime_name_txt)
-        animeDetailsTxt = view.findViewById(R.id.anime_details_txt)
-        coverImage = view.findViewById(R.id.coverAnime)
-        backgroundImage = view.findViewById(R.id.backgroundImage)
-        progressBar = view.findViewById(R.id.progressbarInPage)
-        lastWatchedText = view.findViewById(R.id.last_watched_txt)
-        pageLayout = view.findViewById(R.id.pageLayout)
-        buttonFavorite = view.findViewById(R.id.button_favorite)
-        spinner = view.findViewById(R.id.episodeSpinner)
-        playAnimeButton = view.findViewById(R.id.episodeButtonForSpinner)
+        animeNameTxt = binding.animeNameTxt
+        animeDetailsTxt = binding.animeDetailsTxt
+        coverImage = binding.coverAnime
+        backgroundImage = binding.backgroundImage
+        progressBar = binding.progressbarInPage
+        lastWatchedText = binding.lastWatchedTxt
+        pageLayout = binding.pageLayout
+        buttonFavorite = binding.buttonFavorite
+        spinner = binding.episodeSpinner
+        playAnimeButton = binding.episodeButtonForSpinner
 
         animeDetailsTxt.movementMethod = ScrollingMovementMethod()
 
         contentLink = args.animeLink
 
         if (contentLink == "null") {
-            activity?.onBackPressed()
+            findNavController().popBackStack()
             Toast.makeText(activity, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
         }
 
@@ -79,8 +87,6 @@ class AnimeFragment : Fragment() {
             activity!!.getSharedPreferences("LastWatchedPref", AppCompatActivity.MODE_PRIVATE)
         lastWatchedPrefString =
             sharedPreferences.getString(contentLink, "Not Started Yet").toString()
-        lastWatchedText.text =
-            if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString else "Last Watched : $lastWatchedPrefString"
 
         // Check Favorite
         handleFavorite()
@@ -92,27 +98,32 @@ class AnimeFragment : Fragment() {
             animeModel = it
             animeNameTxt.text = animeModel.animeName
             animeDetailsTxt.text = animeModel.animeDesc
+
+            lastWatchedText.text =
+                if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString
+                else "Last Watched : $lastWatchedPrefString/${animeModel.animeEpisodes}"
+
             // load background image.
-            backgroundImage.load(animeModel.animeCover){
+            backgroundImage.load(animeModel.animeCover) {
                 error(R.drawable.ic_broken_image)
             }
             // load cover image.
-            coverImage.load(animeModel.animeCover){
+            coverImage.load(animeModel.animeCover) {
                 error(R.drawable.ic_broken_image)
             }
             progressBar.visibility = View.GONE
             pageLayout.visibility = View.VISIBLE
-            setupSpinner(animeModel.animeEpisodes, animeModel.animeName)
+            setupSpinner(animeModel.animeEpisodes, animeModel.animeName,animeModel.animeEpisodes)
         }
 
         CoroutineScope(Dispatchers.IO).launch {
             contentLink?.let { animeDetailsViewModel.getAnimeDetails(it) }
         }
 
-        return view
+        return binding.root
     }
 
-    private fun setupSpinner(num: String, animeName: String) {
+    private fun setupSpinner(num: String, animeName: String, animeEpisodes: String) {
 
         val epList = (num.toInt() downTo 1).map { it.toString() }
         val arrayAdapter =
@@ -137,7 +148,7 @@ class AnimeFragment : Fragment() {
             )
             sharedPreferences.getString(contentLink, "Not Started Yet").apply {
                 lastWatchedText.text =
-                    if (this == "Not Started Yet") this else "Last Watched : $this"
+                    if (this == "Not Started Yet") this else "Last Watched : $this/$animeEpisodes"
             }
 
             // Get the link of episode
