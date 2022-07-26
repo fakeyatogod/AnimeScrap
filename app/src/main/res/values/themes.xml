@@ -15,10 +15,6 @@
         <item name="android:navigationBarColor">@color/bg_color</item>
     </style>
 
-    <style name="Theme.AnimeScrap.Page" parent="Theme.AnimeScrap">
-        <item name="android:navigationBarColor">@color/white</item>
-    </style>
-
     <style name="Theme.AnimeScrap.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:statusBarColor" >@color/white</item>
         <item name="android:navigationBarColor">@color/white</item>

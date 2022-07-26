@@ -1,7 +1,6 @@
 package com.talent.animescrap.ui.activities
 
 import android.os.Bundle
-import android.transition.Fade
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.Gravity
