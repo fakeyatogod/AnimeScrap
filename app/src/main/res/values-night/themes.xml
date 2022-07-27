@@ -1,22 +1,13 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="Theme.AnimeScrap" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
+    <style name="Base.Theme.AnimeScrap" parent="Theme.Material3.DayNight.NoActionBar">
+<!--        &lt;!&ndash; Primary brand color. &ndash;&gt;
         <item name="colorPrimary">@color/red_200</item>
         <item name="colorPrimaryVariant">@color/red_700</item>
         <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
+        &lt;!&ndash; Secondary brand color. &ndash;&gt;
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" >?attr/colorPrimaryDark</item>
-        <!-- Customize your theme here. -->
-        <item name="android:navigationBarColor">@color/bg_color</item>
-    </style>
-
-    <style name="Theme.AnimeScrap.Splash" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:statusBarColor" >@color/black</item>
-        <item name="android:navigationBarColor">@color/black</item>
+        <item name="colorOnSecondary">@color/black</item>-->
     </style>
 </resources>

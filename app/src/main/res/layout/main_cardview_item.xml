@@ -5,8 +5,8 @@
     android:id="@+id/cView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/bg_color"
     app:cardCornerRadius="8dp"
+    style="@style/Widget.Material3.CardView.Filled"
     app:cardElevation="5dp"
     app:cardPreventCornerOverlap="true"
     app:cardUseCompatPadding="true"
@@ -20,6 +20,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="280dp"
+            style="@style/Widget.Material3.CardView.Filled"
             app:cardCornerRadius="8dp">
 
             <RelativeLayout
