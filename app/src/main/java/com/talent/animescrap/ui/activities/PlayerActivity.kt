@@ -102,7 +102,7 @@ class PlayerActivity : AppCompatActivity() {
 
         // For Screen Rotation
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        var flag = false
+        var flag = true
         rotate.setOnClickListener {
             if (flag) {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -116,6 +116,7 @@ class PlayerActivity : AppCompatActivity() {
 
         // Fullscreen controls
         var clickCount = 0
+        btnScale.setImageResource(R.drawable.ic_baseline_height_24)
         btnScale.setOnClickListener {
             val centerTextTimer = object : CountDownTimer(500, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}

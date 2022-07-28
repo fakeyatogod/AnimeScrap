@@ -75,6 +75,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:layout_alignParentBottom="true"
             android:orientation="vertical">
 
@@ -86,7 +87,7 @@
 
                 <TextView
                     android:id="@+id/exo_position"
-                    android:layout_width="40dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
@@ -103,13 +104,14 @@
                     android:contentDescription="@string/timer_bar"
                     app:buffered_color="#BCB9B9"
                     app:played_color="#FF0000"
-                    app:unplayed_color="#6A6767"
+                    app:unplayed_color="#3E3C3C"
                     android:padding="4dp"/>
 
                 <TextView
                     android:id="@+id/exo_duration"
-                    android:layout_width="40dp"
+                    android:layout_width="60dp"
                     android:layout_height="wrap_content"
+                    android:textAlignment="textEnd"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:text="@string/_0_00"
