@@ -69,15 +69,19 @@
                     android:textColor="@color/teal_200"
                     tools:text="Episode 100" />
             </LinearLayout>
-
+            <Button
+                android:id="@+id/quality_selection_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Auto"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:layout_alignParentBottom="true"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="10dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -111,10 +115,10 @@
                     android:id="@+id/exo_duration"
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
-                    android:textAlignment="textEnd"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:text="@string/_0_00"
+                    android:textAlignment="textEnd"
                     android:textColor="@android:color/white"
                     tools:ignore="RelativeOverlap" />
             </RelativeLayout>
@@ -138,15 +142,15 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:contentDescription="@string/exo_controls_previous_description"
-                        android:src="@drawable/ic_baseline_fast_rewind_24"/>
+                        android:src="@drawable/ic_baseline_fast_rewind_24" />
 
                     <ImageView
                         android:id="@+id/exo_play_pause"
+                        style="@style/ExoStyledControls.Button.Center.PlayPause"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:minHeight="64dp"
                         android:minWidth="64dp"
-                        style="@style/ExoStyledControls.Button.Center.PlayPause"/>
+                        android:minHeight="64dp" />
 
                     <ImageView
                         android:id="@+id/exo_ffwd"

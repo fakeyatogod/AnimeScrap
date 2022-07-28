@@ -4,21 +4,20 @@ import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +33,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var simpleExoPlayer: ExoPlayer
     private lateinit var playerView: StyledPlayerView
+    private lateinit var qualityBtn: Button
     private val mCookieManager = CookieManager()
     private val animeDetailsViewModel by viewModels<AnimeDetailsViewModel>()
 
@@ -54,6 +54,7 @@ class PlayerActivity : AppCompatActivity() {
         val btnScale = playerView.findViewById<ImageView>(R.id.btn_fullscreen)
         val centerText = playerView.findViewById<TextView>(R.id.centerText)
         val rotate = playerView.findViewById<ImageView>(R.id.rotate)
+        qualityBtn = playerView.findViewById(R.id.quality_selection_btn)
 
         // Set Video Name
         val videoNameTextView = playerView.findViewById<TextView>(R.id.videoName)
@@ -76,6 +77,28 @@ class PlayerActivity : AppCompatActivity() {
                 onBackPressed()
             }
         }
+
+        val mapOfQualities = mutableMapOf<String, Int>()
+        simpleExoPlayer.addListener(object : Player.Listener {
+            override fun onTracksChanged(tracks: Tracks) {
+                // Update UI using current tracks.
+                for (trackGroup in tracks.groups) {
+                    // Group level information.
+                    if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
+                        for (i in 0 until trackGroup.length) {
+                            val trackFormat = trackGroup.getTrackFormat(i).height
+                            println(trackGroup.getTrackFormat(i))
+                            mapOfQualities["${trackFormat}p"] = i
+                            qualityBtn.setOnClickListener {
+                                showQuality(mapOfQualities, trackGroup)
+                            }
+                        }
+                    }
+
+                }
+            }
+        })
+
 
         CoroutineScope(Dispatchers.IO).launch {
             if (animeUrl != null) {
@@ -181,7 +204,42 @@ class PlayerActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, playerView).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+    }
+
+    private fun showQuality(qualities: MutableMap<String, Int>, trackGroup: Tracks.Group) {
+        val bottomSheet = BottomSheetDialog(this@PlayerActivity)
+        bottomSheet.setContentView(R.layout.bottom_sheet_layout)
+
+        val list = bottomSheet.findViewById<ListView>(R.id.listView)
+
+        val arr = ArrayAdapter(
+            this,
+            R.layout.support_simple_spinner_dropdown_item,
+            qualities.keys.toList()
+        )
+
+        list?.adapter = arr
+        bottomSheet.behavior.peekHeight = 600
+        bottomSheet.show()
+
+        list?.setOnItemClickListener { _, view, _, _ ->
+            val quality = (view as TextView).text.toString()
+            val trackIndex = qualities.getValue(quality)
+            simpleExoPlayer.trackSelectionParameters = simpleExoPlayer.trackSelectionParameters
+                .buildUpon()
+                .setOverrideForType(
+                    TrackSelectionOverride(
+                        trackGroup.mediaTrackGroup,  /* trackIndex= */
+                        trackIndex
+                    )
+                )
+                .build()
+            qualityBtn.text = quality
+            bottomSheet.hide()
+        }
+
     }
 }
