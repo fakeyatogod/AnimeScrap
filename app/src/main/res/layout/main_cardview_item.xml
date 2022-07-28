@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cView"
+    style="@style/Widget.Material3.CardView.Filled"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:cardBackgroundColor="?attr/colorSurface"
     app:cardCornerRadius="8dp"
-    style="@style/Widget.Material3.CardView.Filled"
-    app:cardElevation="5dp"
     app:cardPreventCornerOverlap="true"
     app:cardUseCompatPadding="true"
     tools:viewBindingIgnore="true">
@@ -18,10 +18,12 @@
         android:orientation="vertical">
 
         <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.Material3.CardView.Filled"
             android:layout_width="match_parent"
             android:layout_height="280dp"
-            style="@style/Widget.Material3.CardView.Filled"
-            app:cardCornerRadius="8dp">
+            android:layout_margin="6dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="6dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
