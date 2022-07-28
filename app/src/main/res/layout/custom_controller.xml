@@ -102,10 +102,10 @@
                     android:layout_toStartOf="@+id/exo_duration"
                     android:layout_toEndOf="@+id/exo_position"
                     android:contentDescription="@string/timer_bar"
+                    android:padding="4dp"
                     app:buffered_color="#BCB9B9"
                     app:played_color="#FF0000"
-                    app:unplayed_color="#3E3C3C"
-                    android:padding="4dp"/>
+                    app:unplayed_color="#3E3C3C" />
 
                 <TextView
                     android:id="@+id/exo_duration"
@@ -138,25 +138,15 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:contentDescription="@string/exo_controls_previous_description"
-                        android:src="@drawable/ic_baseline_fast_rewind_24" />
+                        android:src="@drawable/ic_baseline_fast_rewind_24"/>
 
                     <ImageView
-                        android:id="@+id/exo_play"
+                        android:id="@+id/exo_play_pause"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:contentDescription="@string/exo_controls_play_description"
-                        android:src="@drawable/ic_baseline_play_arrow_24" />
-
-                    <ImageView
-                        android:id="@+id/exo_pause"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginRight="20dp"
-                        android:contentDescription="@string/exo_controls_pause_description"
-                        android:src="@drawable/ic_baseline_pause_24" />
+                        android:minHeight="64dp"
+                        android:minWidth="64dp"
+                        style="@style/ExoStyledControls.Button.Center.PlayPause"/>
 
                     <ImageView
                         android:id="@+id/exo_ffwd"

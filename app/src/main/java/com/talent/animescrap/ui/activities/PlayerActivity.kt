@@ -1,22 +1,22 @@
 package com.talent.animescrap.ui.activities
 
-import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
-import android.view.WindowInsets
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.talent.animescrap.R
@@ -33,10 +33,10 @@ import java.net.CookiePolicy
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var simpleExoPlayer: ExoPlayer
+    private lateinit var playerView: StyledPlayerView
     private val mCookieManager = CookieManager()
     private val animeDetailsViewModel by viewModels<AnimeDetailsViewModel>()
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
@@ -50,7 +50,7 @@ class PlayerActivity : AppCompatActivity() {
         val animeUrl = intent.getStringExtra("anime_url")
 
         /// Player Views
-        val playerView = findViewById<PlayerView>(R.id.exoPlayerView)
+        playerView = findViewById(R.id.exoPlayerView)
         val btnScale = playerView.findViewById<ImageView>(R.id.btn_fullscreen)
         val centerText = playerView.findViewById<TextView>(R.id.centerText)
         val rotate = playerView.findViewById<ImageView>(R.id.rotate)
@@ -158,8 +158,8 @@ class PlayerActivity : AppCompatActivity() {
 
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
+    override fun onPause() {
+        super.onPause()
         simpleExoPlayer.stop()
         simpleExoPlayer.release()
         finish()
@@ -172,19 +172,16 @@ class PlayerActivity : AppCompatActivity() {
         finish()
     }
 
-    @Suppress("DEPRECATION")
-    override fun onStart() {
-        super.onStart()
+    override fun onResume() {
+        super.onResume()
+        hideSystemUi()
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.decorView.windowInsetsController?.hide(WindowInsets.Type.navigationBars())
-        } else {
-            val decorView: View = window.decorView
-
-            val uiOptions: Int = (View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    or View.SYSTEM_UI_FLAG_FULLSCREEN)
-            decorView.systemUiVisibility = uiOptions
+    private fun hideSystemUi() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, playerView).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-
     }
 }
