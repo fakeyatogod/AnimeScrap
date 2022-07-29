@@ -62,7 +62,13 @@ dependencies {
     implementation 'io.coil-kt:coil:2.1.0'
     implementation 'org.jsoup:jsoup:1.15.2'
 
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
+    def media3_version = "1.0.0-beta02"
+    // For media playback using ExoPlayer
+    implementation"androidx.media3:media3-exoplayer:$media3_version"
+    // For HLS playback support with ExoPlayer
+    implementation"androidx.media3:media3-exoplayer-hls:$media3_version"
+    // For building media playback UIs
+    implementation "androidx.media3:media3-ui:$media3_version"
 
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.0'

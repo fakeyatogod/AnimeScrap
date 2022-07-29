@@ -73,7 +73,7 @@
                 android:id="@+id/quality_selection_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Auto"/>
+                android:text="@string/quality_btn_txt"/>
         </LinearLayout>
 
         <LinearLayout
@@ -98,7 +98,7 @@
                     android:text="@string/_0_00"
                     android:textColor="@android:color/white" />
 
-                <com.google.android.exoplayer2.ui.DefaultTimeBar
+                <androidx.media3.ui.DefaultTimeBar
                     android:id="@+id/exo_progress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -137,14 +137,15 @@
                     android:orientation="horizontal">
 
                     <ImageView
+                        android:contentDescription="@string/prev_button_text"
                         android:id="@+id/exo_rew"
                         android:layout_width="50dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:contentDescription="@string/exo_controls_previous_description"
                         android:src="@drawable/ic_baseline_fast_rewind_24" />
 
                     <ImageView
+                        android:contentDescription="@string/play_button_text"
                         android:id="@+id/exo_play_pause"
                         style="@style/ExoStyledControls.Button.Center.PlayPause"
                         android:layout_width="wrap_content"
@@ -153,11 +154,11 @@
                         android:minHeight="64dp" />
 
                     <ImageView
+                        android:contentDescription="@string/next_button_text"
                         android:id="@+id/exo_ffwd"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:contentDescription="@string/exo_controls_next_description"
                         android:src="@drawable/ic_baseline_fast_forward_24" />
 
                 </LinearLayout>

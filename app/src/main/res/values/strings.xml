@@ -6,6 +6,9 @@
     <string name="title_favorite">Favorite</string>
     <string name="title_search">Search</string>
     <string name="play_button_text">Play</string>
+    <string name="prev_button_text">Forward</string>
+    <string name="next_button_text">Rewind</string>
+    <string name="quality_btn_txt">Auto</string>
     <string name="favourite_button_text">Favorite</string>
     <string name="imageview_in_main">ImageView in Main</string>
     <string name="image_title">IMAGE TITLE</string>

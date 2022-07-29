@@ -10,13 +10,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
-import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.google.android.exoplayer2.upstream.DataSource
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import androidx.media3.common.*
+import androidx.media3.datasource.DataSource
+import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.PlayerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
@@ -31,9 +31,10 @@ import java.net.CookiePolicy
 
 class PlayerActivity : AppCompatActivity() {
 
-    private lateinit var simpleExoPlayer: ExoPlayer
-    private lateinit var playerView: StyledPlayerView
+    private lateinit var player: ExoPlayer
+    private lateinit var playerView: PlayerView
     private lateinit var qualityBtn: Button
+    private lateinit var mediaSource: HlsMediaSource
     private val mCookieManager = CookieManager()
     private val animeDetailsViewModel by viewModels<AnimeDetailsViewModel>()
 
@@ -62,13 +63,13 @@ class PlayerActivity : AppCompatActivity() {
         val videoEpTextView = playerView.findViewById<TextView>(R.id.videoEpisode)
         videoEpTextView.text = animeEpisode
 
-        simpleExoPlayer = ExoPlayer.Builder(this)
+        player = ExoPlayer.Builder(this)
             .setSeekForwardIncrementMs(10000)
             .setSeekBackIncrementMs(10000)
             .build()
 
         playerView.keepScreenOn = true
-        playerView.player = simpleExoPlayer
+        playerView.player = player
 
 
         // Back Button
@@ -79,7 +80,7 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         val mapOfQualities = mutableMapOf<String, Int>()
-        simpleExoPlayer.addListener(object : Player.Listener {
+        player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 // Update UI using current tracks.
                 for (trackGroup in tracks.groups) {
@@ -105,15 +106,14 @@ class PlayerActivity : AppCompatActivity() {
                 animeDetailsViewModel.getStreamLink(animeUrl)
                 withContext(Dispatchers.Main) {
                     animeDetailsViewModel.animeStreamLink.observe(this@PlayerActivity) {
-                        val mediaItem: MediaItem = MediaItem.fromUri(it)
                         val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
                             .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
                             .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
-                        val mediaSource: HlsMediaSource = HlsMediaSource.Factory(dataSourceFactory)
-                            .createMediaSource(mediaItem)
-                        simpleExoPlayer.setMediaSource(mediaSource)
-                        simpleExoPlayer.prepare()
-                        simpleExoPlayer.play()
+                        mediaSource = HlsMediaSource.Factory(dataSourceFactory)
+                            .createMediaSource(MediaItem.fromUri(it))
+                        player.setMediaSource(mediaSource)
+                        player.prepare()
+                        player.play()
                     }
                 }
             } else {
@@ -183,15 +183,15 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        simpleExoPlayer.stop()
-        simpleExoPlayer.release()
+        player.stop()
+        player.release()
         finish()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        simpleExoPlayer.stop()
-        simpleExoPlayer.release()
+        player.stop()
+        player.release()
         finish()
     }
 
@@ -228,15 +228,18 @@ class PlayerActivity : AppCompatActivity() {
         list?.setOnItemClickListener { _, view, _, _ ->
             val quality = (view as TextView).text.toString()
             val trackIndex = qualities.getValue(quality)
-            simpleExoPlayer.trackSelectionParameters = simpleExoPlayer.trackSelectionParameters
+            val trackParams = player.trackSelectionParameters
                 .buildUpon()
                 .setOverrideForType(
-                    TrackSelectionOverride(
-                        trackGroup.mediaTrackGroup,  /* trackIndex= */
-                        trackIndex
-                    )
+                    TrackSelectionOverride(trackGroup.mediaTrackGroup, trackIndex)
                 )
                 .build()
+
+            player.trackSelectionParameters = trackParams
+
+
+
+
             qualityBtn.text = quality
             bottomSheet.hide()
         }

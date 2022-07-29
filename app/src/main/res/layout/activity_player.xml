@@ -11,7 +11,7 @@
     tools:ignore="Overdraw"
     tools:viewBindingIgnore="true">
 
-    <com.google.android.exoplayer2.ui.StyledPlayerView
+    <androidx.media3.ui.PlayerView
         android:id="@+id/exoPlayerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +20,6 @@
         android:background="@android:color/background_dark"
         app:controller_layout_id="@layout/custom_controller"
         app:hide_on_touch="true"
-        app:player_layout_id="@layout/exo_player_view"
         app:resize_mode="fit"
         app:show_buffering="always"
         app:show_timeout="5000"
