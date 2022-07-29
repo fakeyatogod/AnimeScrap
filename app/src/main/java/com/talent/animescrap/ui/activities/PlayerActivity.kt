@@ -89,9 +89,13 @@ class PlayerActivity : AppCompatActivity() {
                         for (i in 0 until trackGroup.length) {
                             val trackFormat = trackGroup.getTrackFormat(i).height
                             println(trackGroup.getTrackFormat(i))
-                            mapOfQualities["${trackFormat}p"] = i
-                            qualityBtn.setOnClickListener {
-                                showQuality(mapOfQualities, trackGroup)
+                            println(trackGroup.isTrackSupported(i))
+                            println(trackGroup.isTrackSelected(i))
+                            if (trackGroup.isTrackSupported(i) && trackGroup.isTrackSelected(i)) {
+                                mapOfQualities["${trackFormat}p"] = i
+                                qualityBtn.setOnClickListener {
+                                    showQuality(mapOfQualities, trackGroup)
+                                }
                             }
                         }
                     }
