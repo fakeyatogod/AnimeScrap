@@ -174,10 +174,19 @@ class AnimeFragment : Fragment() {
                             PreferenceManager.getDefaultSharedPreferences(activity)
                         val isExternalPlayerEnabled =
                             settingsPreferenceManager.getBoolean("external_player", false)
+                        val isMX =
+                            settingsPreferenceManager.getBoolean("mx_player", false)
                         if (isExternalPlayerEnabled) {
-                            val intent = Intent(Intent.ACTION_VIEW)
-                            intent.setDataAndType(Uri.parse(it), "video/*")
-                            startActivity(Intent.createChooser(intent, "Complete action using"))
+                            if (isMX) {
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.setDataAndType(Uri.parse(it), "application/x-mpegURL")
+                                intent.setPackage("com.mxtech.videoplayer.pro")
+                                startActivity(intent)
+                            } else {
+                                val intent = Intent(Intent.ACTION_VIEW)
+                                intent.setDataAndType(Uri.parse(it), "video/*")
+                                startActivity(Intent.createChooser(intent, "Complete action using"))
+                            }
                         } else {
                             Intent(activity, PlayerActivity::class.java).apply {
                                 putExtra("anime_name", animeName)
@@ -186,7 +195,7 @@ class AnimeFragment : Fragment() {
                                 startActivity(this)
                             }
                         }
-                        
+
                         progressBar.visibility = View.GONE
                         pageLayout.visibility = View.VISIBLE
                     }
