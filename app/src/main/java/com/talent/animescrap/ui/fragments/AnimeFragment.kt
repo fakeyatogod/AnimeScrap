@@ -3,6 +3,7 @@ package com.talent.animescrap.ui.fragments
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
@@ -14,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.preference.PreferenceManager
 import androidx.room.Room
 import coil.load
 import com.google.android.material.progressindicator.CircularProgressIndicator
@@ -113,7 +115,7 @@ class AnimeFragment : Fragment() {
             }
             progressBar.visibility = View.GONE
             pageLayout.visibility = View.VISIBLE
-            setupSpinner(animeModel.animeEpisodes, animeModel.animeName,animeModel.animeEpisodes)
+            setupSpinner(animeModel.animeEpisodes, animeModel.animeName, animeModel.animeEpisodes)
         }
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -157,12 +159,40 @@ class AnimeFragment : Fragment() {
             val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"
             println(animeEpUrl)
 
-            Intent(activity, PlayerActivity::class.java).apply {
-                putExtra("anime_name", animeName)
-                putExtra("anime_episode", "Episode ${spinner.selectedItem}")
-                putExtra("anime_url", animeEpUrl)
-                startActivity(this)
+            CoroutineScope(Dispatchers.IO).launch {
+
+                withContext(Dispatchers.Main) {
+                    progressBar.visibility = View.VISIBLE
+                    pageLayout.visibility = View.GONE
+                }
+                animeDetailsViewModel.getStreamLink(animeEpUrl)
+
+                withContext(Dispatchers.Main) {
+                    animeDetailsViewModel.animeStreamLink.observe(viewLifecycleOwner) {
+
+                        val settingsPreferenceManager =
+                            PreferenceManager.getDefaultSharedPreferences(activity)
+                        val isExternalPlayerEnabled =
+                            settingsPreferenceManager.getBoolean("external_player", false)
+                        if (isExternalPlayerEnabled) {
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.setDataAndType(Uri.parse(it), "video/*")
+                            startActivity(Intent.createChooser(intent, "Complete action using"))
+                        } else {
+                            Intent(activity, PlayerActivity::class.java).apply {
+                                putExtra("anime_name", animeName)
+                                putExtra("anime_episode", "Episode ${spinner.selectedItem}")
+                                putExtra("anime_url", it)
+                                startActivity(this)
+                            }
+                        }
+                        
+                        progressBar.visibility = View.GONE
+                        pageLayout.visibility = View.VISIBLE
+                    }
+                }
             }
+
 
         }
 

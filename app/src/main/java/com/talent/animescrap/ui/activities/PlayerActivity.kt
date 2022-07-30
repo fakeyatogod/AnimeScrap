@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.*
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,11 +18,6 @@ import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
-import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
@@ -36,7 +30,6 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var qualityBtn: Button
     private lateinit var mediaSource: HlsMediaSource
     private val mCookieManager = CookieManager()
-    private val animeDetailsViewModel by viewModels<AnimeDetailsViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,28 +97,23 @@ class PlayerActivity : AppCompatActivity() {
             }
         })
 
+        if (animeUrl != null) {
 
-        CoroutineScope(Dispatchers.IO).launch {
-            if (animeUrl != null) {
-                animeDetailsViewModel.getStreamLink(animeUrl)
-                withContext(Dispatchers.Main) {
-                    animeDetailsViewModel.animeStreamLink.observe(this@PlayerActivity) {
-                        val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-                            .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
-                            .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
-                        mediaSource = HlsMediaSource.Factory(dataSourceFactory)
-                            .createMediaSource(MediaItem.fromUri(it))
-                        player.setMediaSource(mediaSource)
-                        player.prepare()
-                        player.play()
-                    }
-                }
-            } else {
-                Toast.makeText(this@PlayerActivity, "No Anime Website Url Found", Toast.LENGTH_LONG)
-                    .show()
-            }
+            val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+                .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
+                .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
+            mediaSource = HlsMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(animeUrl))
+            player.setMediaSource(mediaSource)
+            player.prepare()
+            player.play()
 
+
+        } else {
+            Toast.makeText(this@PlayerActivity, "No Anime Website Url Found", Toast.LENGTH_LONG)
+                .show()
         }
+
 
         // For Screen Rotation
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
