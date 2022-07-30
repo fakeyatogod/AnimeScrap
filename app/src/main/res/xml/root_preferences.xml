@@ -1,0 +1,23 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Theme">
+
+        <SwitchPreferenceCompat
+            app:key="dynamic_colors"
+            app:summaryOff="Dynamic colors disabled"
+            app:summaryOn="Dynamic colors enabled"
+            app:title="Use dynamic colors" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Player">
+
+        <SwitchPreferenceCompat
+            app:key="external_player"
+            app:summaryOff="Using internal player"
+            app:summaryOn="Using external player"
+            app:title="Use external video player" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

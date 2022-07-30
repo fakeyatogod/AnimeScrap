@@ -44,18 +44,13 @@ class MainActivity : AppCompatActivity() {
                 duration = 200
                 addTarget(navView)
             }
-            TransitionManager.beginDelayedTransition(navView,transition)
-            when (destination.id) {
-                R.id.navigation_anime -> {
-
-                    navView.visibility = View.GONE
-                }
-                R.id.navigation_search -> {
-                    navView.visibility = View.GONE
-                }
-                else -> {
-                    navView.visibility = View.VISIBLE
-                }
+            TransitionManager.beginDelayedTransition(navView, transition)
+            if (destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
+                || destination.id == R.id.settingsFragment
+            ) {
+                navView.visibility = View.GONE
+            } else {
+                navView.visibility = View.VISIBLE
             }
         }
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -65,17 +60,23 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.topbar_menu, menu)
         val search = menu.findItem(R.id.navigation_search)
+        val settings = menu.findItem(R.id.navigation_settings)
         val navController = findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
 
         search.setOnMenuItemClickListener {
-            search.isVisible = false
-            navController.popBackStack(R.id.navigation_latest,false)
             navController.navigate(R.id.navigation_search)
             return@setOnMenuItemClickListener true
         }
+        settings.setOnMenuItemClickListener {
+            navController.navigate(R.id.settingsFragment)
+            return@setOnMenuItemClickListener true
+        }
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.navigation_anime) {
+            if (destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
+                || destination.id == R.id.settingsFragment
+            ) {
                 search.isVisible = false
+                settings.isVisible = false
             }
         }
         return super.onCreateOptionsMenu(menu)
