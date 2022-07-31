@@ -17,9 +17,11 @@
             app:summaryOff="Using internal player"
             app:summaryOn="Using external player"
             app:title="Use external video player" />
+
         <SwitchPreferenceCompat
             app:key="mx_player"
             app:dependency="external_player"
+            app:summary="Will only work if you have MX Player installed on your device"
             app:title="Use MX player" />
 
     </PreferenceCategory>

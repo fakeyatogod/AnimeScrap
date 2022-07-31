@@ -1,11 +1,13 @@
 package com.talent.animescrap.ui.fragments
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -178,14 +180,12 @@ class AnimeFragment : Fragment() {
                             settingsPreferenceManager.getBoolean("mx_player", false)
                         if (isExternalPlayerEnabled) {
                             if (isMX) {
-                                val intent = Intent(Intent.ACTION_VIEW)
-                                intent.setDataAndType(Uri.parse(it), "application/x-mpegURL")
-                                intent.setPackage("com.mxtech.videoplayer.pro")
-                                startActivity(intent)
+                                startMX(it)
                             } else {
-                                val intent = Intent(Intent.ACTION_VIEW)
-                                intent.setDataAndType(Uri.parse(it), "video/*")
-                                startActivity(Intent.createChooser(intent, "Complete action using"))
+                                Intent(Intent.ACTION_VIEW).apply {
+                                    setDataAndType(Uri.parse(it), "video/*")
+                                    startActivity(Intent.createChooser(this, "Play using"))
+                                }
                             }
                         } else {
                             Intent(activity, PlayerActivity::class.java).apply {
@@ -206,6 +206,37 @@ class AnimeFragment : Fragment() {
         }
 
 
+    }
+
+    private fun startMX(animeStreamUrl: String) {
+        try {
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(Uri.parse(animeStreamUrl), "application/x-mpegURL")
+                setPackage("com.mxtech.videoplayer.pro")
+                startActivity(this)
+            }
+        } catch (e: ActivityNotFoundException) {
+            Log.i(
+                R.string.app_name.toString(),
+                "MX Player pro isn't installed, falling back to MX player Ads"
+            )
+            try {
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(Uri.parse(animeStreamUrl), "application/x-mpegURL")
+                    setPackage("com.mxtech.videoplayer.ad")
+                    startActivity(this)
+                }
+            } catch (e: ActivityNotFoundException) {
+                Log.i(
+                    R.string.app_name.toString(),
+                    "No version of MX Player is installed, falling back to other external player"
+                )
+                Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(Uri.parse(animeStreamUrl), "video/*")
+                    startActivity(Intent.createChooser(this, "Play using"))
+                }
+            }
+        }
     }
 
     private fun handleFavorite() {
