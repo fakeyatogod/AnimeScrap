@@ -15,9 +15,10 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.PlayerView
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
+import com.talent.animescrap.widgets.DoubleTapOverlay
+import com.talent.animescrap.widgets.DoubleTapPlayerView
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
@@ -26,7 +27,7 @@ import java.net.CookiePolicy
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var player: ExoPlayer
-    private lateinit var playerView: PlayerView
+    private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
     private lateinit var mediaSource: HlsMediaSource
     private val mCookieManager = CookieManager()
@@ -45,6 +46,9 @@ class PlayerActivity : AppCompatActivity() {
 
         /// Player Views
         playerView = findViewById(R.id.exoPlayerView)
+        val doubleTapOverlay = findViewById<DoubleTapOverlay>(R.id.double_tap_overlay)
+        playerView.doubleTapOverlay = doubleTapOverlay
+
         val btnScale = playerView.findViewById<ImageView>(R.id.btn_fullscreen)
         val centerText = playerView.findViewById<TextView>(R.id.centerText)
         val rotate = playerView.findViewById<ImageView>(R.id.rotate)

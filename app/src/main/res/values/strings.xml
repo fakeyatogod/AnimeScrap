@@ -44,4 +44,7 @@
     <string name="dynamic_colors_disabled_summary">Dynamic colors disabled</string>
     <string name="dynamic_colors_enabled_summary">Dynamic colors enabled</string>
     <string name="dynamic_colors_title">Use dynamic colors</string>
+
+    <string name="seek_seconds_forward">+%d seconds</string>
+    <string name="seek_seconds_backward">-%d seconds</string>
 </resources>

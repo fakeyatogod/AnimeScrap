@@ -71,4 +71,7 @@
     <color name="md_theme_dark_surfaceTint">#FFB3B4</color>
     <color name="md_theme_dark_surfaceTintColor">#FFB3B4</color>
 
+
+    <color name="playerDoubleTapTouch">#18FFFFFF</color>
+    <color name="playerDoubleTapBackground">#20EEEEEE</color>
 </resources>
