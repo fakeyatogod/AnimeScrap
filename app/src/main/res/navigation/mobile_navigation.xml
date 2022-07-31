@@ -67,7 +67,7 @@
     <fragment
         android:id="@+id/navigation_anime"
         android:name="com.talent.animescrap.ui.fragments.AnimeFragment"
-        android:label="Anime Details"
+        android:label="@string/anime_details_title"
         tools:layout="@layout/fragment_anime">
         <argument
             android:name="animeLink"

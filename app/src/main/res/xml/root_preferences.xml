@@ -4,9 +4,9 @@
 
         <SwitchPreferenceCompat
             app:key="dynamic_colors"
-            app:summaryOff="Dynamic colors disabled"
-            app:summaryOn="Dynamic colors enabled"
-            app:title="Use dynamic colors" />
+            app:summaryOff="@string/dynamic_colors_disabled_summary"
+            app:summaryOn="@string/dynamic_colors_enabled_summary"
+            app:title="@string/dynamic_colors_title" />
 
     </PreferenceCategory>
 
@@ -14,15 +14,15 @@
 
         <SwitchPreferenceCompat
             app:key="external_player"
-            app:summaryOff="Using internal player"
-            app:summaryOn="Using external player"
-            app:title="Use external video player" />
+            app:summaryOff="@string/external_player_off_summary"
+            app:summaryOn="@string/external_player_on_summary"
+            app:title="@string/external_player_title" />
 
         <SwitchPreferenceCompat
-            app:key="mx_player"
             app:dependency="external_player"
-            app:summary="Will only work if you have MX Player installed on your device"
-            app:title="Use MX player" />
+            app:key="mx_player"
+            app:summary="@string/mx_player_summary"
+            app:title="@string/mx_player_title" />
 
     </PreferenceCategory>
 

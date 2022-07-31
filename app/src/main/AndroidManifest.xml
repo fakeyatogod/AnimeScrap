@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.talent.animescrap">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -12,8 +13,8 @@
         android:theme="@style/Theme.AnimeScrap">
         <activity
             android:name=".ui.activities.SplashActivity"
-            android:theme="@style/Theme.AnimeScrap"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.AnimeScrap">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
