@@ -1,4 +1,5 @@
 <resources>
+
     <style name="Theme.AnimeScrap" parent="Base.Theme.AnimeScrap">
         <!-- Transparent system bars for edge-to-edge. -->
         <item name="android:navigationBarColor">@android:color/transparent</item>

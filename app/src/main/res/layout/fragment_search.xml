@@ -11,24 +11,25 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-       <LinearLayout
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content"
-           android:padding="10dp"
-           android:orientation="vertical">
-           <com.google.android.material.textfield.TextInputLayout
-               android:id="@+id/text_input_layout"
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:hint="@string/title_search">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
 
-               <com.google.android.material.textfield.TextInputEditText
-                   android:id="@+id/text_input_edit_text"
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"/>
-           </com.google.android.material.textfield.TextInputLayout>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/text_input_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/title_search">
 
-       </LinearLayout>
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/text_input_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
 
 
         <androidx.recyclerview.widget.RecyclerView

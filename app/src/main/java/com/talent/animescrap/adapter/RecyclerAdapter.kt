@@ -39,10 +39,10 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
         val pic = itemList[position]
         holder.itemName.text = pic.resName
 
-        holder.itemImage.load(pic.resImage){
+        holder.itemImage.load(pic.resImage) {
             error(R.drawable.ic_broken_image)
             listener(
-                onSuccess = { _,_->
+                onSuccess = { _, _ ->
                     holder.progressInCard.visibility = View.GONE
                 }
             )

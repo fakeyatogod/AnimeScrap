@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 import java.util.*
 
 
-class SearchFragment : Fragment(){
+class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -48,18 +48,19 @@ class SearchFragment : Fragment(){
                 CoroutineScope(Dispatchers.IO).launch {
                     searchViewModel.searchAnime(searchUrl)
                     withContext(Dispatchers.Main) {
-                        searchViewModel.animeLatestList.observe(viewLifecycleOwner){ animeList ->
+                        searchViewModel.animeLatestList.observe(viewLifecycleOwner) { animeList ->
                             binding.progressbarInMain.visibility = View.GONE
-                            binding.recyclerView.adapter = RecyclerAdapter(activity as Context, animeList)
+                            binding.recyclerView.adapter =
+                                RecyclerAdapter(activity as Context, animeList)
                             binding.recyclerView.setHasFixedSize(true)
                         }
                     }
 
-                    }
                 }
             }
-
-            return binding.root
         }
+
+        return binding.root
+    }
 
 }

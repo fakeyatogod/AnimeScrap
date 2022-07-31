@@ -18,12 +18,12 @@
         android:layout_gravity="center"
         android:animateLayoutChanges="true"
         android:background="@android:color/background_dark"
+        app:animation_enabled="false"
         app:controller_layout_id="@layout/custom_controller"
         app:hide_on_touch="true"
         app:resize_mode="fit"
         app:show_buffering="always"
         app:show_timeout="5000"
-        app:animation_enabled="false"
         app:use_controller="true" />
 </FrameLayout>
 
