@@ -12,8 +12,8 @@ android {
         applicationId "com.talent.animescrap"
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 6
-        versionName "1.5"
+        versionCode 7
+        versionName "1.6"
 
         kapt {
             arguments {
@@ -61,7 +61,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'io.coil-kt:coil:2.1.0'
     implementation 'org.jsoup:jsoup:1.15.2'
-    implementation 'androidx.preference:preference:1.1.1'
+    implementation 'androidx.preference:preference-ktx:1.2.0'
 
     def media3_version = "1.0.0-beta02"
     // For media playback using ExoPlayer

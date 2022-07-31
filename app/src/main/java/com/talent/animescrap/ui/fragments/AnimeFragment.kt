@@ -173,7 +173,7 @@ class AnimeFragment : Fragment() {
                     animeDetailsViewModel.animeStreamLink.observe(viewLifecycleOwner) {
 
                         val settingsPreferenceManager =
-                            PreferenceManager.getDefaultSharedPreferences(activity)
+                            PreferenceManager.getDefaultSharedPreferences(activity as Context)
                         val isExternalPlayerEnabled =
                             settingsPreferenceManager.getBoolean("external_player", false)
                         val isMX =
