@@ -1,10 +1,11 @@
-package com.talent.animescrap
+package com.talent.animescrap.ui.fragments
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
+import com.talent.animescrap.R
 import kotlin.system.exitProcess
 
 class SettingsFragment : PreferenceFragmentCompat() {
