@@ -20,6 +20,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import androidx.room.Room
 import coil.load
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.kittinunf.fuel.Fuel
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
@@ -32,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 
 
 class AnimeFragment : Fragment() {
@@ -161,50 +164,88 @@ class AnimeFragment : Fragment() {
             val animeEpUrl = "https://yugen.to${watchLink}${spinner.selectedItem}"
             println(animeEpUrl)
 
+            progressBar.visibility = View.VISIBLE
+            pageLayout.visibility = View.GONE
             CoroutineScope(Dispatchers.IO).launch {
-
-                withContext(Dispatchers.Main) {
-                    progressBar.visibility = View.VISIBLE
-                    pageLayout.visibility = View.GONE
-                }
-                animeDetailsViewModel.getStreamLink(animeEpUrl)
-
-                withContext(Dispatchers.Main) {
-                    animeDetailsViewModel.animeStreamLink.observe(viewLifecycleOwner) {
-
-                        val settingsPreferenceManager =
-                            PreferenceManager.getDefaultSharedPreferences(activity as Context)
-                        val isExternalPlayerEnabled =
-                            settingsPreferenceManager.getBoolean("external_player", false)
-                        val isMX =
-                            settingsPreferenceManager.getBoolean("mx_player", false)
-                        if (isExternalPlayerEnabled) {
-                            if (isMX) {
-                                startMX(it)
-                            } else {
-                                Intent(Intent.ACTION_VIEW).apply {
-                                    setDataAndType(Uri.parse(it), "video/*")
-                                    startActivity(Intent.createChooser(this, "Play using"))
-                                }
-                            }
-                        } else {
-                            Intent(activity, PlayerActivity::class.java).apply {
-                                putExtra("anime_name", animeName)
-                                putExtra("anime_episode", "Episode ${spinner.selectedItem}")
-                                putExtra("anime_url", it)
-                                startActivity(this)
-                            }
-                        }
-
-                        progressBar.visibility = View.GONE
-                        pageLayout.visibility = View.VISIBLE
-                    }
-                }
+                getStreamLink(animeEpUrl, animeName)
             }
 
 
         }
 
+
+    }
+
+    private fun getStreamLink(animeEpUrl: String, animeName: String) {
+
+        var yugenEmbedLink = Jsoup.connect(animeEpUrl)
+            .get().getElementById("main-embed")!!.attr("src")
+        if (!yugenEmbedLink.contains("https:")) {
+            yugenEmbedLink = "https:$yugenEmbedLink"
+        }
+
+        val mapOfHeaders = mutableMapOf(
+            "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+            "Accept-Encoding" to "gzip, deflate",
+            "Accept-Language" to "en-US,en;q=0.5",
+            "Connection" to "keep-alive",
+            "Upgrade-Insecure-Requests" to "1",
+            "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
+            "Host" to "yugen.to",
+            "TE" to "Trailers",
+            "Origin" to "https://yugen.to",
+            "X-Requested-With" to "XMLHttpRequest",
+            "Referer" to yugenEmbedLink
+        )
+
+        val apiRequest = "https://yugen.to/api/embed/"
+        val id = yugenEmbedLink.split("/")
+        val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
+
+        println(dataMap)
+
+        try {
+            Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
+                .response { _, _, results ->
+                    val (bytes, _) = results
+                    println("hi")
+                    if (bytes != null) {
+                        val json = ObjectMapper().readTree(String(bytes))
+                        val link = json.get("hls").asText()
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val settingsPreferenceManager =
+                                PreferenceManager.getDefaultSharedPreferences(activity as Context)
+                            val isExternalPlayerEnabled =
+                                settingsPreferenceManager.getBoolean("external_player", false)
+                            val isMX =
+                                settingsPreferenceManager.getBoolean("mx_player", false)
+                            if (isExternalPlayerEnabled) {
+                                if (isMX) {
+                                    startMX(link)
+                                } else {
+                                    Intent(Intent.ACTION_VIEW).apply {
+                                        setDataAndType(Uri.parse(link), "video/*")
+                                        startActivity(Intent.createChooser(this, "Play using"))
+                                    }
+                                }
+                            } else {
+                                Intent(activity, PlayerActivity::class.java).apply {
+                                    putExtra("anime_name", animeName)
+                                    putExtra("anime_episode", "Episode ${spinner.selectedItem}")
+                                    putExtra("anime_url", link)
+                                    startActivity(this)
+                                }
+                            }
+
+                            progressBar.visibility = View.GONE
+                            pageLayout.visibility = View.VISIBLE
+                        }
+                    }
+                }
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
 
     }
 
