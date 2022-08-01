@@ -151,7 +151,7 @@
 
                     <ImageView
                         android:id="@+id/exo_rew"
-                        android:layout_width="50dp"
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:contentDescription="@string/prev_button_text"
@@ -168,7 +168,7 @@
 
                     <ImageView
                         android:id="@+id/exo_ffwd"
-                        android:layout_width="wrap_content"
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:contentDescription="@string/next_button_text"
@@ -178,7 +178,7 @@
 
                 <ImageView
                     android:id="@+id/rotate"
-                    android:layout_width="wrap_content"
+                    android:layout_width="26dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="30dp"
@@ -188,19 +188,19 @@
 
                 <ImageView
                     android:id="@+id/btn_fullscreen"
-                    android:layout_width="wrap_content"
+                    android:layout_width="28dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="30dp"
                     android:contentDescription="@string/display_scale"
-                    android:src="@drawable/ic_baseline_fullscreen_24" />
+                    android:src="@drawable/ic_baseline_height_24" />
             </RelativeLayout>
 
         </LinearLayout>
 
     </RelativeLayout>
 
-    <ImageView
+<!--    <ImageView
         android:id="@+id/lock"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -209,6 +209,6 @@
         android:layout_marginBottom="20dp"
         android:contentDescription="@string/unlock"
         android:src="@drawable/ic_baseline_lock_open_24"
-        android:visibility="invisible" />
+        android:visibility="invisible" />-->
 
 </RelativeLayout>
