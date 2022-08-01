@@ -1,6 +1,6 @@
 # AnimeScrap
 <p align="center">
-  <a href=""><img width="200" height="200" src="https://github.com/fakeyatogod/AnimeScrap/blob/master/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"></a>
+  <a href=""><img width="200" height="200" src="https://github.com/fakeyatogod/AnimeScrap/blob/main/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png"></a>
 </p>
 <p align="center" style="font-size:18px"><b>Anime Scrap</b></p>
 
@@ -32,13 +32,14 @@
 - [Fuel](https://github.com/kittinunf/fuel) - The easiest HTTP networking library for Kotlin/Android.
 - [Jackson](https://github.com/FasterXML/jackson) - Useful to parse JSON without the need of data class.
 - [Swiperefreshlayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - For swipe to refresh layouts
+- [Media3/ExoPlayer](https://developer.android.com/jetpack/androidx/releases/media3) - For video playback
 
 
 ### 🤝 Thanks
 - To me for being so dumb
 
 ### ♥️ Donations
-If this project helped you a little bit, please consider donating to support further development. You can do that just that by treating yourself with a ice cream. Cheers
+If this project helped you a little bit, please consider donating to support further development. You can do that just by treating yourself with a nice ice cream. Cheers
 
 
 ### ©️ License
