@@ -91,7 +91,7 @@ class AnimeFragment : Fragment() {
         }
 
         sharedPreferences =
-            activity!!.getSharedPreferences("LastWatchedPref", AppCompatActivity.MODE_PRIVATE)
+            requireActivity().getSharedPreferences("LastWatchedPref", AppCompatActivity.MODE_PRIVATE)
         lastWatchedPrefString =
             sharedPreferences.getString(contentLink, "Not Started Yet").toString()
 
@@ -149,7 +149,7 @@ class AnimeFragment : Fragment() {
                 .putString(contentLink, spinner.selectedItem.toString()).apply()
 
             // Update to new value
-            sharedPreferences = activity!!.getSharedPreferences(
+            sharedPreferences = requireActivity().getSharedPreferences(
                 "LastWatchedPref",
                 AppCompatActivity.MODE_PRIVATE
             )
