@@ -56,6 +56,7 @@ class PlayerActivity : AppCompatActivity() {
 
         // Set Video Name
         val videoNameTextView = playerView.findViewById<TextView>(R.id.videoName)
+        videoNameTextView.isSelected = true
         videoNameTextView.text = animeName
         val videoEpTextView = playerView.findViewById<TextView>(R.id.videoEpisode)
         videoEpTextView.text = animeEpisode
