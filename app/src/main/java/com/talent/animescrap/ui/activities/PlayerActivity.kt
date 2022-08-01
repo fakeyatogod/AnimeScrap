@@ -1,6 +1,8 @@
 package com.talent.animescrap.ui.activities
 
+import android.app.PictureInPictureParams
 import android.content.pm.ActivityInfo
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -36,6 +38,11 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
 
+        setPictureInPictureParams(
+            PictureInPictureParams.Builder()
+                .setAutoEnterEnabled(true)
+                .build()
+        )
         mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         CookieHandler.setDefault(mCookieManager)
 
@@ -241,5 +248,19 @@ class PlayerActivity : AppCompatActivity() {
             bottomSheet.hide()
         }
 
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration
+    ) {
+        val totalLayout = playerView.findViewById<RelativeLayout>(R.id.totalLayout)
+        if (isInPictureInPictureMode) {
+            // Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
+            totalLayout.visibility = View.GONE
+        } else {
+            // Restore the full-screen UI.
+            totalLayout.visibility = View.VISIBLE
+        }
     }
 }
