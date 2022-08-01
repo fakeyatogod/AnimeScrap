@@ -32,11 +32,15 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
     private lateinit var mediaSource: HlsMediaSource
+    private lateinit var bottomSheet: BottomSheetDialog
     private val mCookieManager = CookieManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
+
+        bottomSheet = BottomSheetDialog(this@PlayerActivity)
+        bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
         setPictureInPictureParams(
             PictureInPictureParams.Builder()
@@ -214,8 +218,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun showQuality(qualities: MutableMap<String, Int>, trackGroup: Tracks.Group) {
-        val bottomSheet = BottomSheetDialog(this@PlayerActivity)
-        bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
         val list = bottomSheet.findViewById<ListView>(R.id.listView)
 
@@ -241,11 +243,8 @@ class PlayerActivity : AppCompatActivity() {
 
             player.trackSelectionParameters = trackParams
 
-
-
-
             qualityBtn.text = quality
-            bottomSheet.hide()
+            bottomSheet.dismiss()
         }
 
     }
