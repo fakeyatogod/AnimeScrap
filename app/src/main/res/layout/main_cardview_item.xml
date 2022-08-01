@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="?attr/colorSurface"
-    app:cardCornerRadius="8dp"
+    app:cardCornerRadius="10dp"
     app:cardPreventCornerOverlap="true"
     app:cardUseCompatPadding="true"
     tools:viewBindingIgnore="true">
@@ -53,8 +53,9 @@
             android:id="@+id/name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:fontFamily="sans-serif-condensed-medium"
-            android:maxLines="3"
+            android:maxLines="2"
             android:padding="6dp"
             android:text="@string/image_title"
             android:textAlignment="center" />
