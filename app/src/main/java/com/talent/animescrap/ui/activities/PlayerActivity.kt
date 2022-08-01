@@ -1,6 +1,7 @@
 package com.talent.animescrap.ui.activities
 
 import android.app.PictureInPictureParams
+import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Build
@@ -18,6 +19,7 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.widgets.DoubleTapOverlay
@@ -34,6 +36,8 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var qualityBtn: Button
     private lateinit var mediaSource: HlsMediaSource
     private lateinit var bottomSheet: BottomSheetDialog
+    private lateinit var settingsPreferenceManager: SharedPreferences
+    private var isPipEnabled: Boolean = false
     private val mCookieManager = CookieManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +47,11 @@ class PlayerActivity : AppCompatActivity() {
         bottomSheet = BottomSheetDialog(this@PlayerActivity)
         bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+        isPipEnabled = settingsPreferenceManager.getBoolean("pip", false)
+
+        println(isPipEnabled)
+        if (isPipEnabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 setPictureInPictureParams(
                     PictureInPictureParams.Builder()
@@ -52,6 +60,7 @@ class PlayerActivity : AppCompatActivity() {
                 )
             }
         }
+
         mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         CookieHandler.setDefault(mCookieManager)
 
@@ -272,12 +281,15 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onUserLeaveHint() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                enterPictureInPictureMode(
-                    PictureInPictureParams.Builder()
-                        .build()
-                )
+
+        if (isPipEnabled) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    enterPictureInPictureMode(
+                        PictureInPictureParams.Builder()
+                            .build()
+                    )
+                }
             }
         }
     }

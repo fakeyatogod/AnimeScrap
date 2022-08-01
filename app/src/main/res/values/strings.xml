@@ -47,4 +47,7 @@
 
     <string name="seek_seconds_forward">+%d seconds</string>
     <string name="seek_seconds_backward">-%d seconds</string>
+    <string name="pip_disabled">Picture-in-picture disabled</string>
+    <string name="pip_enabled">Picture-in-picture enabled</string>
+    <string name="pip_title">Enable PiP</string>
 </resources>

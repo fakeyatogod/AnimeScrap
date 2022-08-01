@@ -24,6 +24,13 @@
             app:summary="@string/mx_player_summary"
             app:title="@string/mx_player_title" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="pip"
+            app:summaryOff="@string/pip_disabled"
+            app:summaryOn="@string/pip_enabled"
+            app:title="@string/pip_title" />
+
     </PreferenceCategory>
 
 </PreferenceScreen>
