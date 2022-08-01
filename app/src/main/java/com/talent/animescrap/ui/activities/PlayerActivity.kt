@@ -3,6 +3,7 @@ package com.talent.animescrap.ui.activities
 import android.app.PictureInPictureParams
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
@@ -42,11 +43,15 @@ class PlayerActivity : AppCompatActivity() {
         bottomSheet = BottomSheetDialog(this@PlayerActivity)
         bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
-        setPictureInPictureParams(
-            PictureInPictureParams.Builder()
-                .setAutoEnterEnabled(true)
-                .build()
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setPictureInPictureParams(
+                    PictureInPictureParams.Builder()
+                        .setAutoEnterEnabled(true)
+                        .build()
+                )
+            }
+        }
         mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         CookieHandler.setDefault(mCookieManager)
 
@@ -253,6 +258,9 @@ class PlayerActivity : AppCompatActivity() {
         isInPictureInPictureMode: Boolean,
         newConfig: Configuration
     ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+        }
         val totalLayout = playerView.findViewById<RelativeLayout>(R.id.totalLayout)
         if (isInPictureInPictureMode) {
             // Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
@@ -260,6 +268,17 @@ class PlayerActivity : AppCompatActivity() {
         } else {
             // Restore the full-screen UI.
             totalLayout.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onUserLeaveHint() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                enterPictureInPictureMode(
+                    PictureInPictureParams.Builder()
+                        .build()
+                )
+            }
         }
     }
 }
