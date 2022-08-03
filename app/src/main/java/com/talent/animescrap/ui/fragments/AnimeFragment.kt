@@ -69,7 +69,7 @@ class AnimeFragment : Fragment() {
     ): View {
         _binding = FragmentAnimeBinding.inflate(inflater, container, false)
 
-        animeStreamViewModel.liveData.observe(viewLifecycleOwner) {
+        animeStreamViewModel.animeStreamLink.observe(viewLifecycleOwner) {
             progressBar.visibility = View.GONE
             pageLayout.visibility = View.VISIBLE
             println("ob = $it")

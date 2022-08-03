@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
-class SomeRepository {
+class AnimeRepository {
 
     private fun getAnimeEmbedLink(animeEpUrl: String): String {
         var yugenEmbedLink = Jsoup.connect(animeEpUrl)
@@ -65,12 +65,12 @@ class SomeRepository {
 
 class AnimeStreamViewModel : ViewModel() {
     private val animeLink: MutableLiveData<String> = MutableLiveData()
-    val liveData: LiveData<String> = animeLink
+    val animeStreamLink: LiveData<String> = animeLink
 
     fun setAnimeLink(animeEpUrl: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeLink.postValue(SomeRepository().getStreamLink(animeEpUrl))
+                animeLink.postValue(AnimeRepository().getStreamLink(animeEpUrl))
             }
         }
 

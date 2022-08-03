@@ -4,20 +4,19 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.model.Photos
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
 class LatestViewModel : ViewModel() {
-    private val _animeList1 = MutableLiveData<ArrayList<Photos>>().apply {
-        CoroutineScope(Dispatchers.IO).launch {
-            getLatestAnime()
-        }
+    private val _latestAnimeList = MutableLiveData<ArrayList<Photos>>().apply {
+        getLatestAnimeList()
     }
 
-    fun getLatestAnime() {
+    private fun getLatestAnimeFromSite(): ArrayList<Photos> {
         Log.i("$javaClass", "Getting the latest anime")
         val picInfo = arrayListOf<Photos>()
         val url = "https://yugen.to/latest/"
@@ -31,11 +30,15 @@ class LatestViewModel : ViewModel() {
             val picObject = Photos(itemName, itemImage, itemLink)
             picInfo.add(picObject)
         }
-
-        CoroutineScope(Dispatchers.Main).launch {
-            _animeList1.value = picInfo
-        }
+        return picInfo
     }
 
-    val animeLatestList: LiveData<ArrayList<Photos>> = _animeList1
+    fun getLatestAnimeList(){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO){
+                _latestAnimeList.postValue(getLatestAnimeFromSite())
+            }
+        }
+    }
+    val latestAnimeList: LiveData<ArrayList<Photos>> = _latestAnimeList
 }

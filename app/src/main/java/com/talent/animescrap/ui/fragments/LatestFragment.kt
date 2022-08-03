@@ -11,10 +11,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.FragmentLatestBinding
 import com.talent.animescrap.ui.viewmodels.LatestViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class LatestFragment : Fragment() {
 
@@ -24,6 +20,7 @@ class LatestFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,21 +34,16 @@ class LatestFragment : Fragment() {
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        latestViewModel.animeLatestList.observe(viewLifecycleOwner) {
+        latestViewModel.latestAnimeList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
-        }
-
-        binding.swipeContainer.setOnRefreshListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                latestViewModel.getLatestAnime()
-                withContext(Dispatchers.Main) {
-                    binding.swipeContainer.isRefreshing = false
-                }
+            if (binding.swipeContainer.isRefreshing) {
+                binding.swipeContainer.isRefreshing = false
             }
-
         }
+
+        binding.swipeContainer.setOnRefreshListener { latestViewModel.getLatestAnimeList() }
 
         return binding.root
     }
