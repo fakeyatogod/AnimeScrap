@@ -131,13 +131,12 @@ class AnimeFragment : Fragment() {
             pageLayout.visibility = View.VISIBLE
 
             animeName = animeModel.animeName
-
             setupSpinner(animeModel.animeEpisodes, animeModel.animeEpisodes)
         }
 
-        CoroutineScope(Dispatchers.IO).launch {
-            contentLink?.let { animeDetailsViewModel.getAnimeDetails(it) }
-        }
+
+        contentLink?.let { animeDetailsViewModel.getAnimeDetails(it) }
+
 
         return binding.root
     }

@@ -12,10 +12,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.FragmentSearchBinding
 import com.talent.animescrap.ui.viewmodels.SearchViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 
 
@@ -31,32 +27,26 @@ class SearchFragment : Fragment() {
     ): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
 
-        val inputEditText = binding.textInputEditText
-        val recyclerView = binding.recyclerView
         binding.progressbarInMain.visibility = View.GONE
+        binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
-        inputEditText.addTextChangedListener {
+        searchViewModel.searchedAnimeList.observe(viewLifecycleOwner) { animeList ->
+            binding.progressbarInMain.visibility = View.GONE
+            binding.recyclerView.adapter =
+                RecyclerAdapter(activity as Context, animeList)
+            binding.recyclerView.setHasFixedSize(true)
+        }
+
+        binding.textInputEditText.addTextChangedListener {
             val newText2 = it.toString().lowercase(Locale.ENGLISH)
 
             if (newText2.length >= 3) {
                 binding.progressbarInMain.visibility = View.VISIBLE
-                recyclerView.visibility = View.VISIBLE
-                recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+                binding.recyclerView.visibility = View.VISIBLE
+                binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
                 val searchUrl = "https://yugen.to/search/?q=${newText2.replace(" ", "+")}"
                 println(searchUrl)
-                CoroutineScope(Dispatchers.IO).launch {
-                    searchViewModel.searchAnime(searchUrl)
-                    withContext(Dispatchers.Main) {
-                        searchViewModel.animeLatestList.observe(viewLifecycleOwner) { animeList ->
-                            binding.progressbarInMain.visibility = View.GONE
-                            binding.recyclerView.adapter =
-                                RecyclerAdapter(activity as Context, animeList)
-                            binding.recyclerView.setHasFixedSize(true)
-                        }
-                    }
-
-                }
+                searchViewModel.searchAnime(searchUrl)
             }
         }
 

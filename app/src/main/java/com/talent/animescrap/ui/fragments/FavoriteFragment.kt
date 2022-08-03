@@ -11,10 +11,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.FragmentFavoriteBinding
 import com.talent.animescrap.ui.viewmodels.FavoriteViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class FavoriteFragment : Fragment() {
 
@@ -36,30 +32,23 @@ class FavoriteFragment : Fragment() {
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
 
-        favoriteViewModel.animeFavoriteList.observe(viewLifecycleOwner) {
+        favoriteViewModel.favoriteAnimeList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
-        }
-
-        binding.swipeContainer.setOnRefreshListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                favoriteViewModel.getLatestAnime(requireContext())
-                withContext(Dispatchers.Main) {
-                    binding.swipeContainer.isRefreshing = false
-                }
+            if (binding.swipeContainer.isRefreshing) {
+                binding.swipeContainer.isRefreshing = false
             }
-
         }
+
+        binding.swipeContainer.setOnRefreshListener { favoriteViewModel.getFavorites() }
 
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        CoroutineScope(Dispatchers.IO).launch {
-            favoriteViewModel.getLatestAnime(requireContext())
-        }
+        favoriteViewModel.getFavorites()
 
     }
 

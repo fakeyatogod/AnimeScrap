@@ -4,32 +4,43 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.model.Photos
-import kotlinx.coroutines.CoroutineScope
+import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.jsoup.Jsoup
+import kotlinx.coroutines.withContext
 
 class SearchViewModel : ViewModel() {
-    private val _animeList1 = MutableLiveData<ArrayList<Photos>>()
+    private val _searchedAnimeList = MutableLiveData<ArrayList<Photos>>()
 
-    fun searchAnime(searchUrl: String) {
-        Log.i("$javaClass", "Getting to search anime")
-        val picInfo = arrayListOf<Photos>()
-        val doc = Jsoup.connect(searchUrl).get()
+    private suspend fun searchAnimeFromSite(searchUrl: String) = withContext(Dispatchers.IO) {
+        Log.i("SearchViewModel", "Getting to search anime")
+        val animeList = arrayListOf<Photos>()
+        val doc = Utils().getJsoup(searchUrl)
         val allInfo = doc.getElementsByClass("anime-meta")
         for (item in allInfo) {
             val itemImage = item.getElementsByTag("img").attr("data-src")
             val itemName = item.getElementsByClass("anime-name").text()
             val itemLink = item.attr("href")
             val picObject = Photos(itemName, itemImage, itemLink)
-            picInfo.add(picObject)
+            animeList.add(picObject)
         }
 
-        CoroutineScope(Dispatchers.Main).launch {
-            _animeList1.value = picInfo
+        return@withContext animeList
+    }
+
+    fun searchAnime(searchUrl: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                searchAnimeFromSite(searchUrl).apply {
+                    withContext(Dispatchers.Main) {
+                        _searchedAnimeList.value = this@apply
+                    }
+                }
+            }
         }
     }
 
-    val animeLatestList: LiveData<ArrayList<Photos>> = _animeList1
+    val searchedAnimeList: LiveData<ArrayList<Photos>> = _searchedAnimeList
 }
