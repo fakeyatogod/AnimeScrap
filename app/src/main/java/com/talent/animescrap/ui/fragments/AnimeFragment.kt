@@ -58,6 +58,7 @@ class AnimeFragment : Fragment() {
     private lateinit var buttonFavorite: ImageButton
     private lateinit var spinner: Spinner
     private lateinit var playAnimeButton: ImageButton
+    private var animeName: String? = null
 
     private val args: AnimeFragmentArgs by navArgs()
     private val animeDetailsViewModel: AnimeDetailsViewModel by viewModels()
@@ -67,6 +68,13 @@ class AnimeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAnimeBinding.inflate(inflater, container, false)
+
+        animeStreamViewModel.liveData.observe(viewLifecycleOwner) {
+            progressBar.visibility = View.GONE
+            pageLayout.visibility = View.VISIBLE
+            println("ob = $it")
+            animeName?.let { name -> startPlayer(it, name) }
+        }
 
         animeNameTxt = binding.animeNameTxt
         animeDetailsTxt = binding.animeDetailsTxt
@@ -121,7 +129,10 @@ class AnimeFragment : Fragment() {
             }
             progressBar.visibility = View.GONE
             pageLayout.visibility = View.VISIBLE
-            setupSpinner(animeModel.animeEpisodes, animeModel.animeName, animeModel.animeEpisodes)
+
+            animeName = animeModel.animeName
+
+            setupSpinner(animeModel.animeEpisodes, animeModel.animeEpisodes)
         }
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -131,7 +142,7 @@ class AnimeFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupSpinner(num: String, animeName: String, animeEpisodes: String) {
+    private fun setupSpinner(num: String, animeEpisodes: String) {
 
         val epList = (num.toInt() downTo 1).map { it.toString() }
         val arrayAdapter =
@@ -142,13 +153,6 @@ class AnimeFragment : Fragment() {
         // Remember Last watched in Spinner
         if (lastWatchedPrefString in epList)
             spinner.setSelection(epList.indexOf(lastWatchedPrefString))
-
-        animeStreamViewModel.liveData.observe(viewLifecycleOwner) {
-            progressBar.visibility = View.GONE
-            pageLayout.visibility = View.VISIBLE
-            println("ob = $it")
-            startPlayer(it, animeName)
-        }
 
         playAnimeButton.setOnClickListener {
 
