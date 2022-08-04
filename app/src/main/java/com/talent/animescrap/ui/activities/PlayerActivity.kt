@@ -37,7 +37,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var mediaSource: HlsMediaSource
     private lateinit var bottomSheet: BottomSheetDialog
     private lateinit var settingsPreferenceManager: SharedPreferences
-    private var isPipEnabled: Boolean = false
+    private var isPipEnabled: Boolean = true
     private val mCookieManager = CookieManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +48,7 @@ class PlayerActivity : AppCompatActivity() {
         bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
         settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
-        isPipEnabled = settingsPreferenceManager.getBoolean("pip", false)
+        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
 
         println(isPipEnabled)
         if (isPipEnabled) {
