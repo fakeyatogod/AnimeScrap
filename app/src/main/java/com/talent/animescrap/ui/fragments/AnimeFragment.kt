@@ -256,55 +256,38 @@ class AnimeFragment : Fragment() {
         var linkDao = db.linkDao()
 
         CoroutineScope(Dispatchers.IO).launch {
-            // get fav list
-            val favList = linkDao.getLinks()
+            val isFav = linkDao.isItFav(contentLink!!)
             db.close()
             withContext(Dispatchers.Main) {
-                // check Fav
-                val isFav = favList.any { it.linkString == contentLink }
-                if (isFav)
-                    inFav(buttonFavorite)
-                else
-                    notInFav(buttonFavorite)
+                if (isFav) inFav(buttonFavorite)
+                else notInFav(buttonFavorite)
             }
         }
 
         /*
         btn on click ->
-            open db
-            check is fav
+            open db + check is fav
             if fav ->
-                remove from fav
-                set icon
+                remove from fav + set icon
             not fav
-                add to fav
-                set icon
+                add to fav + set icon
             close db
         */
 
         buttonFavorite.setOnClickListener {
             // open DB
             db = Room.databaseBuilder(
-                activity as Context,
-                LinksRoomDatabase::class.java, "fav-db"
+                activity as Context, LinksRoomDatabase::class.java, "fav-db"
             ).build()
+
             linkDao = db.linkDao()
 
             CoroutineScope(Dispatchers.IO).launch {
                 // get fav list
-                val favList = linkDao.getLinks()
+                val isFav = linkDao.isItFav(contentLink!!)
+                val foundFav = linkDao.getFav(contentLink!!)
                 withContext(Dispatchers.Main) {
                     // check Fav
-                    var isFav = false
-                    var foundFav = FavRoomModel("null", "null", "null")
-                    for (fav in favList) {
-                        if (fav.linkString == contentLink) {
-                            isFav = true
-                            foundFav = fav
-                            break
-                        }
-                    }
-
                     if (isFav) {
                         inFav(buttonFavorite)
                         CoroutineScope(Dispatchers.IO).launch {
@@ -312,8 +295,7 @@ class AnimeFragment : Fragment() {
                             withContext(Dispatchers.Main) {
                                 notInFav(buttonFavorite)
                             }
-                        }.start()
-
+                        }
                     } else {
                         notInFav(buttonFavorite)
                         CoroutineScope(Dispatchers.IO).launch {
@@ -327,12 +309,10 @@ class AnimeFragment : Fragment() {
                             withContext(Dispatchers.Main) {
                                 inFav(buttonFavorite)
                             }
-                        }.start()
+                        }
                     }
-
                     // end of main thread
                 }
-
                 // end of io thread
             }
             db.close()
