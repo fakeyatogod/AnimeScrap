@@ -36,7 +36,7 @@
         <entry key="app/src/main/res/layout/custom_controller.xml" value="0.33" />
         <entry key="app/src/main/res/layout/double_tap_overlay.xml" value="0.225" />
         <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.34739583333333335" />
-        <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.34739583333333335" />
+        <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_latest.xml" value="0.196875" />
         <entry key="app/src/main/res/layout/fragment_player.xml" value="0.16875" />
         <entry key="app/src/main/res/layout/fragment_search.xml" value="0.28541666666666665" />
