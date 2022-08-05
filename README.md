@@ -30,7 +30,7 @@
 - [Jsoup](https://jsoup.org/) - Very cool library to scrape and parse HTML from a URL, file, or string.
 - [Coil](https://coil-kt.github.io/coil/) - An image loading library for Android backed by Kotlin Coroutines.
 - [Fuel](https://github.com/kittinunf/fuel) - The easiest HTTP networking library for Kotlin/Android.
-- [Jackson](https://github.com/FasterXML/jackson) - Useful to parse JSON without the need of data class.
+- [Gson](https://github.com/google/gson) - Useful to parse JSON into Java Objects.
 - [Swiperefreshlayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - For swipe to refresh layouts
 - [Media3/ExoPlayer](https://developer.android.com/jetpack/androidx/releases/media3) - For video playback
 
