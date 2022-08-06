@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.talent.animescrap.R
-import com.talent.animescrap.model.Photos
+import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.ui.fragments.FavoriteFragmentDirections
 import com.talent.animescrap.ui.fragments.LatestFragmentDirections
 import com.talent.animescrap.ui.fragments.SearchFragmentDirections
 import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
 
-class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Photos>) :
+class RecyclerAdapter(val context: Context, private val itemList: ArrayList<SimpleAnime>) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -37,9 +37,9 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val pic = itemList[position]
-        holder.itemName.text = pic.resName
+        holder.itemName.text = pic.animeName
 
-        holder.itemImage.load(pic.resImage) {
+        holder.itemImage.load(pic.animeImageURL) {
             error(R.drawable.ic_broken_image)
             listener(
                 onSuccess = { _, _ ->
@@ -59,24 +59,24 @@ class RecyclerAdapter(val context: Context, private val itemList: ArrayList<Phot
                 R.id.navigation_favorite -> {
                     val action =
                         FavoriteFragmentDirections.actionNavigationFavoriteToNavigationAnime()
-                            .setAnimeLink(pic.resLink)
+                            .setAnimeLink(pic.animeLink)
                     navController.navigate(action)
                 }
                 R.id.navigation_latest -> {
                     val action = LatestFragmentDirections.actionNavigationLatestToNavigationAnime()
-                        .setAnimeLink(pic.resLink)
+                        .setAnimeLink(pic.animeLink)
                     navController.navigate(action)
                 }
                 R.id.navigation_trending -> {
                     val action =
                         TrendingFragmentDirections.actionNavigationTrendingToNavigationAnime()
-                            .setAnimeLink(pic.resLink)
+                            .setAnimeLink(pic.animeLink)
                     navController.navigate(action)
                 }
                 R.id.navigation_search -> {
                     val action =
                         SearchFragmentDirections.actionNavigationSearchToNavigationAnime()
-                            .setAnimeLink(pic.resLink)
+                            .setAnimeLink(pic.animeLink)
                     navController.navigate(action)
                 }
             }

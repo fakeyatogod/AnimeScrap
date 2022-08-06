@@ -27,21 +27,21 @@
                 <ImageView
                     android:id="@+id/backgroundImage"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="60dp"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
                     tools:ignore="ContentDescription" />
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="60dp"
                     android:background="@drawable/shadow_gradient" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="20dp"
-                    android:layout_marginTop="56dp">
+                    android:layout_marginTop="16dp">
 
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="96dp"
@@ -69,7 +69,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="124dp"
-                    android:layout_marginTop="85dp"
+                    android:layout_marginTop="65dp"
                     android:orientation="vertical"
                     android:paddingStart="20dp"
                     android:paddingEnd="4dp">
@@ -105,114 +105,133 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="14dp">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingVertical="10dp">
 
                 <!-- Favourites button -->
-                <LinearLayout
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/fav_card"
+                    style="@style/Widget.Material3.CardView.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <ImageButton
-                        android:id="@+id/button_favorite"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/round_image_button"
-                        android:contentDescription="@string/favourite_button_text"
-                        android:padding="8dp"
-                        android:src="@drawable/ic_heart_plus" />
-
-                    <TextView
-                        android:id="@+id/favButtonText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/favourite_button_text"
-                        android:textAlignment="center" />
-
-                </LinearLayout>
-
-                <!-- Episode button -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="8dp">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp">
 
                         <ImageView
+                            android:id="@+id/button_favorite"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/round_image_button"
+                            android:contentDescription="@string/favourite_button_text"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_heart_plus" />
+
+                        <TextView
+                            android:id="@+id/favButtonText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:padding="8dp"
-                            android:src="@drawable/ic_episode"
-                            tools:ignore="ContentDescription" />
-
-                        <Spinner
-                            android:id="@+id/episodeSpinner"
-                            android:layout_width="100dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:contentDescription="@string/select_episode"
+                            android:text="@string/favourite_button_text"
                             android:textAlignment="center" />
 
                     </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/select_episode"
-                        android:textAlignment="center" />
-
-                </LinearLayout>
-
-                <!-- Play button -->
-                <LinearLayout
+                <!-- Episode button -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/ep_card"
+                    style="@style/Widget.Material3.CardView.Filled"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="15dp"
-                    tools:ignore="UseCompoundDrawables">
+                    android:layout_margin="6dp"
+                    android:clickable="true"
+                    android:focusable="true">
 
-                    <ImageButton
-                        android:id="@+id/episodeButtonForSpinner"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/round_image_button"
-                        android:contentDescription="@string/play_button_text"
-                        android:padding="4dp"
-                        android:src="@drawable/ic_play" />
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp">
 
-                    <TextView
-                        android:id="@+id/playButtonText"
-                        android:layout_width="match_parent"
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center">
+
+                            <ImageView
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_gravity="center"
+                                android:scaleType="centerInside"
+                                android:src="@drawable/ic_episode"
+                                tools:ignore="ContentDescription" />
+
+                            <Spinner
+                                android:id="@+id/episodeSpinner"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:contentDescription="@string/select_episode"
+                                android:textAlignment="center" />
+
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/select_episode"
+                            android:textAlignment="center" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Play button -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/play_card"
+                    style="@style/Widget.Material3.CardView.Filled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/play_button_text"
-                        android:textAlignment="center" />
+                        android:orientation="vertical"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="6dp">
 
-                </LinearLayout>
+                        <ImageView
+                            android:id="@+id/episodeButtonForSpinner"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/round_image_button"
+                            android:contentDescription="@string/play_button_text"
+                            android:scaleType="centerInside"
+                            android:src="@drawable/ic_play" />
 
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
+                        <TextView
+                            android:id="@+id/playButtonText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/play_button_text"
+                            android:textAlignment="center" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
+
 
             <!-- Synopsis -->
             <TextView
