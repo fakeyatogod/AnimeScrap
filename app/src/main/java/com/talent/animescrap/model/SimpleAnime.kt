@@ -1,6 +1,6 @@
 package com.talent.animescrap.model
 
-data class Photos(
+data class SimpleAnime(
     val resName: String,
     val resImage: String,
     val resLink: String
