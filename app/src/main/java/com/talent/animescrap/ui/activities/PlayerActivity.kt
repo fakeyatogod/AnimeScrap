@@ -102,7 +102,7 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        val mapOfQualities = mutableMapOf<String, Int>()
+        val qualityMapUnsorted = mutableMapOf<String, Int>()
         player.addListener(object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
                 // Update UI using current tracks.
@@ -115,11 +115,14 @@ class PlayerActivity : AppCompatActivity() {
                             println(trackGroup.isTrackSupported(i))
                             println(trackGroup.isTrackSelected(i))
                             if (trackGroup.isTrackSupported(i) && trackGroup.isTrackSelected(i)) {
-                                mapOfQualities["${trackFormat}p"] = i
-                                qualityBtn.setOnClickListener {
-                                    showQuality(mapOfQualities, trackGroup)
-                                }
+                                qualityMapUnsorted["${trackFormat}p"] = i
                             }
+                        }
+                        val qualityMapSorted = mutableMapOf<String, Int>()
+                        qualityMapUnsorted.entries.sortedBy { it.key.replace("p", "").toInt() }
+                            .reversed().forEach { qualityMapSorted[it.key] = it.value }
+                        qualityBtn.setOnClickListener {
+                            showQuality(qualityMapSorted, trackGroup)
                         }
                     }
 
