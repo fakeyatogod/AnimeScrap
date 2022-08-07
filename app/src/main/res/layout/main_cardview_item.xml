@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="animeInfo"
-            type="com.talent.animescrap.model.SimpleAnime"/>
-
+            type="com.talent.animescrap.model.SimpleAnime" />
 
         <variable
             name="clickListener"
-            type="android.view.View.OnClickListener"/>
+            type="android.view.View.OnClickListener" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cView"
-        android:onClick="@{clickListener}"
         style="@style/Widget.Material3.CardView.Filled"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:onClick="@{clickListener}"
         app:cardBackgroundColor="?attr/colorSurface"
         app:cardCornerRadius="10dp"
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true"
         tools:viewBindingIgnore="true">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -42,21 +45,21 @@
 
                     <ImageView
                         android:id="@+id/imageView"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
                         image="@{animeInfo.animeImageURL}"
                         loaderId="@{progressInCard}"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
                         android:contentDescription="@string/imageview_in_main"
-                        android:scaleType="centerCrop"/>
+                        android:scaleType="centerCrop" />
 
                     <com.google.android.material.progressindicator.CircularProgressIndicator
                         android:id="@+id/progressInCard"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerInParent="true"
-
                         android:indeterminate="true"
-                        app:indicatorSize="40dp" app:trackThickness="20dp"/>
+                        app:indicatorSize="40dp"
+                        app:trackThickness="20dp" />
 
                 </RelativeLayout>
 
@@ -71,7 +74,7 @@
                 android:maxLines="2"
                 android:padding="6dp"
                 android:text="@{animeInfo.animeName}"
-                android:textAlignment="center"/>
+                android:textAlignment="center" />
 
         </LinearLayout>
 

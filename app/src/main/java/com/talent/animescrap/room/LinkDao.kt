@@ -14,9 +14,9 @@ interface LinkDao {
     fun deleteOne(fav: FavRoomModel)
 
     @Query("SELECT EXISTS (SELECT * FROM fav_table where favLink = :link)")
-    fun isItFav(link : String) : Boolean
+    fun isItFav(link: String): Boolean
 
     @Query("SELECT * FROM fav_table where favLink = :link")
-    fun getFav(link : String): FavRoomModel
+    fun getFav(link: String): FavRoomModel
 
 }

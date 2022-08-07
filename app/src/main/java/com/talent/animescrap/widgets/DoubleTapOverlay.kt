@@ -18,7 +18,7 @@ class DoubleTapOverlay @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-): ConstraintLayout(context, attrs, defStyleAttr) {
+) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     companion object {
         const val CYCLE_DURATION = 750L
@@ -176,12 +176,16 @@ class DoubleTapOverlay @JvmOverloads constructor(
             clone(rootLayout)
             if (forward) {
                 clear(indicatorContainer.id, ConstraintSet.START)
-                connect(indicatorContainer.id, ConstraintSet.END,
-                    ConstraintSet.PARENT_ID, ConstraintSet.END)
+                connect(
+                    indicatorContainer.id, ConstraintSet.END,
+                    ConstraintSet.PARENT_ID, ConstraintSet.END
+                )
             } else {
                 clear(indicatorContainer.id, ConstraintSet.END)
-                connect(indicatorContainer.id, ConstraintSet.START,
-                    ConstraintSet.PARENT_ID, ConstraintSet.START)
+                connect(
+                    indicatorContainer.id, ConstraintSet.START,
+                    ConstraintSet.PARENT_ID, ConstraintSet.START
+                )
             }
             start()
             applyTo(rootLayout)
@@ -203,8 +207,7 @@ class DoubleTapOverlay @JvmOverloads constructor(
             if (forward)
                 R.string.seek_seconds_forward
             else
-                R.string.seek_seconds_backward
-            , secondsOffset
+                R.string.seek_seconds_backward, secondsOffset
         )
 
         // Cancel ripple and start new without triggering overlay disappearance

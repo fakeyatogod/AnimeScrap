@@ -17,7 +17,8 @@ import com.talent.animescrap.ui.fragments.SearchFragmentDirections
 import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
 
 class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(AnimeDiffUtil) {
-    inner class ViewHolder(private val binding: MainCardviewItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: MainCardviewItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         init {
             binding.setClickListener { view ->
                 binding.animeInfo?.let { anime ->
@@ -66,7 +67,8 @@ class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(Ani
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = MainCardviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            MainCardviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
