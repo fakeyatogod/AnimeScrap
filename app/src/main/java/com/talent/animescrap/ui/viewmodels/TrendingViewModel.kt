@@ -13,18 +13,17 @@ import kotlinx.coroutines.withContext
 class TrendingViewModel : ViewModel() {
     private val _trendingAnimeList =
         MutableLiveData<ArrayList<SimpleAnime>>().apply { getTrendingAnimeList() }
+    val trendingAnimeList: LiveData<ArrayList<SimpleAnime>> = _trendingAnimeList
+
 
     fun getTrendingAnimeList() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 AnimeRepository().getTrendingAnimeFromSite().apply {
-                    withContext(Dispatchers.Main) {
-                        _trendingAnimeList.value = this@apply
-                    }
+                    _trendingAnimeList.postValue(this@apply)
                 }
             }
         }
     }
 
-    val trendingAnimeList: LiveData<ArrayList<SimpleAnime>> = _trendingAnimeList
 }

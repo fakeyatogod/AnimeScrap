@@ -12,18 +12,16 @@ import kotlinx.coroutines.withContext
 
 class AnimeDetailsViewModel : ViewModel() {
     private val _animeDetails = MutableLiveData<AnimeDetails>()
+    val animeDetails: LiveData<AnimeDetails> = _animeDetails
 
     fun getAnimeDetails(contentLink: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 AnimeRepository().getAnimeDetailsFromSite(contentLink).apply {
-                    withContext(Dispatchers.Main) {
-                        _animeDetails.value = this@apply
-                    }
+                    _animeDetails.postValue(this@apply)
                 }
             }
         }
     }
 
-    val animeDetails: LiveData<AnimeDetails> = _animeDetails
 }

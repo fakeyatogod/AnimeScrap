@@ -14,18 +14,16 @@ class LatestViewModel : ViewModel() {
     private val _latestAnimeList = MutableLiveData<ArrayList<SimpleAnime>>().apply {
         getLatestAnimeList()
     }
+    val latestAnimeList: LiveData<ArrayList<SimpleAnime>> = _latestAnimeList
 
     fun getLatestAnimeList() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 AnimeRepository().getLatestAnimeFromSite().apply {
-                    withContext(Dispatchers.Main) {
-                        _latestAnimeList.value = this@apply
-                    }
+                    _latestAnimeList.postValue(this@apply)
                 }
             }
         }
     }
 
-    val latestAnimeList: LiveData<ArrayList<SimpleAnime>> = _latestAnimeList
 }
