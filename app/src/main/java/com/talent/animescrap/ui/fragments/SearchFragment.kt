@@ -20,6 +20,7 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private val searchViewModel by viewModels<SearchViewModel>()
+    private val rvAdapter = RecyclerAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,11 +30,13 @@ class SearchFragment : Fragment() {
 
         binding.progressbarInMain.visibility = View.GONE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+        binding.recyclerView.adapter = rvAdapter
 
         searchViewModel.searchedAnimeList.observe(viewLifecycleOwner) { animeList ->
             binding.progressbarInMain.visibility = View.GONE
-            binding.recyclerView.adapter =
-                RecyclerAdapter(activity as Context, animeList)
+
+            rvAdapter.submitList(animeList)
+
             binding.recyclerView.setHasFixedSize(true)
         }
 

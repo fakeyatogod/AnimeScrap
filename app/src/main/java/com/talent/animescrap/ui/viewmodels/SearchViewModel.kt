@@ -12,18 +12,15 @@ import kotlinx.coroutines.withContext
 
 class SearchViewModel : ViewModel() {
     private val _searchedAnimeList = MutableLiveData<ArrayList<SimpleAnime>>()
+    val searchedAnimeList: LiveData<ArrayList<SimpleAnime>> = _searchedAnimeList
 
     fun searchAnime(searchUrl: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 AnimeRepository().searchAnimeFromSite(searchUrl).apply {
-                    withContext(Dispatchers.Main) {
-                        _searchedAnimeList.value = this@apply
-                    }
+                    _searchedAnimeList.postValue(this@apply)
                 }
             }
         }
     }
-
-    val searchedAnimeList: LiveData<ArrayList<SimpleAnime>> = _searchedAnimeList
 }

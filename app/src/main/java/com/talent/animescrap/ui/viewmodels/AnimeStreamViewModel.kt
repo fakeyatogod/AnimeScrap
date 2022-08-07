@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 
 
 class AnimeStreamViewModel : ViewModel() {
+
     private val _animeStreamLink: MutableLiveData<String> = MutableLiveData()
     val animeStreamLink: LiveData<String> = _animeStreamLink
 
@@ -18,9 +19,7 @@ class AnimeStreamViewModel : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 AnimeRepository().getStreamLink(animeEpUrl).apply {
-                    withContext(Dispatchers.Main) {
-                        _animeStreamLink.value = this@apply
-                    }
+                    _animeStreamLink.postValue(this@apply)
                 }
             }
         }

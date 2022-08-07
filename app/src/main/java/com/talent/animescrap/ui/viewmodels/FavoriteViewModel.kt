@@ -17,18 +17,16 @@ class FavoriteViewModel(application: Application) : AndroidViewModel(application
     private val _favoriteAnimeList = MutableLiveData<ArrayList<SimpleAnime>>().apply {
         getFavorites()
     }
+    val favoriteAnimeList: LiveData<ArrayList<SimpleAnime>> = _favoriteAnimeList
 
     fun getFavorites() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 AnimeRepository().getFavoritesFromRoom(getApplication() as Context).apply {
-                    withContext(Dispatchers.Main) {
-                        _favoriteAnimeList.value = this@apply
-                    }
+                    _favoriteAnimeList.postValue(this@apply)
                 }
             }
         }
     }
 
-    val favoriteAnimeList: LiveData<ArrayList<SimpleAnime>> = _favoriteAnimeList
 }

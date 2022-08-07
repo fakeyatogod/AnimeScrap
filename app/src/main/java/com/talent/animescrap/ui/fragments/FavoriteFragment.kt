@@ -16,6 +16,7 @@ class FavoriteFragment : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null
     private val favoriteViewModel: FavoriteViewModel by viewModels()
+    private val rvAdapter = RecyclerAdapter()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -31,14 +32,15 @@ class FavoriteFragment : Fragment() {
 
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+        binding.recyclerView.adapter = rvAdapter
 
         favoriteViewModel.favoriteAnimeList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
-            binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
             binding.recyclerView.setHasFixedSize(true)
             if (binding.swipeContainer.isRefreshing) {
                 binding.swipeContainer.isRefreshing = false
             }
+            rvAdapter.submitList(it)
         }
 
         binding.swipeContainer.setOnRefreshListener { favoriteViewModel.getFavorites() }
