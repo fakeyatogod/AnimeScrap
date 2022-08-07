@@ -47,6 +47,7 @@ android {
 
     buildFeatures {
         viewBinding true
+        dataBinding true
     }
     namespace 'com.talent.animescrap'
 }

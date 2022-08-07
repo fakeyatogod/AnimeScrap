@@ -16,6 +16,7 @@ class TrendingFragment : Fragment() {
 
     private var _binding: FragmentTrendingBinding? = null
     private lateinit var trendingViewModel: TrendingViewModel
+    private var rvAdapter = RecyclerAdapter()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -32,10 +33,10 @@ class TrendingFragment : Fragment() {
 
         binding.progressbarInMain.visibility = View.VISIBLE
         binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
-
+        binding.recyclerView.adapter = rvAdapter
         trendingViewModel.trendingAnimeList.observe(viewLifecycleOwner) {
             binding.progressbarInMain.visibility = View.GONE
-            binding.recyclerView.adapter = RecyclerAdapter(activity as Context, it)
+            rvAdapter.submitList(it)
             binding.recyclerView.setHasFixedSize(true)
             if (binding.swipeContainer.isRefreshing) {
                 binding.swipeContainer.isRefreshing = false
