@@ -49,8 +49,8 @@ class AnimeRepositoryImpl @Inject constructor(
 
 
     override suspend fun getFavoritesFromRoom() = withContext(Dispatchers.IO) {
-        return@withContext linkDao.getLinks().map {
-            it.map { SimpleAnime(it.nameString, it.picLinkString, it.linkString) }
+        return@withContext linkDao.getLinks().map { animeList ->
+            animeList.map { SimpleAnime(it.nameString, it.picLinkString, it.linkString) }
         }
     }
 
