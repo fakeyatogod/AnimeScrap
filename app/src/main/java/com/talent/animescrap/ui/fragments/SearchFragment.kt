@@ -12,9 +12,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.FragmentSearchBinding
 import com.talent.animescrap.ui.viewmodels.SearchViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
-
+@AndroidEntryPoint
 class SearchFragment : Fragment() {
 
     private var _binding: FragmentSearchBinding? = null

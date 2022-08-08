@@ -29,12 +29,13 @@ import com.talent.animescrap.room.LinksRoomDatabase
 import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-
+@AndroidEntryPoint
 class AnimeFragment : Fragment() {
 
     private val animeStreamViewModel by viewModels<AnimeStreamViewModel>()

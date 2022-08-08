@@ -24,11 +24,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.widgets.DoubleTapOverlay
 import com.talent.animescrap.widgets.DoubleTapPlayerView
+import dagger.hilt.android.AndroidEntryPoint
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
 
-
+@AndroidEntryPoint
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var player: ExoPlayer

@@ -2,6 +2,8 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id("androidx.navigation.safeargs")
+    id 'dagger.hilt.android.plugin'
+
 }
 apply plugin: 'kotlin-kapt'
 
@@ -91,6 +93,12 @@ dependencies {
 
     // Preference / Settings
     implementation 'androidx.preference:preference-ktx:1.2.0'
+
+    //Hilt dependency injection
+    def hiltVersion = "2.43.1"
+    def hiltAnnotationProcessor = "2.43.1"
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    kapt "com.google.dagger:hilt-android-compiler:$hiltAnnotationProcessor"
 
     // Test
     testImplementation 'junit:junit:4.13.2'

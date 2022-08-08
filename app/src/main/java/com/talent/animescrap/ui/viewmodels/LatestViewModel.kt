@@ -6,11 +6,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.repo.AnimeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class LatestViewModel : ViewModel() {
+@HiltViewModel
+class LatestViewModel @Inject constructor(
+    private val animeRepository: AnimeRepository
+) : ViewModel() {
     private val _latestAnimeList = MutableLiveData<ArrayList<SimpleAnime>>().apply {
         getLatestAnimeList()
     }
@@ -19,7 +24,7 @@ class LatestViewModel : ViewModel() {
     fun getLatestAnimeList() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                AnimeRepository().getLatestAnimeFromSite().apply {
+                animeRepository.getLatestAnimeFromSite().apply {
                     _latestAnimeList.postValue(this@apply)
                 }
             }

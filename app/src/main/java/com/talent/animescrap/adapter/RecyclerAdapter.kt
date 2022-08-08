@@ -15,6 +15,7 @@ import com.talent.animescrap.ui.fragments.FavoriteFragmentDirections
 import com.talent.animescrap.ui.fragments.LatestFragmentDirections
 import com.talent.animescrap.ui.fragments.SearchFragmentDirections
 import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
+import dagger.hilt.android.internal.managers.ViewComponentManager
 
 class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(AnimeDiffUtil) {
     inner class ViewHolder(private val binding: MainCardviewItemBinding) :
@@ -28,8 +29,12 @@ class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(Ani
         }
 
         private fun navigate(view: View, anime: SimpleAnime) {
+            val mContext = if (view.context is ViewComponentManager.FragmentContextWrapper)
+                (view.context as ViewComponentManager.FragmentContextWrapper).baseContext
+            else view.context
+
             val navController =
-                (view.context as Activity).findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
+                (mContext as Activity).findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
             when (navController.currentDestination?.id) {
                 R.id.navigation_favorite -> {
                     val action =

@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.talent.animescrap.adapter.RecyclerAdapter
 import com.talent.animescrap.databinding.FragmentFavoriteBinding
 import com.talent.animescrap.ui.viewmodels.FavoriteViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FavoriteFragment : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null

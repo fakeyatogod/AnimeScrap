@@ -6,18 +6,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.repo.AnimeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class SearchViewModel : ViewModel() {
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val animeRepository: AnimeRepository
+) : ViewModel() {
     private val _searchedAnimeList = MutableLiveData<ArrayList<SimpleAnime>>()
     val searchedAnimeList: LiveData<ArrayList<SimpleAnime>> = _searchedAnimeList
 
     fun searchAnime(searchUrl: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                AnimeRepository().searchAnimeFromSite(searchUrl).apply {
+                animeRepository.searchAnimeFromSite(searchUrl).apply {
                     _searchedAnimeList.postValue(this@apply)
                 }
             }
