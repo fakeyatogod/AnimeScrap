@@ -6,8 +6,10 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
+import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -21,7 +23,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                     }, Restart App to take effect", Snackbar.LENGTH_SHORT
                 ).setAction("Restart") {
                     val intent =
-                        context!!.packageManager.getLaunchIntentForPackage(context!!.packageName)!!
+                        requireContext().packageManager.getLaunchIntentForPackage(requireContext().packageName)!!
                             .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     startActivity(intent)
                     exitProcess(0)

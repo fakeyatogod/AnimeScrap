@@ -1,11 +1,12 @@
 package com.talent.animescrap.room
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LinkDao {
     @Query("SELECT * FROM fav_table")
-    fun getLinks(): List<FavRoomModel>
+    fun getLinks(): Flow<List<FavRoomModel>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(fav: FavRoomModel)
@@ -14,9 +15,9 @@ interface LinkDao {
     fun deleteOne(fav: FavRoomModel)
 
     @Query("SELECT EXISTS (SELECT * FROM fav_table where favLink = :link)")
-    fun isItFav(link : String) : Boolean
+    fun isItFav(link: String): Boolean
 
     @Query("SELECT * FROM fav_table where favLink = :link")
-    fun getFav(link : String): FavRoomModel
+    fun getFav(link: String): FavRoomModel
 
 }

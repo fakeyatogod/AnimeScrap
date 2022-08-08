@@ -1,29 +1,32 @@
 package com.talent.animescrap.ui.viewmodels
 
-import android.app.Application
-import android.content.Context
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.repo.AnimeRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class FavoriteViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class FavoriteViewModel @Inject constructor(
+    private val animeRepository: AnimeRepository
+) : ViewModel() {
 
-    private val _favoriteAnimeList = MutableLiveData<ArrayList<SimpleAnime>>().apply {
+    private val _favoriteAnimeList = MutableLiveData<List<SimpleAnime>>().apply {
         getFavorites()
     }
-    val favoriteAnimeList: LiveData<ArrayList<SimpleAnime>> = _favoriteAnimeList
+    val favoriteAnimeList: LiveData<List<SimpleAnime>> = _favoriteAnimeList
 
     fun getFavorites() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                AnimeRepository().getFavoritesFromRoom(getApplication() as Context).apply {
-                    _favoriteAnimeList.postValue(this@apply)
+                animeRepository.getFavoritesFromRoom().collect {
+                    _favoriteAnimeList.postValue(it)
                 }
             }
         }
