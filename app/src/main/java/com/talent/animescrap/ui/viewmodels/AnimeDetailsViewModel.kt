@@ -6,24 +6,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.repo.AnimeRepository
-import com.talent.animescrap.repo.AnimeRepositoryImpl
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-@HiltViewModel
-class AnimeDetailsViewModel @Inject constructor(
-    private val animeRepository: AnimeRepository
-) : ViewModel() {
+class AnimeDetailsViewModel : ViewModel() {
     private val _animeDetails = MutableLiveData<AnimeDetails>()
     val animeDetails: LiveData<AnimeDetails> = _animeDetails
 
     fun getAnimeDetails(contentLink: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeRepository.getAnimeDetailsFromSite(contentLink).apply {
+                AnimeRepository().getAnimeDetailsFromSite(contentLink).apply {
                     _animeDetails.postValue(this@apply)
                 }
             }
