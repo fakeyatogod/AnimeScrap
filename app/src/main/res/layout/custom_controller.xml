@@ -200,15 +200,15 @@
 
     </RelativeLayout>
 
-<!--    <ImageView
-        android:id="@+id/lock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="20dp"
-        android:layout_marginBottom="20dp"
-        android:contentDescription="@string/unlock"
-        android:src="@drawable/ic_baseline_lock_open_24"
-        android:visibility="invisible" />-->
+    <!--    <ImageView
+            android:id="@+id/lock"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="20dp"
+            android:contentDescription="@string/unlock"
+            android:src="@drawable/ic_baseline_lock_open_24"
+            android:visibility="invisible" />-->
 
 </RelativeLayout>

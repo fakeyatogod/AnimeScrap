@@ -15,11 +15,11 @@ class DoubleTapPlayerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-): PlayerView(context, attrs, defStyleAttr) {
+) : PlayerView(context, attrs, defStyleAttr) {
 
     companion object {
         const val SEEK_SECONDS = 10
-        const val SEEK_MILLISECONDS = SEEK_SECONDS *1000
+        const val SEEK_MILLISECONDS = SEEK_SECONDS * 1000
     }
 
     lateinit var doubleTapOverlay: DoubleTapOverlay
@@ -78,7 +78,8 @@ class DoubleTapPlayerView @JvmOverloads constructor(
         player?.let { player ->
             if (player.playbackState == PlaybackState.STATE_ERROR ||
                 player.playbackState == PlaybackState.STATE_NONE ||
-                player.playbackState == PlaybackState.STATE_STOPPED)
+                player.playbackState == PlaybackState.STATE_STOPPED
+            )
                 gestureListener.cancelDoubleTap()
             else if (player.currentPosition > 500 && x < doubleTapOverlay.width * 0.35)
                 triggerSeek(false, x, y)

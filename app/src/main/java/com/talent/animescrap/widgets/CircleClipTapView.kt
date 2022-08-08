@@ -18,7 +18,7 @@ import com.talent.animescrap.R
  *
  * Draws a arc shape and provides a circle scaling animation.
  */
-internal class CircleClipTapView(context: Context, attrs: AttributeSet): View(context, attrs) {
+internal class CircleClipTapView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
     private var backgroundPaint = Paint()
     private var circlePaint = Paint()
