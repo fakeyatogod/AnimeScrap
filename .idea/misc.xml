@@ -6,6 +6,8 @@
         <entry key="../../.gradle/caches/transforms-3/9dfe6f05cc58432f1dfe02f01a9a32ff/transformed/exoplayer-ui-2.17.1/res/layout/exo_player_view.xml" value="0.17552083333333332" />
         <entry key="../../.gradle/caches/transforms-3/beb63f77b8d554c74e22e558f3341966/transformed/media3-ui-1.0.0-beta02/res/layout/exo_player_view.xml" value="0.21770833333333334" />
         <entry key="../../.gradle/caches/transforms-3/da71ff423a35dc2e60a955dd86076228/transformed/exoplayer-ui-2.18.1/res/layout/exo_player_view.xml" value="0.2546875" />
+        <entry key="../../Android/Sdk/platforms/android-32/data/res/layout/simple_spinner_dropdown_item.xml" value="0.44375" />
+        <entry key="../../Android/Sdk/platforms/android-32/data/res/layout/simple_spinner_item.xml" value="0.44375" />
         <entry key="..\:/Users/starr/AndroidStudioProjects/AnimeScrap/app/src/main/res/drawable/ic_broken_image.xml" value="0.108" />
         <entry key="..\:/Users/starr/AndroidStudioProjects/AnimeScrap/app/src/main/res/drawable/ic_episode.xml" value="0.108" />
         <entry key="..\:/Users/starr/AndroidStudioProjects/AnimeScrap/app/src/main/res/drawable/ic_heart_minus.xml" value="0.108" />
@@ -23,13 +25,14 @@
         <entry key="app/src/main/res/drawable/ic_episode.xml" value="0.279" />
         <entry key="app/src/main/res/drawable/ic_heart_minus.xml" value="0.301" />
         <entry key="app/src/main/res/drawable/ic_heart_plus.xml" value="0.277" />
+        <entry key="app/src/main/res/drawable/ic_outline_latest_black_24.xml" value="0.221" />
         <entry key="app/src/main/res/drawable/ic_play.xml" value="0.279" />
         <entry key="app/src/main/res/drawable/ic_search_black_24.xml" value="0.1805" />
         <entry key="app/src/main/res/drawable/icon_triangle.xml" value="0.2315" />
         <entry key="app/src/main/res/drawable/round_image_button.xml" value="0.279" />
         <entry key="app/src/main/res/layout-land/activity_page.xml" value="0.2" />
         <entry key="app/src/main/res/layout-land/custom_controller.xml" value="0.3944543828264758" />
-        <entry key="app/src/main/res/layout-land/fragment_anime.xml" value="0.4552083333333333" />
+        <entry key="app/src/main/res/layout-land/fragment_anime.xml" value="0.1" />
         <entry key="app/src/main/res/layout-land/main_cardview_item.xml" value="0.2" />
         <entry key="app/src/main/res/layout/activity_main_bottom_nav.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/layout/activity_page.xml" value="0.264" />
@@ -38,19 +41,29 @@
         <entry key="app/src/main/res/layout/bottom_sheet_layout.xml" value="0.3463541666666667" />
         <entry key="app/src/main/res/layout/custom_controller.xml" value="0.22" />
         <entry key="app/src/main/res/layout/double_tap_overlay.xml" value="0.225" />
-        <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.3615819209039548" />
+        <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_latest.xml" value="0.196875" />
         <entry key="app/src/main/res/layout/fragment_player.xml" value="0.16875" />
         <entry key="app/src/main/res/layout/fragment_search.xml" value="0.28541666666666665" />
         <entry key="app/src/main/res/layout/fragment_trending.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/layout/main_cardview_item.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/spinner_dropdown_item.xml" value="0.44125" />
+        <entry key="app/src/main/res/layout/spinner_item.xml" value="0.22" />
         <entry key="app/src/main/res/menu/bottom_nav_menu.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/menu/topbar_menu.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/menu/topbar_menu_search.xml" value="0.225" />
         <entry key="app/src/main/res/xml/root_preferences.xml" value="0.33" />
       </map>
     </option>
+  </component>
+  <component name="EntryPointsManager">
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="androidx.databinding.BindingAdapter" />
+      <item index="1" class="java.lang.String" itemvalue="dagger.Binds" />
+      <item index="2" class="java.lang.String" itemvalue="dagger.Module" />
+      <item index="3" class="java.lang.String" itemvalue="dagger.Provides" />
+    </list>
   </component>
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$" />

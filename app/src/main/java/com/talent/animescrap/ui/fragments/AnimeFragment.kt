@@ -126,7 +126,7 @@ class AnimeFragment : Fragment() {
         val epList = (num.toInt() downTo 1).map { it.toString() }
         val arrayAdapter =
             ArrayAdapter(activity as Context, android.R.layout.simple_spinner_item, epList)
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        arrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         binding.episodeSpinner.adapter = arrayAdapter
 
         // Remember Last watched in binding.episodeSpinner
