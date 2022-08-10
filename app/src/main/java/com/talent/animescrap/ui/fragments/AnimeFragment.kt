@@ -19,21 +19,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
-import androidx.room.Room
 import coil.load
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
 import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.room.FavRoomModel
-import com.talent.animescrap.room.LinksRoomDatabase
 import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class AnimeFragment : Fragment() {
@@ -47,7 +40,7 @@ class AnimeFragment : Fragment() {
 
     private var contentLink: String? = "null"
     private var animeName: String? = null
-    private lateinit var animeModel: AnimeDetails
+    private lateinit var animeDetails: AnimeDetails
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var lastWatchedPrefString: String
 
@@ -85,33 +78,51 @@ class AnimeFragment : Fragment() {
             sharedPreferences.getString(contentLink, "Not Started Yet").toString()
 
         // Check Favorite
-        handleFavorite()
+        contentLink?.let { animeDetailsViewModel.checkFavorite(it) }
+        animeDetailsViewModel.isAnimeFav.observe(viewLifecycleOwner) { isFav ->
+            if (isFav) {
+                inFav()
+                binding.favCard.setOnClickListener {
+                    animeDetailsViewModel.removeFav(contentLink!!)
+                }
+            } else {
+                notInFav()
+                binding.favCard.setOnClickListener {
+                    animeDetailsViewModel.addToFav(
+                        contentLink!!,
+                        animeDetails.animeName,
+                        animeDetails.animeCover
+                    )
+                }
+            }
+        }
+
 
         binding.pageLayout.visibility = View.GONE
         binding.progressbarInPage.visibility = View.VISIBLE
 
         animeDetailsViewModel.animeDetails.observe(viewLifecycleOwner) {
-            animeModel = it
-            binding.animeNameTxt.text = animeModel.animeName
-            binding.animeDetailsTxt.text = animeModel.animeDesc
+            animeDetails = it
+            binding.animeNameTxt.text = animeDetails.animeName
+            binding.animeDetailsTxt.text = animeDetails.animeDesc
 
             binding.lastWatchedTxt.text =
                 if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString
-                else "Last Watched : $lastWatchedPrefString/${animeModel.animeEpisodes}"
+                else "Last Watched : $lastWatchedPrefString/${animeDetails.animeEpisodes}"
 
             // load background image.
-            binding.backgroundImage.load(animeModel.animeCover) {
+            binding.backgroundImage.load(animeDetails.animeCover) {
                 error(R.drawable.ic_broken_image)
             }
             // load cover image.
-            binding.coverAnime.load(animeModel.animeCover) {
+            binding.coverAnime.load(animeDetails.animeCover) {
                 error(R.drawable.ic_broken_image)
             }
             binding.progressbarInPage.visibility = View.GONE
             binding.pageLayout.visibility = View.VISIBLE
 
-            animeName = animeModel.animeName
-            setupSpinner(animeModel.animeEpisodes, animeModel.animeEpisodes)
+            animeName = animeDetails.animeName
+            setupSpinner(animeDetails.animeEpisodes, animeDetails.animeEpisodes)
         }
 
 
@@ -228,77 +239,6 @@ class AnimeFragment : Fragment() {
         }
     }
 
-    private fun handleFavorite() {
-        // open DB
-        val db = Room.databaseBuilder(
-            activity as Context,
-            LinksRoomDatabase::class.java, "fav-db"
-        ).build()
-        val linkDao = db.linkDao()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val isFav = linkDao.isItFav(contentLink!!)
-            db.close()
-            withContext(Dispatchers.Main) {
-                if (isFav) inFav()
-                else notInFav()
-            }
-        }
-        binding.favCard.setOnClickListener { favClick() }
-    }
-
-    private fun favClick() {
-        /*
-        btn on click ->
-            open db + check is fav
-            if fav ->
-                remove from fav + set icon
-            not fav
-                add to fav + set icon
-            close db
-        */
-        // open DB
-        val db = Room.databaseBuilder(
-            activity as Context, LinksRoomDatabase::class.java, "fav-db"
-        ).build()
-
-        val linkDao = db.linkDao()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            // get fav list
-            val isFav = linkDao.isItFav(contentLink!!)
-            val foundFav = linkDao.getFav(contentLink!!)
-            withContext(Dispatchers.Main) {
-                // check Fav
-                if (isFav) {
-                    inFav()
-                    CoroutineScope(Dispatchers.IO).launch {
-                        linkDao.deleteOne(foundFav)
-                        withContext(Dispatchers.Main) {
-                            notInFav()
-                        }
-                    }
-                } else {
-                    notInFav()
-                    CoroutineScope(Dispatchers.IO).launch {
-                        linkDao.insert(
-                            FavRoomModel(
-                                contentLink.toString(),
-                                animeModel.animeCover,
-                                animeModel.animeName
-                            )
-                        )
-                        withContext(Dispatchers.Main) {
-                            inFav()
-                        }
-                    }
-                }
-                // end of main thread
-            }
-            // end of io thread
-        }
-        db.close()
-    }
 
     private fun inFav() {
         println("In Fav")

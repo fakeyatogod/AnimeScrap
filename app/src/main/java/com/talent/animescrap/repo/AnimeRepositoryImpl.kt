@@ -6,6 +6,7 @@ import com.google.gson.JsonParser
 import com.talent.animescrap.R
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.SimpleAnime
+import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinkDao
 import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -15,12 +16,18 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface AnimeRepository {
+    // API operations
     suspend fun getAnimeDetailsFromSite(contentLink: String): AnimeDetails
-    suspend fun getFavoritesFromRoom(): Flow<List<SimpleAnime>>
     suspend fun searchAnimeFromSite(searchUrl: String): ArrayList<SimpleAnime>
     suspend fun getLatestAnimeFromSite(): ArrayList<SimpleAnime>
     suspend fun getTrendingAnimeFromSite(): ArrayList<SimpleAnime>
     suspend fun getStreamLink(animeEpUrl: String): String
+
+    // Room Operations
+    suspend fun getFavoritesFromRoom(): Flow<List<SimpleAnime>>
+    suspend fun checkFavoriteFromRoom(animeLink: String): Boolean
+    suspend fun removeFavFromRoom(animeLink: String)
+    suspend fun addFavToRoom(animeLink: String, animeName: String, animeCoverLink: String)
 }
 
 
@@ -43,19 +50,12 @@ class AnimeRepositoryImpl @Inject constructor(
             val animeModel =
                 AnimeDetails(animeName, animDesc, animeCover, animeEpContent)
 
-            Log.i("AnimeDetailsViewModel", animeModel.toString())
+            Log.i(TAG, animeModel.toString())
             return@withContext animeModel
         }
 
-
-    override suspend fun getFavoritesFromRoom() = withContext(Dispatchers.IO) {
-        return@withContext linkDao.getLinks().map { animeList ->
-            animeList.map { SimpleAnime(it.nameString, it.picLinkString, it.linkString) }
-        }
-    }
-
     override suspend fun searchAnimeFromSite(searchUrl: String) = withContext(Dispatchers.IO) {
-        Log.i("SearchViewModel", "Getting to search anime")
+        Log.i(TAG, "Getting to search anime")
         val animeList = arrayListOf<SimpleAnime>()
         val doc = Utils().getJsoup(searchUrl)
         val allInfo = doc.getElementsByClass("anime-meta")
@@ -90,7 +90,7 @@ class AnimeRepositoryImpl @Inject constructor(
 
     override suspend fun getTrendingAnimeFromSite(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
-            Log.i("TrendingViewModel", "Getting the trending anime")
+            Log.i(TAG, "Getting the trending anime")
             val animeList = arrayListOf<SimpleAnime>()
             val doc = Utils().getJsoup(url = "https://yugen.to/trending/")
             val allInfo = doc.getElementsByClass("anime-meta")
@@ -132,7 +132,6 @@ class AnimeRepositoryImpl @Inject constructor(
         val fuel = Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
         val res = fuel.response().third
         val (bytes, _) = res
-        println("hi new repo")
         if (bytes != null) {
             val linkDetails = JsonParser.parseString(String(bytes)).asJsonObject
             val link = linkDetails.get("hls")
@@ -141,6 +140,29 @@ class AnimeRepositoryImpl @Inject constructor(
 
         return@withContext "No Link Found"
 
+    }
+
+    override suspend fun getFavoritesFromRoom() = withContext(Dispatchers.IO) {
+        return@withContext linkDao.getLinks().map { animeList ->
+            animeList.map { SimpleAnime(it.nameString, it.picLinkString, it.linkString) }
+        }
+    }
+
+    override suspend fun checkFavoriteFromRoom(animeLink: String): Boolean =
+        withContext(Dispatchers.IO) {
+            return@withContext linkDao.isItFav(animeLink)
+        }
+
+    override suspend fun removeFavFromRoom(animeLink: String) =
+        withContext(Dispatchers.IO) {
+            val foundFav = linkDao.getFav(animeLink)
+            linkDao.deleteOne(foundFav)
+        }
+
+    override suspend fun addFavToRoom(
+        animeLink: String, animeName: String, animeCoverLink: String
+    ) = withContext(Dispatchers.IO) {
+        linkDao.insert(FavRoomModel(animeLink, animeCoverLink, animeName))
     }
 
     companion object {

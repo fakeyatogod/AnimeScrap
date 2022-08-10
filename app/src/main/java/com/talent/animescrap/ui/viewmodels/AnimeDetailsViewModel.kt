@@ -29,4 +29,37 @@ class AnimeDetailsViewModel @Inject constructor(
         }
     }
 
+
+    private val _isAnimeFav = MutableLiveData<Boolean>()
+    val isAnimeFav: LiveData<Boolean> = _isAnimeFav
+
+    fun checkFavorite(animeLink: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                animeRepository.checkFavoriteFromRoom(animeLink).apply {
+                    if (this) _isAnimeFav.postValue(true)
+                    else _isAnimeFav.postValue(false)
+                }
+            }
+        }
+    }
+
+    fun removeFav(animeLink: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                animeRepository.removeFavFromRoom(animeLink)
+                _isAnimeFav.postValue(false)
+            }
+        }
+    }
+
+    fun addToFav(animeLink: String, animeName: String, animeCoverLink: String) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                animeRepository.addFavToRoom(animeLink, animeName, animeCoverLink)
+                _isAnimeFav.postValue(true)
+            }
+        }
+
+    }
 }
