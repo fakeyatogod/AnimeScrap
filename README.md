@@ -8,15 +8,20 @@
   <a href="https://www.android.com"><img src="https://forthebadge.com/images/badges/built-for-android.svg"></a> <a href="https://www.github.com/fakeyatogod/"><img src="https://forthebadge.com/images/badges/built-with-love.svg"/></a>
 </p>
 
-**Anime Scrap** is a simple [FOSS](https://en.m.wikipedia.org/wiki/Free_and_open-source_software) android app to help you watch anime in your phone.
+**Anime Scrap** is a simple [Open Source](https://en.m.wikipedia.org/wiki/Free_and_open-source_software) android app to help you watch anime in your phone.
 
 ### 👇 Downloads
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="65">](https://github.com/fakeyatogod/AnimeScrap/releases/latest)
 
 
 ### ✨ Features
-- Compatible with Android 7.0 and above (API 24+)
+- Compatible with Android 6.0 and above (API 23+)
 - Comes in both light and dark mode.
+- Supports dynamic colors on A12+.
+- Supports external video player
+- Supports Picture-in-Picture mode.
+- [Material Design 3](https://m3.material.io/) Theme.
+
 
 ### 🛠️ Built with
 - [Kotlin](https://kotlinlang.org/) - First class and official programming language for Android development.
@@ -33,6 +38,7 @@
 - [Gson](https://github.com/google/gson) - Useful to parse JSON into Java Objects.
 - [Swiperefreshlayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - For swipe to refresh layouts
 - [Media3/ExoPlayer](https://developer.android.com/jetpack/androidx/releases/media3) - For video playback
+- [Dagger-Hilt](https://dagger.dev/hilt/) For [Dependency injection (DI)](https://developer.android.com/training/dependency-injection)
 
 
 ### 🤝 Thanks
