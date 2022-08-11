@@ -100,7 +100,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:padding="10dp">
+                android:padding="4dp">
 
                 <TextView
                     android:id="@+id/exo_position"
@@ -120,6 +120,7 @@
                     android:layout_toEndOf="@+id/exo_position"
                     android:contentDescription="@string/timer_bar"
                     android:padding="4dp"
+                    app:bar_height="2dp"
                     app:buffered_color="#BCB9B9"
                     app:played_color="#FF0000"
                     app:unplayed_color="#3E3C3C" />
@@ -140,7 +141,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="6dp">
+                android:paddingVertical="2dp">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
