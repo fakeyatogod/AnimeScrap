@@ -1,6 +1,7 @@
 package com.talent.animescrap.ui.fragments
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,7 +34,11 @@ class FavoriteFragment : Fragment() {
         _binding = FragmentFavoriteBinding.inflate(inflater, container, false)
 
         binding.progressbarInMain.visibility = View.VISIBLE
-        binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 4)
+        } else {
+            binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+        }
         binding.recyclerView.adapter = rvAdapter
 
         favoriteViewModel.favoriteAnimeList.observe(viewLifecycleOwner) {
