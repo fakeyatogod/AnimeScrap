@@ -32,7 +32,7 @@
         <entry key="app/src/main/res/drawable/round_image_button.xml" value="0.279" />
         <entry key="app/src/main/res/layout-land/activity_page.xml" value="0.2" />
         <entry key="app/src/main/res/layout-land/custom_controller.xml" value="0.3944543828264758" />
-        <entry key="app/src/main/res/layout-land/fragment_anime.xml" value="0.1" />
+        <entry key="app/src/main/res/layout-land/fragment_anime.xml" value="0.5" />
         <entry key="app/src/main/res/layout-land/main_cardview_item.xml" value="0.2" />
         <entry key="app/src/main/res/layout/activity_main_bottom_nav.xml" value="0.16822916666666668" />
         <entry key="app/src/main/res/layout/activity_page.xml" value="0.264" />
@@ -41,7 +41,7 @@
         <entry key="app/src/main/res/layout/bottom_sheet_layout.xml" value="0.3463541666666667" />
         <entry key="app/src/main/res/layout/custom_controller.xml" value="0.5038759689922481" />
         <entry key="app/src/main/res/layout/double_tap_overlay.xml" value="0.225" />
-        <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.67" />
         <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.1" />
         <entry key="app/src/main/res/layout/fragment_latest.xml" value="0.196875" />
         <entry key="app/src/main/res/layout/fragment_player.xml" value="0.16875" />
