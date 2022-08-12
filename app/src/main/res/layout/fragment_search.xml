@@ -27,6 +27,7 @@
                     android:id="@+id/text_input_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:imeOptions="actionDone"
                     android:inputType="text"
                     android:lines="1"
                     android:maxLines="1" />

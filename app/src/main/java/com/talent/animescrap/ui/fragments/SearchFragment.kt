@@ -40,20 +40,17 @@ class SearchFragment : Fragment() {
 
         searchViewModel.searchedAnimeList.observe(viewLifecycleOwner) { animeList ->
             binding.progressbarInMain.visibility = View.GONE
-
-            rvAdapter.submitList(animeList)
-
             binding.recyclerView.setHasFixedSize(true)
+            rvAdapter.submitList(animeList)
         }
 
         binding.textInputEditText.addTextChangedListener {
-            val newText2 = it.toString().lowercase(Locale.ENGLISH)
+            val searchedText = it.toString().lowercase(Locale.ENGLISH)
 
-            if (newText2.length >= 3) {
+            if (searchedText.length >= 3) {
                 binding.progressbarInMain.visibility = View.VISIBLE
                 binding.recyclerView.visibility = View.VISIBLE
-                binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
-                val searchUrl = "https://yugen.to/search/?q=${newText2.replace(" ", "+")}"
+                val searchUrl = "https://yugen.to/search/?q=${searchedText.replace(" ", "+")}"
                 println(searchUrl)
                 searchViewModel.searchAnime(searchUrl)
             }
