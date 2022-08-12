@@ -50,4 +50,6 @@
     <string name="pip_disabled">Picture-in-picture disabled</string>
     <string name="pip_enabled">Picture-in-picture enabled</string>
     <string name="pip_title">Enable PiP</string>
+    <string name="theme_cat_title">Theme</string>
+    <string name="player_cat_title">Player</string>
 </resources>

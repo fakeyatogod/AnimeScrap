@@ -1,7 +1,9 @@
 package com.talent.animescrap.ui.fragments
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +32,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }.show()
             }
             true
+        }
+
+        // Hide theme section in versions that don't support dynamic colors.
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            findPreference<PreferenceCategory>("theme")?.isVisible = false
         }
 
     }

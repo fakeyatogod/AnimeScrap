@@ -17,8 +17,7 @@ class SplashActivity : AppCompatActivity() {
 
         // Set dynamic colors
         val settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
-        settingsPreferenceManager.getBoolean("dynamic_colors", false).also {
-            println(it)
+        settingsPreferenceManager.getBoolean("dynamic_colors", true).also {
             if (it) DynamicColors.applyToActivitiesIfAvailable(application)
         }
 
