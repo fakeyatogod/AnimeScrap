@@ -41,12 +41,12 @@
         <entry key="app/src/main/res/layout/bottom_sheet_layout.xml" value="0.3463541666666667" />
         <entry key="app/src/main/res/layout/custom_controller.xml" value="0.5038759689922481" />
         <entry key="app/src/main/res/layout/double_tap_overlay.xml" value="0.225" />
-        <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.67" />
-        <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/fragment_latest.xml" value="0.196875" />
+        <entry key="app/src/main/res/layout/fragment_anime.xml" value="0.5802238805970149" />
+        <entry key="app/src/main/res/layout/fragment_favorite.xml" value="0.5" />
+        <entry key="app/src/main/res/layout/fragment_latest.xml" value="0.6511194029850746" />
         <entry key="app/src/main/res/layout/fragment_player.xml" value="0.16875" />
         <entry key="app/src/main/res/layout/fragment_search.xml" value="0.28541666666666665" />
-        <entry key="app/src/main/res/layout/fragment_trending.xml" value="0.16822916666666668" />
+        <entry key="app/src/main/res/layout/fragment_trending.xml" value="0.33" />
         <entry key="app/src/main/res/layout/main_cardview_item.xml" value="0.33" />
         <entry key="app/src/main/res/layout/spinner_dropdown_item.xml" value="0.44125" />
         <entry key="app/src/main/res/layout/spinner_item.xml" value="0.22" />

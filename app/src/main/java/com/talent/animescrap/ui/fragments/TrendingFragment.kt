@@ -40,12 +40,19 @@ class TrendingFragment : Fragment() {
             binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
         }
         binding.recyclerView.adapter = rvAdapter
+        binding.recyclerView.setHasFixedSize(true)
+
         trendingViewModel.trendingAnimeList.observe(viewLifecycleOwner) {
-            binding.progressbarInMain.visibility = View.GONE
-            rvAdapter.submitList(it)
-            binding.recyclerView.setHasFixedSize(true)
-            if (binding.swipeContainer.isRefreshing) {
-                binding.swipeContainer.isRefreshing = false
+            if (it.isNotEmpty()) {
+                binding.progressbarInMain.visibility = View.GONE
+                binding.errorCard.visibility = View.GONE
+                if (binding.swipeContainer.isRefreshing) {
+                    binding.swipeContainer.isRefreshing = false
+                }
+                rvAdapter.submitList(it)
+            } else {
+                binding.progressbarInMain.visibility = View.GONE
+                binding.errorCard.visibility = View.VISIBLE
             }
         }
 

@@ -31,7 +31,6 @@ class LatestFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
 
-
         _binding = FragmentLatestBinding.inflate(inflater, container, false)
 
         binding.progressbarInMain.visibility = View.VISIBLE
@@ -41,13 +40,20 @@ class LatestFragment : Fragment() {
             binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
         }
         binding.recyclerView.adapter = rvAdapter
+        binding.recyclerView.setHasFixedSize(true)
+
         latestViewModel.latestAnimeList.observe(viewLifecycleOwner) {
-            binding.progressbarInMain.visibility = View.GONE
-            binding.recyclerView.setHasFixedSize(true)
-            if (binding.swipeContainer.isRefreshing) {
-                binding.swipeContainer.isRefreshing = false
+            if (it.isNotEmpty()) {
+                binding.progressbarInMain.visibility = View.GONE
+                binding.errorCard.visibility = View.GONE
+                if (binding.swipeContainer.isRefreshing) {
+                    binding.swipeContainer.isRefreshing = false
+                }
+                rvAdapter.submitList(it)
+            } else {
+                binding.progressbarInMain.visibility = View.GONE
+                binding.errorCard.visibility = View.VISIBLE
             }
-            rvAdapter.submitList(it)
         }
 
         binding.swipeContainer.setOnRefreshListener { latestViewModel.getLatestAnimeList() }

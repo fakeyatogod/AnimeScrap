@@ -102,27 +102,33 @@ class AnimeFragment : Fragment() {
         binding.progressbarInPage.visibility = View.VISIBLE
 
         animeDetailsViewModel.animeDetails.observe(viewLifecycleOwner) {
-            animeDetails = it
-            binding.animeNameTxt.text = animeDetails.animeName
-            binding.animeDetailsTxt.text = animeDetails.animeDesc
+            if (it != null) {
+                animeDetails = it
+                binding.animeNameTxt.text = animeDetails.animeName
+                binding.animeDetailsTxt.text = animeDetails.animeDesc
 
-            binding.lastWatchedTxt.text =
-                if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString
-                else "Last Watched : $lastWatchedPrefString/${animeDetails.animeEpisodes}"
+                binding.lastWatchedTxt.text =
+                    if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString
+                    else "Last Watched : $lastWatchedPrefString/${animeDetails.animeEpisodes}"
 
-            // load background image.
-            binding.backgroundImage.load(animeDetails.animeCover) {
-                error(R.drawable.ic_broken_image)
+                // load background image.
+                binding.backgroundImage.load(animeDetails.animeCover) {
+                    error(R.drawable.ic_broken_image)
+                }
+                // load cover image.
+                binding.coverAnime.load(animeDetails.animeCover) {
+                    error(R.drawable.ic_broken_image)
+                }
+                binding.progressbarInPage.visibility = View.GONE
+                binding.errorCard?.visibility = View.GONE
+                binding.pageLayout.visibility = View.VISIBLE
+
+                animeName = animeDetails.animeName
+                setupSpinner(animeDetails.animeEpisodes, animeDetails.animeEpisodes)
+            } else {
+                binding.progressbarInPage.visibility = View.GONE
+                binding.errorCard?.visibility = View.VISIBLE
             }
-            // load cover image.
-            binding.coverAnime.load(animeDetails.animeCover) {
-                error(R.drawable.ic_broken_image)
-            }
-            binding.progressbarInPage.visibility = View.GONE
-            binding.pageLayout.visibility = View.VISIBLE
-
-            animeName = animeDetails.animeName
-            setupSpinner(animeDetails.animeEpisodes, animeDetails.animeEpisodes)
         }
 
 
