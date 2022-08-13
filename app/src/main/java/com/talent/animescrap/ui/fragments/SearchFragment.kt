@@ -45,7 +45,9 @@ class SearchFragment : Fragment() {
         }
 
         binding.textInputEditText.addTextChangedListener {
-            val searchedText = it.toString().lowercase(Locale.ENGLISH)
+            val searchedText =
+                it.toString().lowercase(Locale.ENGLISH).replace("[^A-Za-z0-9]".toRegex(), " ")
+                    .trim().replace("\\s+".toRegex(), " ")
 
             if (searchedText.length >= 3) {
                 binding.progressbarInMain.visibility = View.VISIBLE
