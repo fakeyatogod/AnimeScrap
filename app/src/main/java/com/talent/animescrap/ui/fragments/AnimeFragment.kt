@@ -102,6 +102,7 @@ class AnimeFragment : Fragment() {
         binding.progressbarInPage.visibility = View.VISIBLE
 
         animeDetailsViewModel.animeDetails.observe(viewLifecycleOwner) {
+            binding.progressbarInPage.visibility = View.GONE
             if (it != null) {
                 animeDetails = it
                 binding.animeNameTxt.text = animeDetails.animeName
@@ -119,14 +120,12 @@ class AnimeFragment : Fragment() {
                 binding.coverAnime.load(animeDetails.animeCover) {
                     error(R.drawable.ic_broken_image)
                 }
-                binding.progressbarInPage.visibility = View.GONE
                 binding.errorCard?.visibility = View.GONE
                 binding.pageLayout.visibility = View.VISIBLE
 
                 animeName = animeDetails.animeName
                 setupSpinner(animeDetails.animeEpisodes, animeDetails.animeEpisodes)
             } else {
-                binding.progressbarInPage.visibility = View.GONE
                 binding.errorCard?.visibility = View.VISIBLE
             }
         }

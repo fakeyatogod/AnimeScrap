@@ -17,6 +17,8 @@ fun ImageView.setImage(url: String?, progressBar: ProgressBar) {
             listener(
                 onSuccess = { _, _ ->
                     progressBar.visibility = View.GONE
+                }, onError = { _, _ ->
+                    progressBar.visibility = View.GONE
                 }
             )
             build()

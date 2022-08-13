@@ -43,16 +43,15 @@ class LatestFragment : Fragment() {
         binding.recyclerView.setHasFixedSize(true)
 
         latestViewModel.latestAnimeList.observe(viewLifecycleOwner) {
+            binding.progressbarInMain.visibility = View.GONE
             if (it.isNotEmpty()) {
-                binding.progressbarInMain.visibility = View.GONE
                 binding.errorCard.visibility = View.GONE
-                if (binding.swipeContainer.isRefreshing) {
-                    binding.swipeContainer.isRefreshing = false
-                }
-                rvAdapter.submitList(it)
             } else {
-                binding.progressbarInMain.visibility = View.GONE
                 binding.errorCard.visibility = View.VISIBLE
+            }
+            rvAdapter.submitList(it)
+            if (binding.swipeContainer.isRefreshing) {
+                binding.swipeContainer.isRefreshing = false
             }
         }
 

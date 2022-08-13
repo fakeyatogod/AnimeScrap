@@ -88,7 +88,7 @@ class AnimeRepositoryImpl @Inject constructor(
                 return@withContext "No Link Found"
             }
 
-    }
+        }
 
     override suspend fun getFavoritesFromRoom() = withContext(Dispatchers.IO) {
         return@withContext linkDao.getLinks().map { animeList ->

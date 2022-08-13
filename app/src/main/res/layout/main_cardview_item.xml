@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="animeInfo"
             type="com.talent.animescrap.model.SimpleAnime" />
