@@ -16,9 +16,8 @@ import javax.inject.Inject
 class LatestViewModel @Inject constructor(
     private val animeRepository: AnimeRepository
 ) : ViewModel() {
-    private val _latestAnimeList = MutableLiveData<ArrayList<SimpleAnime>>().apply {
-        getLatestAnimeList()
-    }
+    private val _latestAnimeList =
+        MutableLiveData<ArrayList<SimpleAnime>>().apply { getLatestAnimeList() }
     val latestAnimeList: LiveData<ArrayList<SimpleAnime>> = _latestAnimeList
 
     fun getLatestAnimeList() {

@@ -41,7 +41,11 @@ class SearchFragment : Fragment() {
         searchViewModel.searchedAnimeList.observe(viewLifecycleOwner) { animeList ->
             binding.progressbarInMain.visibility = View.GONE
             binding.recyclerView.setHasFixedSize(true)
-            rvAdapter.submitList(animeList)
+
+            rvAdapter.submitList(animeList) {
+                if (animeList.isNotEmpty())
+                    binding.recyclerView.scrollToPosition(0)
+            }
         }
 
         binding.textInputEditText.addTextChangedListener {

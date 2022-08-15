@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        val navView: BottomNavigationView = binding.navView
+        val bottomNavView: BottomNavigationView = binding.navView
 
         val navController = findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
 
@@ -43,19 +43,19 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             val transition = Slide(Gravity.BOTTOM).apply {
                 duration = 200
-                addTarget(navView)
+                addTarget(bottomNavView)
             }
-            TransitionManager.beginDelayedTransition(navView, transition)
+            TransitionManager.beginDelayedTransition(bottomNavView, transition)
             if (destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
                 || destination.id == R.id.settingsFragment
             ) {
-                navView.visibility = View.GONE
+                bottomNavView.visibility = View.GONE
             } else {
-                navView.visibility = View.VISIBLE
+                bottomNavView.visibility = View.VISIBLE
             }
         }
         setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+        bottomNavView.setupWithNavController(navController)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

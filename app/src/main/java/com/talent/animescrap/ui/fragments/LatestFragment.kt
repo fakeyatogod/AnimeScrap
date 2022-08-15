@@ -49,9 +49,14 @@ class LatestFragment : Fragment() {
             } else {
                 binding.errorCard.visibility = View.VISIBLE
             }
-            rvAdapter.submitList(it)
+
             if (binding.swipeContainer.isRefreshing) {
+                rvAdapter.submitList(it) {
+                    binding.recyclerView.smoothScrollToPosition(0)
+                }
                 binding.swipeContainer.isRefreshing = false
+            } else {
+                rvAdapter.submitList(it)
             }
         }
 

@@ -50,6 +50,7 @@ class TrendingFragment : Fragment() {
                 binding.errorCard.visibility = View.VISIBLE
             }
             rvAdapter.submitList(it)
+
             if (binding.swipeContainer.isRefreshing) {
                 binding.swipeContainer.isRefreshing = false
             }

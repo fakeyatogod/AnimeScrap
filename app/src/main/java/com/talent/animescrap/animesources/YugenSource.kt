@@ -43,19 +43,16 @@ class YugenSource : AnimeSource {
 
     override suspend fun latestAnime(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
-            val picInfo = arrayListOf<SimpleAnime>()
-            val url = "https://yugen.to/latest/"
-
-            val doc = Utils().getJsoup(url)
+            val animeList = arrayListOf<SimpleAnime>()
+            val doc = Utils().getJsoup(url = "https://yugen.to/latest/")
             val allInfo = doc.getElementsByClass("ep-card")
             for (item in allInfo) {
                 val itemImage = item.getElementsByTag("img").attr("data-src")
                 val itemName = item.getElementsByClass("ep-origin-name").text()
                 val itemLink = item.getElementsByClass("ep-details").attr("href")
-                val picObject = SimpleAnime(itemName, itemImage, itemLink)
-                picInfo.add(picObject)
+                animeList.add(SimpleAnime(itemName, itemImage, itemLink))
             }
-            return@withContext picInfo
+            return@withContext animeList
         }
 
     override suspend fun trendingAnime(): ArrayList<SimpleAnime> =
@@ -69,7 +66,6 @@ class YugenSource : AnimeSource {
                 val itemLink = item.attr("href")
                 animeList.add(SimpleAnime(itemName, itemImage, itemLink))
             }
-
             return@withContext animeList
         }
 
