@@ -1,5 +1,6 @@
 package com.talent.animescrap.ui.activities
 
+import android.annotation.SuppressLint
 import android.app.PictureInPictureParams
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
@@ -18,6 +19,7 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -37,10 +39,12 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var qualityBtn: Button
     private lateinit var mediaSource: HlsMediaSource
     private lateinit var bottomSheet: BottomSheetDialog
+    private lateinit var mediaSession: MediaSession
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var isPipEnabled: Boolean = true
     private val mCookieManager = CookieManager()
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
@@ -95,6 +99,8 @@ class PlayerActivity : AppCompatActivity() {
         playerView.keepScreenOn = true
         playerView.player = player
 
+        mediaSession = MediaSession.Builder(this@PlayerActivity, player)
+            .build()
 
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
@@ -214,6 +220,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onBackPressed()
         player.stop()
         player.release()
+        mediaSession.release()
         finish()
     }
 
@@ -221,6 +228,7 @@ class PlayerActivity : AppCompatActivity() {
         super.onDestroy()
         player.stop()
         player.release()
+        mediaSession.release()
         finish()
     }
 

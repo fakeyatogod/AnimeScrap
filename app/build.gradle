@@ -66,6 +66,9 @@ dependencies {
     implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
     implementation "androidx.media3:media3-ui:$media3_version"
 
+    // Media Session
+    implementation "androidx.media3:media3-session:$media3_version"
+
     // MVVM
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
