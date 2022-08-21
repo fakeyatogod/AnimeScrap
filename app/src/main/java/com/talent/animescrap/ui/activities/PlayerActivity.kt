@@ -148,21 +148,6 @@ class PlayerActivity : AppCompatActivity() {
                 .show()
         }
 
-
-        // For Screen Rotation
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        var flag = true
-        rotate.setOnClickListener {
-            if (flag) {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                flag = false
-            } else {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                flag = true
-
-            }
-        }
-
         // Fullscreen controls
         var clickCount = 0
         btnScale.setImageResource(R.drawable.ic_baseline_height_24)
@@ -202,6 +187,24 @@ class PlayerActivity : AppCompatActivity() {
                     btnScale.setImageResource(R.drawable.ic_baseline_zoom_out_map_24)
                     clickCount = 1
                 }
+            }
+        }
+
+        // For Screen Rotation
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        var flag = true
+        rotate.setOnClickListener {
+            clickCount = 3
+            btnScale.setImageResource(R.drawable.ic_baseline_height_24)
+            if (flag) {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+                flag = false
+            } else {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                flag = true
+
             }
         }
 
