@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.MaterialComponents.Light.NoActionBar.FullScreen" parent="Base.Theme.AnimeScrap">
+    <style name="Theme.MaterialComponents.Light.NoActionBar.FullScreen" parent="@style/Theme.Material3.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
