@@ -7,7 +7,6 @@
 
     <application
         android:name=".AnimeScrapApplication"
-        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -27,6 +26,8 @@
             android:theme="@style/Theme.AnimeScrap" />
         <activity
             android:name=".ui.activities.PlayerActivity"
+            android:launchMode="singleTask"
+            android:taskAffinity=":pip"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|smallestScreenSize|screenLayout"
             android:supportsPictureInPicture="true"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen"

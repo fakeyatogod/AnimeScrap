@@ -207,6 +207,7 @@ class AnimeFragment : Fragment() {
                 putExtra("anime_name", animeName)
                 putExtra("anime_episode", animeEp)
                 putExtra("anime_url", link)
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(this)
             }
         }
