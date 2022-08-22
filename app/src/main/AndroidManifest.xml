@@ -28,6 +28,7 @@
             android:name=".ui.activities.PlayerActivity"
             android:launchMode="singleTask"
             android:taskAffinity=":pip"
+            android:autoRemoveFromRecents="true"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|smallestScreenSize|screenLayout"
             android:supportsPictureInPicture="true"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen"

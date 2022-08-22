@@ -2,6 +2,7 @@ package com.talent.animescrap.ui.activities
 
 import android.annotation.SuppressLint
 import android.app.PictureInPictureParams
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -30,6 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
+
 
 @AndroidEntryPoint
 class PlayerActivity : AppCompatActivity() {
@@ -222,6 +224,11 @@ class PlayerActivity : AppCompatActivity() {
         player.release()
         mediaSession.release()
         finish()
+        startActivity(
+            Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            }
+        )
     }
 
     override fun onDestroy() {
@@ -296,7 +303,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onUserLeaveHint() {
-
         if (isPipEnabled) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -308,4 +314,5 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
     }
+
 }
