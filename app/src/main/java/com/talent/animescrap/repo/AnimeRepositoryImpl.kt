@@ -1,8 +1,12 @@
 package com.talent.animescrap.repo
 
+import android.app.Application
 import android.util.Log
+import androidx.preference.PreferenceManager
 import com.talent.animescrap.R
+import com.talent.animescrap.animesources.AnimeSource
 import com.talent.animescrap.animesources.YugenSource
+import com.talent.animescrap.animesources.ZoroSource
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.room.FavRoomModel
@@ -19,7 +23,7 @@ interface AnimeRepository {
     suspend fun searchAnimeFromSite(searchUrl: String): ArrayList<SimpleAnime>
     suspend fun getLatestAnimeFromSite(): ArrayList<SimpleAnime>
     suspend fun getTrendingAnimeFromSite(): ArrayList<SimpleAnime>
-    suspend fun getStreamLink(animeEpUrl: String): String
+    suspend fun getStreamLink(animeUrl: String, animeEpCode: String): Pair<String, String?>
 
     // Room Operations
     suspend fun getFavoritesFromRoom(): Flow<List<SimpleAnime>>
@@ -30,9 +34,32 @@ interface AnimeRepository {
 
 
 class AnimeRepositoryImpl @Inject constructor(
-    private val linkDao: LinkDao
+    private val linkDao: LinkDao,
+    application: Application
 ) : AnimeRepository {
-    private val animeSource = YugenSource()
+
+    fun sourceResolver(sourceName: String): AnimeSource {
+        return if (sourceName == "yugen") YugenSource()
+        else ZoroSource()
+    }
+
+    private val selectedSource = PreferenceManager
+        .getDefaultSharedPreferences(application)
+        .getString("source", "yugen")
+
+    private val animeSource: AnimeSource =
+        when (selectedSource) {
+            "yugen" -> {
+                YugenSource()
+            }
+            "zoro" -> {
+                ZoroSource()
+            }
+            else -> {
+                YugenSource()
+            }
+        }
+
     override suspend fun getAnimeDetailsFromSite(contentLink: String) =
         withContext(Dispatchers.IO) {
             Log.i(TAG, "Getting anime details")
@@ -78,14 +105,17 @@ class AnimeRepositoryImpl @Inject constructor(
             }
         }
 
-    override suspend fun getStreamLink(animeEpUrl: String): String =
+    override suspend fun getStreamLink(
+        animeUrl: String,
+        animeEpCode: String
+    ): Pair<String, String?> =
         withContext(Dispatchers.IO) {
             Log.i(TAG, "Getting the anime stream Link")
             try {
-                return@withContext animeSource.streamLink(animeEpUrl)
+                return@withContext animeSource.streamLink(animeUrl, animeEpCode)
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
-                return@withContext "No Link Found"
+                return@withContext Pair("", "")
             }
 
         }

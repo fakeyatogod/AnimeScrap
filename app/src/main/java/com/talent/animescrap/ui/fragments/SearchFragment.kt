@@ -51,14 +51,12 @@ class SearchFragment : Fragment() {
         binding.textInputEditText.addTextChangedListener {
             val searchedText =
                 it.toString().lowercase(Locale.ENGLISH).replace("[^A-Za-z0-9]".toRegex(), " ")
-                    .trim().replace("\\s+".toRegex(), " ")
+                    .trim().replace("\\s+".toRegex(), " ").replace(" ", "+")
 
             if (searchedText.length >= 3) {
                 binding.progressbarInMain.visibility = View.VISIBLE
                 binding.recyclerView.visibility = View.VISIBLE
-                val searchUrl = "https://yugen.to/search/?q=${searchedText.replace(" ", "+")}"
-                println(searchUrl)
-                searchViewModel.searchAnime(searchUrl)
+                searchViewModel.searchAnime(searchedText)
             }
         }
 

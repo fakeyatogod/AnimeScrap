@@ -4,5 +4,5 @@ data class AnimeDetails(
     val animeName: String,
     val animeDesc: String,
     val animeCover: String,
-    val animeEpisodes: String
+    val animeEpisodes: Map<String,String>
 )

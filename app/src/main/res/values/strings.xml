@@ -44,14 +44,18 @@
     <string name="dynamic_colors_disabled_summary">Dynamic colors disabled</string>
     <string name="dynamic_colors_enabled_summary">Dynamic colors enabled</string>
     <string name="dynamic_colors_title">Use dynamic colors</string>
-
-    <string name="seek_seconds_forward">+%d seconds</string>
-    <string name="seek_seconds_backward">-%d seconds</string>
+    <string name="source_cat_title">Source</string>
+    <string name="source_list_pref_title">Select Source</string>
     <string name="pip_disabled">Picture-in-picture disabled</string>
     <string name="pip_enabled">Picture-in-picture enabled</string>
     <string name="pip_title">Enable PiP</string>
     <string name="theme_cat_title">Theme</string>
     <string name="player_cat_title">Player</string>
+
+    <string name="seek_seconds_forward">+%d seconds</string>
+    <string name="seek_seconds_backward">-%d seconds</string>
+
     <string name="anime_details_error_message">Something went wrong, unable to connect to the server. Please check your network connection</string>
     <string name="no_favorites_text">Your Favorites will show here</string>
+
 </resources>

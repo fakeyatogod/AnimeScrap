@@ -16,13 +16,13 @@ class AnimeStreamViewModel @Inject constructor(
     private val animeRepository: AnimeRepository
 ) : ViewModel() {
 
-    private val _animeStreamLink: MutableLiveData<String> = MutableLiveData()
-    val animeStreamLink: LiveData<String> = _animeStreamLink
+    private val _animeStreamLink: MutableLiveData<Pair<String,String?>> = MutableLiveData()
+    val animeStreamLink: LiveData<Pair<String,String?>> = _animeStreamLink
 
-    fun setAnimeLink(animeEpUrl: String) {
+    fun setAnimeLink(animeUrl: String, animeEpCode: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeRepository.getStreamLink(animeEpUrl).apply {
+                animeRepository.getStreamLink(animeUrl,animeEpCode).apply {
                     _animeStreamLink.postValue(this@apply)
                 }
             }

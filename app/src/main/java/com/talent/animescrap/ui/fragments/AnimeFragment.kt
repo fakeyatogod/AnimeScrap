@@ -110,7 +110,7 @@ class AnimeFragment : Fragment() {
 
                 binding.lastWatchedTxt.text =
                     if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString
-                    else "Last Watched : $lastWatchedPrefString/${animeDetails.animeEpisodes}"
+                    else "Last Watched : $lastWatchedPrefString/${animeDetails.animeEpisodes.keys.max()}"
 
                 // load background image.
                 binding.backgroundImage.load(animeDetails.animeCover) {
@@ -124,22 +124,22 @@ class AnimeFragment : Fragment() {
                 binding.pageLayout.visibility = View.VISIBLE
 
                 animeName = animeDetails.animeName
-                setupSpinner(animeDetails.animeEpisodes, animeDetails.animeEpisodes)
+                setupSpinner(animeDetails.animeEpisodes)
             } else {
                 binding.errorCard?.visibility = View.VISIBLE
             }
         }
 
-
+        println(contentLink)
         contentLink?.let { animeDetailsViewModel.getAnimeDetails(it) }
 
 
         return binding.root
     }
 
-    private fun setupSpinner(num: String, animeEpisodes: String) {
+    private fun setupSpinner(animeEpisodes: Map<String,String>) {
 
-        val epList = (num.toInt() downTo 1).map { it.toString() }
+        val epList = animeEpisodes.keys.toList().reversed()
         val arrayAdapter =
             ArrayAdapter(activity as Context, android.R.layout.simple_spinner_item, epList)
         arrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
@@ -163,18 +163,12 @@ class AnimeFragment : Fragment() {
             )
             sharedPreferences.getString(contentLink, "Not Started Yet").apply {
                 binding.lastWatchedTxt.text =
-                    if (this == "Not Started Yet") this else "Last Watched : $this/$animeEpisodes"
+                    if (this == "Not Started Yet") this else "Last Watched : $this/${epList.first()}"
             }
-
-            // Get the link of episode
-            var watchLink = contentLink
-            watchLink = watchLink?.replace("anime", "watch")
-            val animeEpUrl = "https://yugen.to${watchLink}${binding.episodeSpinner.selectedItem}"
-            println(animeEpUrl)
 
             binding.progressbarInPage.visibility = View.VISIBLE
             binding.pageLayout.visibility = View.GONE
-            animeStreamViewModel.setAnimeLink(animeEpUrl)
+            animeStreamViewModel.setAnimeLink(contentLink!!,animeEpisodes[binding.episodeSpinner.selectedItem]!!)
 
         }
 
@@ -182,7 +176,7 @@ class AnimeFragment : Fragment() {
     }
 
     private fun startPlayer(
-        link: String,
+        link: Pair<String,String?>,
         animeName: String,
         animeEp: String = "Episode ${binding.episodeSpinner.selectedItem}"
     ) {
@@ -198,7 +192,7 @@ class AnimeFragment : Fragment() {
                 startMX(link)
             } else {
                 Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(Uri.parse(link), "video/*")
+                    setDataAndType(Uri.parse(link.first), "video/*")
                     startActivity(Intent.createChooser(this, "Play using"))
                 }
             }
@@ -206,18 +200,19 @@ class AnimeFragment : Fragment() {
             Intent(activity, PlayerActivity::class.java).apply {
                 putExtra("anime_name", animeName)
                 putExtra("anime_episode", animeEp)
-                putExtra("anime_url", link)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra("anime_url", link.first)
+                if(link.second != null) putExtra("anime_sub", link.second)
                 startActivity(this)
             }
         }
 
     }
 
-    private fun startMX(animeStreamUrl: String) {
+    private fun startMX(animeStreamUrl: Pair<String,String?>) {
         try {
             Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(Uri.parse(animeStreamUrl), "application/x-mpegURL")
+                setDataAndType(Uri.parse(animeStreamUrl.first), "application/x-mpegURL")
                 setPackage("com.mxtech.videoplayer.pro")
                 startActivity(this)
             }
@@ -228,7 +223,7 @@ class AnimeFragment : Fragment() {
             )
             try {
                 Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(Uri.parse(animeStreamUrl), "application/x-mpegURL")
+                    setDataAndType(Uri.parse(animeStreamUrl.first), "application/x-mpegURL")
                     setPackage("com.mxtech.videoplayer.ad")
                     startActivity(this)
                 }
@@ -238,7 +233,7 @@ class AnimeFragment : Fragment() {
                     "No version of MX Player is installed, falling back to other external player"
                 )
                 Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(Uri.parse(animeStreamUrl), "video/*")
+                    setDataAndType(Uri.parse(animeStreamUrl.first), "video/*")
                     startActivity(Intent.createChooser(this, "Play using"))
                 }
             }

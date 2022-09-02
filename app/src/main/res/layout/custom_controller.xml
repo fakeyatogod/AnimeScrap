@@ -211,5 +211,9 @@
             android:contentDescription="@string/unlock"
             android:src="@drawable/ic_baseline_lock_open_24"
             android:visibility="invisible" />-->
-
+    <androidx.media3.ui.SubtitleView
+        android:id="@+id/exo_subtitles"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>

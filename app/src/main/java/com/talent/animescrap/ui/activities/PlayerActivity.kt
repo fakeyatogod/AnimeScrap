@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -28,6 +29,7 @@ import com.talent.animescrap.R
 import com.talent.animescrap.widgets.DoubleTapOverlay
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.internal.immutableListOf
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
@@ -40,6 +42,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
     private lateinit var mediaSource: HlsMediaSource
+    private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
     private lateinit var mediaSession: MediaSession
     private lateinit var settingsPreferenceManager: SharedPreferences
@@ -75,6 +78,7 @@ class PlayerActivity : AppCompatActivity() {
         val animeName = intent.getStringExtra("anime_name")
         val animeEpisode = intent.getStringExtra("anime_episode")
         val animeUrl = intent.getStringExtra("anime_url")
+        val animeSub = intent.getStringExtra("anime_sub")
 
         /// Player Views
         playerView = findViewById(R.id.exoPlayerView)
@@ -100,6 +104,7 @@ class PlayerActivity : AppCompatActivity() {
 
         playerView.keepScreenOn = true
         playerView.player = player
+        playerView.subtitleView?.visibility = View.VISIBLE
 
         mediaSession = MediaSession.Builder(this@PlayerActivity, player)
             .build()
@@ -144,8 +149,22 @@ class PlayerActivity : AppCompatActivity() {
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
                 .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
                 .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
+
+            mediaItem = if (animeSub != null) {
+                val subtitle = MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub))
+                    .setMimeType(MimeTypes.TEXT_VTT) // The correct MIME type (required).
+                    .setLanguage("en")
+                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                    .build()
+
+                MediaItem.Builder().setUri(animeUrl)
+                    .setSubtitleConfigurations(immutableListOf(subtitle))
+                    .build()
+            } else {
+                MediaItem.fromUri(animeUrl)
+            }
             mediaSource = HlsMediaSource.Factory(dataSourceFactory)
-                .createMediaSource(MediaItem.fromUri(animeUrl))
+                .createMediaSource(mediaItem)
             player.setMediaSource(mediaSource)
             player.prepare()
             player.play()
