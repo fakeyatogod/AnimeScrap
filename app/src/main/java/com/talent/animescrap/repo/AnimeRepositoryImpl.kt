@@ -4,9 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.talent.animescrap.R
-import com.talent.animescrap.animesources.AnimeSource
-import com.talent.animescrap.animesources.YugenSource
-import com.talent.animescrap.animesources.ZoroSource
+import com.talent.animescrap.animesources.*
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.room.FavRoomModel
@@ -38,11 +36,6 @@ class AnimeRepositoryImpl @Inject constructor(
     application: Application
 ) : AnimeRepository {
 
-    fun sourceResolver(sourceName: String): AnimeSource {
-        return if (sourceName == "yugen") YugenSource()
-        else ZoroSource()
-    }
-
     private val selectedSource = PreferenceManager
         .getDefaultSharedPreferences(application)
         .getString("source", "yugen")
@@ -54,6 +47,9 @@ class AnimeRepositoryImpl @Inject constructor(
             }
             "zoro" -> {
                 ZoroSource()
+            }
+            "fake_gogo" -> {
+                AllAnimeSource()
             }
             else -> {
                 YugenSource()
