@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.repo.AnimeRepository
+import com.talent.animescrap.room.FavRoomModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,10 +34,10 @@ class AnimeDetailsViewModel @Inject constructor(
     private val _isAnimeFav = MutableLiveData<Boolean>()
     val isAnimeFav: LiveData<Boolean> = _isAnimeFav
 
-    fun checkFavorite(animeLink: String) {
+    fun checkFavorite(animeLink: String, sourceName: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeRepository.checkFavoriteFromRoom(animeLink).apply {
+                animeRepository.checkFavoriteFromRoom(animeLink, sourceName).apply {
                     if (this) _isAnimeFav.postValue(true)
                     else _isAnimeFav.postValue(false)
                 }
@@ -44,19 +45,26 @@ class AnimeDetailsViewModel @Inject constructor(
         }
     }
 
-    fun removeFav(animeLink: String) {
+    fun removeFav(animeLink: String, sourceName: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeRepository.removeFavFromRoom(animeLink)
+                animeRepository.removeFavFromRoom(animeLink, sourceName)
                 _isAnimeFav.postValue(false)
             }
         }
     }
 
-    fun addToFav(animeLink: String, animeName: String, animeCoverLink: String) {
+    fun addToFav(animeLink: String, animeName: String, animeCoverLink: String, sourceName: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeRepository.addFavToRoom(animeLink, animeName, animeCoverLink)
+                animeRepository.addFavToRoom(
+                    FavRoomModel(
+                        animeLink,
+                        animeCoverLink,
+                        animeName,
+                        sourceName
+                    )
+                )
                 _isAnimeFav.postValue(true)
             }
         }

@@ -46,12 +46,17 @@ class AnimeFragment : Fragment() {
 
     private val args: AnimeFragmentArgs by navArgs()
     private val animeDetailsViewModel: AnimeDetailsViewModel by viewModels()
+    private lateinit var selectedSource: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAnimeBinding.inflate(inflater, container, false)
+
+        selectedSource = PreferenceManager
+                .getDefaultSharedPreferences(requireActivity())
+            .getString("source", "yugen")!!
 
         animeStreamViewModel.animeStreamLink.observe(viewLifecycleOwner) {
             binding.progressbarInPage.visibility = View.GONE
@@ -78,12 +83,12 @@ class AnimeFragment : Fragment() {
             sharedPreferences.getString(contentLink, "Not Started Yet").toString()
 
         // Check Favorite
-        contentLink?.let { animeDetailsViewModel.checkFavorite(it) }
+        contentLink?.let { animeDetailsViewModel.checkFavorite(it, selectedSource) }
         animeDetailsViewModel.isAnimeFav.observe(viewLifecycleOwner) { isFav ->
             if (isFav) {
                 inFav()
                 binding.favCard.setOnClickListener {
-                    animeDetailsViewModel.removeFav(contentLink!!)
+                    animeDetailsViewModel.removeFav(contentLink!!, selectedSource)
                 }
             } else {
                 notInFav()
@@ -91,7 +96,8 @@ class AnimeFragment : Fragment() {
                     animeDetailsViewModel.addToFav(
                         contentLink!!,
                         animeDetails.animeName,
-                        animeDetails.animeCover
+                        animeDetails.animeCover,
+                        selectedSource
                     )
                 }
             }

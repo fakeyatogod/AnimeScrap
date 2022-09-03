@@ -27,9 +27,9 @@ interface AnimeRepository {
 
     // Room Operations
     suspend fun getFavoritesFromRoom(): Flow<List<SimpleAnime>>
-    suspend fun checkFavoriteFromRoom(animeLink: String): Boolean
-    suspend fun removeFavFromRoom(animeLink: String)
-    suspend fun addFavToRoom(animeLink: String, animeName: String, animeCoverLink: String)
+    suspend fun checkFavoriteFromRoom(animeLink: String, sourceName: String): Boolean
+    suspend fun removeFavFromRoom(animeLink: String, sourceName: String)
+    suspend fun addFavToRoom(favRoomModel: FavRoomModel)
 }
 
 
@@ -121,26 +121,26 @@ class AnimeRepositoryImpl @Inject constructor(
         }
 
     override suspend fun getFavoritesFromRoom() = withContext(Dispatchers.IO) {
-        return@withContext linkDao.getLinks().map { animeList ->
+        return@withContext linkDao.getLinks(selectedSource).map { animeList ->
             animeList.map { SimpleAnime(it.nameString, it.picLinkString, it.linkString) }
         }
     }
 
-    override suspend fun checkFavoriteFromRoom(animeLink: String): Boolean =
+    override suspend fun checkFavoriteFromRoom(animeLink: String, sourceName: String): Boolean =
         withContext(Dispatchers.IO) {
-            return@withContext linkDao.isItFav(animeLink)
+            return@withContext linkDao.isItFav(animeLink, sourceName)
         }
 
-    override suspend fun removeFavFromRoom(animeLink: String) =
+    override suspend fun removeFavFromRoom(animeLink: String, sourceName: String) =
         withContext(Dispatchers.IO) {
-            val foundFav = linkDao.getFav(animeLink)
+            val foundFav = linkDao.getFav(animeLink, sourceName)
             linkDao.deleteOne(foundFav)
         }
 
     override suspend fun addFavToRoom(
-        animeLink: String, animeName: String, animeCoverLink: String
+        favRoomModel: FavRoomModel
     ) = withContext(Dispatchers.IO) {
-        linkDao.insert(FavRoomModel(animeLink, animeCoverLink, animeName))
+        linkDao.insert(favRoomModel)
     }
 
     companion object {
