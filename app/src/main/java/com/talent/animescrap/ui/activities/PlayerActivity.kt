@@ -21,6 +21,8 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.MergingMediaSource
+import androidx.media3.exoplayer.source.SingleSampleMediaSource
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.preference.PreferenceManager
@@ -29,7 +31,6 @@ import com.talent.animescrap.R
 import com.talent.animescrap.widgets.DoubleTapOverlay
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
-import okhttp3.internal.immutableListOf
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
@@ -149,23 +150,33 @@ class PlayerActivity : AppCompatActivity() {
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
                 .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
                 .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
+                .setReadTimeoutMs(20000)
+                .setConnectTimeoutMs(20000)
 
-            mediaItem = if (animeSub != null) {
-                val subtitle = MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub))
-                    .setMimeType(MimeTypes.TEXT_VTT) // The correct MIME type (required).
-                    .setLanguage("en")
-                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                    .build()
-
-                MediaItem.Builder().setUri(animeUrl)
-                    .setSubtitleConfigurations(immutableListOf(subtitle))
-                    .build()
-            } else {
+            mediaItem =
                 MediaItem.fromUri(animeUrl)
-            }
             mediaSource = HlsMediaSource.Factory(dataSourceFactory)
+                .setAllowChunklessPreparation(true)
                 .createMediaSource(mediaItem)
-            player.setMediaSource(mediaSource)
+
+            if (animeSub != null) {
+                val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(
+                        MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub))
+                            .setMimeType(MimeTypes.TEXT_VTT)
+                            .setLanguage("en")
+                            .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                            .build(),
+                        C.TIME_UNSET
+                    )
+
+
+                val mergedSource = MergingMediaSource(mediaSource, subtitleMediaSource)
+                player.setMediaSource(mergedSource)
+            } else {
+                player.setMediaSource(mediaSource)
+
+            }
             player.prepare()
             player.play()
 

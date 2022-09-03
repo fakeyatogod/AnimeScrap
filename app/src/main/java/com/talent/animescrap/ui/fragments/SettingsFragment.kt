@@ -3,6 +3,7 @@ package com.talent.animescrap.ui.fragments
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.preference.ListPreference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
@@ -24,11 +25,31 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         if (newValue.toString().toBoolean()) "enabled" else "disabled"
                     }, Restart App to take effect", Snackbar.LENGTH_SHORT
                 ).setAction("Restart") {
-                    val intent =
-                        requireContext().packageManager.getLaunchIntentForPackage(requireContext().packageName)!!
-                            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    startActivity(intent)
-                    exitProcess(0)
+                    requireContext().packageManager
+                        .getLaunchIntentForPackage(requireContext().packageName)!!.apply {
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            startActivity(this)
+                            exitProcess(0)
+                        }
+                }.show()
+            }
+            true
+        }
+
+        val sourcePref = findPreference<ListPreference>("source")
+        sourcePref?.setOnPreferenceChangeListener { _, newValue ->
+            view?.let {
+                Snackbar.make(
+                    it,
+                    "Source changed to $newValue, Restart App to take effect",
+                    Snackbar.LENGTH_SHORT
+                ).setAction("Restart") {
+                    requireContext().packageManager
+                        .getLaunchIntentForPackage(requireContext().packageName)!!.apply {
+                            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            startActivity(this)
+                            exitProcess(0)
+                        }
                 }.show()
             }
             true
