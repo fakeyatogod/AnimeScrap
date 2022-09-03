@@ -6,6 +6,7 @@ import androidx.preference.PreferenceManager
 import com.talent.animescrap.R
 import com.talent.animescrap.animesources.*
 import com.talent.animescrap.model.AnimeDetails
+import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinkDao
@@ -21,7 +22,7 @@ interface AnimeRepository {
     suspend fun searchAnimeFromSite(searchUrl: String): ArrayList<SimpleAnime>
     suspend fun getLatestAnimeFromSite(): ArrayList<SimpleAnime>
     suspend fun getTrendingAnimeFromSite(): ArrayList<SimpleAnime>
-    suspend fun getStreamLink(animeUrl: String, animeEpCode: String): Pair<String, String?>
+    suspend fun getStreamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink
 
     // Room Operations
     suspend fun getFavoritesFromRoom(): Flow<List<SimpleAnime>>
@@ -49,6 +50,9 @@ class AnimeRepositoryImpl @Inject constructor(
                 ZoroSource()
             }
             "fake_gogo" -> {
+                FakeGogoSource()
+            }
+            "allanime" -> {
                 AllAnimeSource()
             }
             else -> {
@@ -104,14 +108,14 @@ class AnimeRepositoryImpl @Inject constructor(
     override suspend fun getStreamLink(
         animeUrl: String,
         animeEpCode: String
-    ): Pair<String, String?> =
+    ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             Log.i(TAG, "Getting the anime stream Link")
             try {
                 return@withContext animeSource.streamLink(animeUrl, animeEpCode)
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
-                return@withContext Pair("", "")
+                return@withContext AnimeStreamLink("", "", false)
             }
 
         }

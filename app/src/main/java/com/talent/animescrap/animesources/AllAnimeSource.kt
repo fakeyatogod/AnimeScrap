@@ -1,10 +1,7 @@
 package com.talent.animescrap.animesources
 
-import com.github.kittinunf.fuel.Fuel
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
 import com.talent.animescrap.model.AnimeDetails
+import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -13,9 +10,6 @@ import kotlinx.coroutines.withContext
 class AllAnimeSource : AnimeSource {
 
     private val mainUrl = "https://allanime.site"
-    private val apiHost = "https://blog.allanimenews.com/"
-    private val idRegex = Regex("${mainUrl}/anime/(\\w+)")
-    private val epNumRegex = Regex("/[sd]ub/(\\d+)")
 
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
@@ -78,46 +72,31 @@ class AllAnimeSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): Pair<String, String?> =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
         withContext(Dispatchers.IO) {
-            // Get the link of episode
-            val watchLink = animeUrl.replace("anime", "watch")
-            val animeEpUrl = "https://yugen.to$watchLink$animeEpCode"
-            println(animeEpUrl)
-            var yugenEmbedLink =
-                Utils().getJsoup(animeEpUrl).getElementById("main-embed")!!.attr("src")
-            if (!yugenEmbedLink.contains("https:")) yugenEmbedLink = "https:$yugenEmbedLink"
 
-            val mapOfHeaders = mutableMapOf(
-                "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Encoding" to "gzip, deflate",
-                "Accept-Language" to "en-US,en;q=0.5",
-                "Connection" to "keep-alive",
-                "Upgrade-Insecure-Requests" to "1",
-                "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
-                "Host" to "yugen.to",
-                "TE" to "Trailers",
-                "Origin" to "https://yugen.to",
-                "X-Requested-With" to "XMLHttpRequest",
-                "Referer" to yugenEmbedLink
-            )
+            println(animeUrl)
+            println(animeEpCode)
 
-            val apiRequest = "https://yugen.to/api/embed/"
-            val id = yugenEmbedLink.split("/")
-            val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
+            val url = """$mainUrl/graphql?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22sub%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2229f49ce1a69320b2ab11a475fd114e5c07b03a7dc683f77dd502ca42b26df232%22%7D%7D"""
+            val res = Utils().getJson(url)!!["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
+            for (sourceUrlHolder in res) {
+                println(sourceUrlHolder)
+                val sourceUrl = sourceUrlHolder.asJsonObject["sourceUrl"].asString
+                if (sourceUrl.contains("apivtwo")){
+                    val apiUrl = Utils().getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
+                    val resSource = Utils().getJson("$apiUrl/${sourceUrl.replace("clock", "clock.json")}")!!.asJsonObject["links"].asJsonArray
+                    println(resSource)
+                    println()
+                    val firstLink = resSource.first().asJsonObject
+                    val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
 
-            println(dataMap)
+                    return@withContext AnimeStreamLink(firstLink["link"].asString,"",isHls)
+                }
 
-            val fuel = Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
-            val res = fuel.response().third
-            val (bytes, _) = res
-            if (bytes != null) {
-                val linkDetails = JsonParser.parseString(String(bytes)).asJsonObject
-                val link = linkDetails.get("hls")
-                return@withContext Pair(link.asString, null)
+
             }
-
-            return@withContext Pair("", "")
+            return@withContext AnimeStreamLink("","",false)
 
         }
 }

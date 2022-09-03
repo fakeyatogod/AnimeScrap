@@ -3,6 +3,7 @@ package com.talent.animescrap.animesources
 import com.github.kittinunf.fuel.Fuel
 import com.google.gson.JsonParser
 import com.talent.animescrap.model.AnimeDetails
+import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +74,7 @@ class YugenSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): Pair<String, String?> =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             // Get the link of episode
             val watchLink = animeUrl.replace("anime", "watch")
@@ -109,10 +110,10 @@ class YugenSource : AnimeSource {
             if (bytes != null) {
                 val linkDetails = JsonParser.parseString(String(bytes)).asJsonObject
                 val link = linkDetails.get("hls")
-                return@withContext Pair(link.asString, null)
+                return@withContext AnimeStreamLink(link.asString, "",true)
             }
 
-            return@withContext Pair("", "")
+            return@withContext AnimeStreamLink("", "",false)
 
         }
 }

@@ -1,6 +1,7 @@
 package com.talent.animescrap.animesources
 
 import com.talent.animescrap.model.AnimeDetails
+import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -83,7 +84,7 @@ class ZoroSource : AnimeSource, Utils() {
             return@withContext simpleAnimeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): Pair<String,String?> =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             println(animeUrl)
             println(animeEpCode)
@@ -136,7 +137,7 @@ class ZoroSource : AnimeSource, Utils() {
             println(m3u8)
             println(subtitle)
 
-            return@withContext Pair(m3u8, subtitle["English"])
+            return@withContext AnimeStreamLink(m3u8, subtitle["English"]!!,true)
 
         }
 }

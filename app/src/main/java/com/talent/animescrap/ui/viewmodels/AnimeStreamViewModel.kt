@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.repo.AnimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -16,8 +17,8 @@ class AnimeStreamViewModel @Inject constructor(
     private val animeRepository: AnimeRepository
 ) : ViewModel() {
 
-    private val _animeStreamLink: MutableLiveData<Pair<String,String?>> = MutableLiveData()
-    val animeStreamLink: LiveData<Pair<String,String?>> = _animeStreamLink
+    private val _animeStreamLink: MutableLiveData<AnimeStreamLink> = MutableLiveData()
+    val animeStreamLink: LiveData<AnimeStreamLink> = _animeStreamLink
 
     fun setAnimeLink(animeUrl: String, animeEpCode: String) {
         viewModelScope.launch {

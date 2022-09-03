@@ -21,7 +21,9 @@ import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
+import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.MergingMediaSource
+import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.SingleSampleMediaSource
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
@@ -42,7 +44,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
     private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
-    private lateinit var mediaSource: HlsMediaSource
+    private lateinit var mediaSource: MediaSource
     private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
     private lateinit var mediaSession: MediaSession
@@ -80,6 +82,7 @@ class PlayerActivity : AppCompatActivity() {
         val animeEpisode = intent.getStringExtra("anime_episode")
         val animeUrl = intent.getStringExtra("anime_url")
         val animeSub = intent.getStringExtra("anime_sub")
+        val isHls = intent.getBooleanExtra("is_hls", true)
 
         /// Player Views
         playerView = findViewById(R.id.exoPlayerView)
@@ -155,9 +158,14 @@ class PlayerActivity : AppCompatActivity() {
 
             mediaItem =
                 MediaItem.fromUri(animeUrl)
-            mediaSource = HlsMediaSource.Factory(dataSourceFactory)
-                .setAllowChunklessPreparation(true)
-                .createMediaSource(mediaItem)
+            mediaSource = if (isHls) {
+                HlsMediaSource.Factory(dataSourceFactory)
+                    .setAllowChunklessPreparation(true)
+                    .createMediaSource(mediaItem)
+            } else {
+                ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(mediaItem)
+            }
 
             if (animeSub != null) {
                 val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)

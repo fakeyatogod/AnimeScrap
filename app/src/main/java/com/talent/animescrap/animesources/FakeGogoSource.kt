@@ -1,8 +1,7 @@
 package com.talent.animescrap.animesources
 
-import com.github.kittinunf.fuel.Fuel
-import com.google.gson.JsonParser
 import com.talent.animescrap.model.AnimeDetails
+import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
@@ -73,46 +72,9 @@ class FakeGogoSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): Pair<String, String?> =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
         withContext(Dispatchers.IO) {
-            // Get the link of episode
-            val watchLink = animeUrl.replace("anime", "watch")
-            val animeEpUrl = "https://yugen.to$watchLink$animeEpCode"
-            println(animeEpUrl)
-            var yugenEmbedLink =
-                Utils().getJsoup(animeEpUrl).getElementById("main-embed")!!.attr("src")
-            if (!yugenEmbedLink.contains("https:")) yugenEmbedLink = "https:$yugenEmbedLink"
-
-            val mapOfHeaders = mutableMapOf(
-                "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Encoding" to "gzip, deflate",
-                "Accept-Language" to "en-US,en;q=0.5",
-                "Connection" to "keep-alive",
-                "Upgrade-Insecure-Requests" to "1",
-                "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
-                "Host" to "yugen.to",
-                "TE" to "Trailers",
-                "Origin" to "https://yugen.to",
-                "X-Requested-With" to "XMLHttpRequest",
-                "Referer" to yugenEmbedLink
-            )
-
-            val apiRequest = "https://yugen.to/api/embed/"
-            val id = yugenEmbedLink.split("/")
-            val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
-
-            println(dataMap)
-
-            val fuel = Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
-            val res = fuel.response().third
-            val (bytes, _) = res
-            if (bytes != null) {
-                val linkDetails = JsonParser.parseString(String(bytes)).asJsonObject
-                val link = linkDetails.get("hls")
-                return@withContext Pair(link.asString, null)
-            }
-
-            return@withContext Pair("", "")
+            return@withContext AnimeStreamLink("", "",true)
 
         }
 }
