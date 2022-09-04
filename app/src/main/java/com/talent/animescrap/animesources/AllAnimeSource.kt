@@ -6,6 +6,7 @@ import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
 
 class AllAnimeSource : AnimeSource {
 
@@ -22,7 +23,7 @@ class AllAnimeSource : AnimeSource {
             val animeCover = data["thumbnail"].asString
             val animeName = data["name"].asString
             val animDesc =
-                if (!data["description"].isJsonNull) data["description"].asString else "No Description"
+                if (!data["description"].isJsonNull) Jsoup.parseBodyFragment(data["description"].asString).text() else "No Description"
 
             val num =
                 data["lastEpisodeInfo"].asJsonObject["sub"].asJsonObject["episodeString"].asString
