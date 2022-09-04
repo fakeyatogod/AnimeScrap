@@ -213,6 +213,8 @@ class AnimeFragment : Fragment() {
                 if(animeStreamLink.subsLink.isNotBlank()) putExtra("anime_sub", animeStreamLink.subsLink)
                 if(!animeStreamLink.extraHeaders.isNullOrEmpty()) putExtra("headers", animeStreamLink.extraHeaders)
                 startActivity(this)
+                requireActivity().overridePendingTransition(R.anim.pop_in, R.anim.fade_out)
+
             }
         }
 
