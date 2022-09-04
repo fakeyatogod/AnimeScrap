@@ -59,7 +59,9 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-
+        val selectedSource = PreferenceManager
+            .getDefaultSharedPreferences(this)
+            .getString("source", "yugen")
         bottomSheet = BottomSheetDialog(this@PlayerActivity)
         bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
@@ -153,9 +155,13 @@ class PlayerActivity : AppCompatActivity() {
 
         if (animeUrl != null) {
 
+            val headerMap = mutableMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+            if (selectedSource.equals("zoro")) {
+                headerMap["referer"] = "https://zoro.to/"
+            }
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
                 .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
-                .setDefaultRequestProperties(hashMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"))
+                .setDefaultRequestProperties(headerMap)
                 .setReadTimeoutMs(20000)
                 .setConnectTimeoutMs(20000)
 
