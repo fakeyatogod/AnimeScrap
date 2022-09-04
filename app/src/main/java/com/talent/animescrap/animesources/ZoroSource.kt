@@ -6,7 +6,10 @@ import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.*
 import org.jsoup.Jsoup
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class ZoroSource : AnimeSource, Utils() {
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
@@ -136,8 +139,59 @@ class ZoroSource : AnimeSource, Utils() {
 
             println(m3u8)
             println(subtitle)
+            val sId = ZoroSource().wss()
 
-            return@withContext AnimeStreamLink(m3u8, subtitle["English"]!!,true)
-
+            return@withContext AnimeStreamLink(
+                m3u8, subtitle["English"]!!, true,
+                hashMapOf(
+                    "sid" to sId,
+                    "referer" to "https://rapid-cloud.co/",
+                    "origin" to "https://rapid-cloud.co"
+                )
+            )
         }
+
+
+    fun String.findBetween(a: String, b: String): String? {
+        val start = this.indexOf(a)
+        val end = if (start != -1) this.indexOf(b, start) else return null
+        return if (end != -1) this.subSequence(start, end).removePrefix(a).removeSuffix(b)
+            .toString() else null
+    }
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .followRedirects(true)
+        .followSslRedirects(true)
+        .build()
+
+    private suspend fun wss(): String = withContext(Dispatchers.IO) {
+        var sId = Utils().getJsoup("https://api.enime.moe/tool/rapid-cloud/server-id").text()
+        if (sId.isEmpty()) {
+            val latch = CountDownLatch(1)
+            val listener = object : WebSocketListener() {
+                override fun onOpen(webSocket: WebSocket, response: Response) {
+                    webSocket.send("40")
+                }
+
+                override fun onMessage(webSocket: WebSocket, text: String) {
+                    when {
+                        text.startsWith("40") -> {
+                            sId = text.findBetween("40{\"sid\":\"", "\"}") ?: ""
+                            latch.countDown()
+                        }
+                        text == "2" -> webSocket.send("3")
+                    }
+                }
+            }
+            okHttpClient.newWebSocket(
+                Request.Builder()
+                    .url("wss://ws1.rapid-cloud.co/socket.io/?EIO=4&transport=websocket").build(),
+                listener
+            )
+            Thread {
+                latch.await(30, TimeUnit.SECONDS)
+            }.start()
+        }
+        return@withContext sId
+    }
 }

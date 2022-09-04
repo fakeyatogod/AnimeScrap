@@ -211,6 +211,7 @@ class AnimeFragment : Fragment() {
                 putExtra("anime_url", animeStreamLink.link)
                 putExtra("is_hls", animeStreamLink.isHls)
                 if(animeStreamLink.subsLink.isNotBlank()) putExtra("anime_sub", animeStreamLink.subsLink)
+                if(!animeStreamLink.extraHeaders.isNullOrEmpty()) putExtra("headers", animeStreamLink.extraHeaders)
                 startActivity(this)
             }
         }

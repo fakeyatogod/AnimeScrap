@@ -71,9 +71,7 @@ class PlayerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
-        val selectedSource = PreferenceManager
-            .getDefaultSharedPreferences(this)
-            .getString("source", "yugen")
+
         bottomSheet = BottomSheetDialog(this@PlayerActivity)
         bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
@@ -100,6 +98,7 @@ class PlayerActivity : AppCompatActivity() {
         val animeUrl = intent.getStringExtra("anime_url")
         val animeSub = intent.getStringExtra("anime_sub")
         val isHls = intent.getBooleanExtra("is_hls", true)
+        val extraHeaders = intent.getSerializableExtra("headers") as HashMap<*, *>?
 
         /// Player Views
         playerView = findViewById(R.id.exoPlayerView)
@@ -172,10 +171,15 @@ class PlayerActivity : AppCompatActivity() {
                 "Connection" to "keep-alive",
                 "Upgrade-Insecure-Requests" to "1"
             )
-            if (selectedSource.equals("zoro")) {
-                headerMap["referer"] = "https://rapid-cloud.co/"
-                headerMap["origin"] = "https://rapid-cloud.co"
+
+            if (extraHeaders != null) {
+                for (header in extraHeaders) {
+                    headerMap[header.key.toString()] = header.value.toString()
+                }
             }
+
+            println(headerMap)
+
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
                 .setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
                 .setDefaultRequestProperties(headerMap)
