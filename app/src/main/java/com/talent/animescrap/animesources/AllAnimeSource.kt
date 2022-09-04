@@ -96,35 +96,47 @@ class AllAnimeSource : AnimeSource {
                 """$mainUrl/graphql?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22sub%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2229f49ce1a69320b2ab11a475fd114e5c07b03a7dc683f77dd502ca42b26df232%22%7D%7D"""
             val res =
                 Utils().getJson(url)!!["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
-            for (sourceUrlHolder in res) {
+
+            val sortedSources =
+                res.sortedBy { if (!it.asJsonObject["priority"].isJsonNull) it.asJsonObject["priority"].asDouble else 0.0 }.reversed()
+            println(sortedSources)
+            println("sorted")
+            for (sourceUrlHolder in sortedSources) {
                 println(sourceUrlHolder)
+                val sourceUrl = sourceUrlHolder.asJsonObject["sourceUrl"].asString
+                if(isThese(sourceUrl)) continue
+                if (sourceUrl.contains("apivtwo")) {
+                    val apiUrl =
+                        Utils().getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
+
+                    val resSource = Utils().getJson(
+                        "$apiUrl/${
+                            sourceUrl.replace("clock", "clock.json")
+                        }"
+                    )!!.asJsonObject["links"].asJsonArray
+                    println(resSource)
+                    println()
+                    val firstLink = resSource.first().asJsonObject
+                    val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
+
+                    return@withContext AnimeStreamLink(firstLink["link"].asString, "", isHls)
+                }
+
+                return@withContext AnimeStreamLink(
+                    sourceUrl,
+                    "",
+                    res.first().toString().contains("hls")
+                )
             }
-            val sourceUrl = res.first().asJsonObject["sourceUrl"].asString
-            println(sourceUrl)
-            if (sourceUrl.contains("apivtwo")) {
-                println("sed")
-                val apiUrl =
-                    Utils().getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
 
-                val resSource = Utils().getJson(
-                    "$apiUrl/${
-                        sourceUrl.replace("clock", "clock.json")
-                    }"
-                )!!.asJsonObject["links"].asJsonArray
-                println(resSource)
-                println()
-                val firstLink = resSource.first().asJsonObject
-                val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
-
-                return@withContext AnimeStreamLink(firstLink["link"].asString, "", isHls)
-            }
-
-            return@withContext AnimeStreamLink(
-                sourceUrl,
-                "",
-                res.first().toString().contains("hls")
-            )
-
-
+            return@withContext AnimeStreamLink("","",false)
         }
+
+    fun isThese( url : String) : Boolean {
+        val unwantedSources = listOf("goload","streamsb","ok.ru","streamlare","mp4upload")
+        unwantedSources.forEach { source ->
+            if (url.contains(source)) return true
+        }
+        return false
+    }
 }
