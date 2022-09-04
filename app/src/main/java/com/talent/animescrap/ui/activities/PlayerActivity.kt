@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -27,6 +28,8 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.SingleSampleMediaSource
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
+import androidx.media3.ui.CaptionStyleCompat
+import androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
@@ -168,6 +171,8 @@ class PlayerActivity : AppCompatActivity() {
             }
 
             if (animeSub != null) {
+                val subStyle = CaptionStyleCompat(Color.WHITE,Color.TRANSPARENT, Color.TRANSPARENT,EDGE_TYPE_OUTLINE, Color.BLACK, null)
+                playerView.subtitleView?.setStyle(subStyle)
                 val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(
                         MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub))
