@@ -20,7 +20,7 @@ class AllAnimeSource : AnimeSource {
             val data = res.asJsonObject["data"].asJsonObject["show"].asJsonObject
             val animeCover = data["thumbnail"].asString
             val animeName = data["name"].asString
-            val animDesc = data["description"].asString
+            val animDesc = if(!data["description"].isJsonNull) data["description"].asString else "No Description"
 
             val num = data["lastEpisodeInfo"].asJsonObject["sub"].asJsonObject["episodeString"].asString
             val animeEpContent = (1..num.toInt()).associate { it.toString() to it.toString() }
