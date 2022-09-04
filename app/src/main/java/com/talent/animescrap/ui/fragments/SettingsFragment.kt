@@ -44,7 +44,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 requireContext(),
                 "Source changed to ${
                     newValue.toString().uppercase().replace("_", " ")
-                }, Restart App to take effect",
+                }",
                 Toast.LENGTH_SHORT
             ).show()
             return@setOnPreferenceChangeListener true
