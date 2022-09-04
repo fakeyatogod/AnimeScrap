@@ -18,14 +18,20 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.media3.common.*
+import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.cache.CacheDataSource
+import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
+import androidx.media3.datasource.cache.SimpleCache
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.MergingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.source.SingleSampleMediaSource
+import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
+import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.CaptionStyleCompat
@@ -36,6 +42,11 @@ import com.talent.animescrap.R
 import com.talent.animescrap.widgets.DoubleTapOverlay
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
@@ -54,6 +65,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var isPipEnabled: Boolean = true
     private val mCookieManager = CookieManager()
+    private var simpleCache: SimpleCache? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -155,29 +167,55 @@ class PlayerActivity : AppCompatActivity() {
 
         if (animeUrl != null) {
 
-            val headerMap = mutableMapOf("Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8")
+            val headerMap = mutableMapOf(
+                "Accept" to "*/*",
+                "Connection" to "keep-alive",
+                "Upgrade-Insecure-Requests" to "1"
+            )
             if (selectedSource.equals("zoro")) {
-                headerMap["referer"] = "https://zoro.to/"
+                headerMap["referer"] = "https://rapid-cloud.co/"
+                headerMap["origin"] = "https://rapid-cloud.co"
             }
             val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-                .setUserAgent("Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0")
+                .setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
                 .setDefaultRequestProperties(headerMap)
                 .setReadTimeoutMs(20000)
                 .setConnectTimeoutMs(20000)
 
+            val databaseProvider = StandaloneDatabaseProvider(this)
+            simpleCache = SimpleCache(
+                File(
+                    this.cacheDir,
+                    "exoplayer"
+                ).also { it.deleteOnExit() }, // Ensures always fresh file
+                LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
+                databaseProvider
+            )
+            val cacheFactory = CacheDataSource.Factory().apply {
+                setCache(simpleCache!!)
+                setUpstreamDataSourceFactory(dataSourceFactory)
+            }
             mediaItem =
                 MediaItem.fromUri(animeUrl)
             mediaSource = if (isHls) {
-                HlsMediaSource.Factory(dataSourceFactory)
+                HlsMediaSource.Factory(cacheFactory)
                     .setAllowChunklessPreparation(true)
+                    .setLoadErrorHandlingPolicy(getMyErrorHandlingPolicy())
                     .createMediaSource(mediaItem)
             } else {
-                ProgressiveMediaSource.Factory(dataSourceFactory)
+                ProgressiveMediaSource.Factory(cacheFactory)
                     .createMediaSource(mediaItem)
             }
 
             if (animeSub != null) {
-                val subStyle = CaptionStyleCompat(Color.WHITE,Color.TRANSPARENT, Color.TRANSPARENT,EDGE_TYPE_OUTLINE, Color.BLACK, null)
+                val subStyle = CaptionStyleCompat(
+                    Color.WHITE,
+                    Color.TRANSPARENT,
+                    Color.TRANSPARENT,
+                    EDGE_TYPE_OUTLINE,
+                    Color.BLACK,
+                    null
+                )
                 playerView.subtitleView?.setStyle(subStyle)
                 val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(
@@ -188,17 +226,12 @@ class PlayerActivity : AppCompatActivity() {
                             .build(),
                         C.TIME_UNSET
                     )
-
-
-                val mergedSource = MergingMediaSource(mediaSource, subtitleMediaSource)
-                player.setMediaSource(mergedSource)
-            } else {
-                player.setMediaSource(mediaSource)
-
+                mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
             }
-            player.prepare()
-            player.play()
 
+            player.setMediaSource(mediaSource)
+            player.prepare()
+            player.playWhenReady = true
 
         } else {
             Toast.makeText(this@PlayerActivity, "No Anime Website Url Found", Toast.LENGTH_LONG)
@@ -272,12 +305,19 @@ class PlayerActivity : AppCompatActivity() {
         player.stop()
         player.release()
         mediaSession.release()
-        finish()
-        startActivity(
-            Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+        CoroutineScope(Dispatchers.IO).launch {
+            simpleCache?.release()
+            simpleCache = null
+            withContext(Dispatchers.Main) {
+                finish()
+                startActivity(
+                    Intent(this@PlayerActivity, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                    }
+                )
             }
-        )
+        }
+
     }
 
     override fun onDestroy() {
@@ -285,6 +325,8 @@ class PlayerActivity : AppCompatActivity() {
         player.stop()
         player.release()
         mediaSession.release()
+        simpleCache?.release()
+        simpleCache = null
         finish()
     }
 
@@ -299,6 +341,14 @@ class PlayerActivity : AppCompatActivity() {
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+
+    private fun getMyErrorHandlingPolicy(): DefaultLoadErrorHandlingPolicy {
+        return object : DefaultLoadErrorHandlingPolicy() {
+            override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo): Long {
+                return 10000
+            }
         }
     }
 
