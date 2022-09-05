@@ -39,13 +39,8 @@ import androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
-import com.talent.animescrap.widgets.DoubleTapOverlay
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.net.CookieHandler
 import java.net.CookieManager
@@ -58,16 +53,30 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
     private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
+    private lateinit var rotateBtn: ImageView
+    private lateinit var scaleBtn: ImageView
+    private lateinit var prevEpBtn: ImageView
+    private lateinit var nextEpBtn: ImageView
+    private lateinit var centerText: TextView
+    private lateinit var videoNameTextView: TextView
+    private lateinit var videoEpTextView: TextView
     private lateinit var mediaSource: MediaSource
     private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
     private lateinit var mediaSession: MediaSession
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var isPipEnabled: Boolean = true
+    private var animeUrl: String? = null
+    private var animeEpisodeNumber: String? = null
+    private var animeSub: String? = null
+    private var animeEpisode: String? = null
+    private var animeName: String? = null
+    private var animeStreamUrl: String? = null
+    private var extraHeaders: HashMap<*, *>? = null
+    private var isHls: Boolean = true
     private val mCookieManager = CookieManager()
     private var simpleCache: SimpleCache? = null
 
-    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
@@ -93,52 +102,209 @@ class PlayerActivity : AppCompatActivity() {
         CookieHandler.setDefault(mCookieManager)
 
         // Intent Arguments
-        val animeName = intent.getStringExtra("anime_name")
-        val animeEpisode = intent.getStringExtra("anime_episode")
-        val animeUrl = intent.getStringExtra("anime_url")
-        val animeSub = intent.getStringExtra("anime_sub")
-        val isHls = intent.getBooleanExtra("is_hls", true)
-        val extraHeaders = intent.getSerializableExtra("headers") as HashMap<*, *>?
+        animeName = intent.getStringExtra("anime_name")
+        animeEpisodeNumber = intent.getStringExtra("anime_episode")
+        animeEpisode = "Episode $animeEpisodeNumber"
+        animeStreamUrl = intent.getStringExtra("anime_stream_url")
+        animeUrl = intent.getStringExtra("anime_url")
+        animeSub = intent.getStringExtra("anime_sub")
+        isHls = intent.getBooleanExtra("is_hls", true)
+        extraHeaders = intent.getSerializableExtra("headers") as HashMap<*, *>?
 
         /// Player Views
         playerView = findViewById(R.id.exoPlayerView)
-        val doubleTapOverlay = findViewById<DoubleTapOverlay>(R.id.double_tap_overlay)
-        playerView.doubleTapOverlay = doubleTapOverlay
+        playerView.doubleTapOverlay = findViewById(R.id.double_tap_overlay)
 
-        val btnScale = playerView.findViewById<ImageView>(R.id.btn_fullscreen)
-        val centerText = playerView.findViewById<TextView>(R.id.centerText)
-        val rotate = playerView.findViewById<ImageView>(R.id.rotate)
+        // Custom player views
+        scaleBtn = playerView.findViewById(R.id.btn_fullscreen)
+        centerText = playerView.findViewById(R.id.centerText)
+        rotateBtn = playerView.findViewById(R.id.rotate)
         qualityBtn = playerView.findViewById(R.id.quality_selection_btn)
+        prevEpBtn = playerView.findViewById(R.id.prev_ep)
+        nextEpBtn = playerView.findViewById(R.id.next_ep)
 
         // Set Video Name
-        val videoNameTextView = playerView.findViewById<TextView>(R.id.videoName)
+        videoNameTextView = playerView.findViewById(R.id.videoName)
+        videoEpTextView = playerView.findViewById(R.id.videoEpisode)
         videoNameTextView.isSelected = true
         videoNameTextView.text = animeName
-        val videoEpTextView = playerView.findViewById<TextView>(R.id.videoEpisode)
         videoEpTextView.text = animeEpisode
 
+        // Build ExoPlayer
         player = ExoPlayer.Builder(this)
             .setSeekForwardIncrementMs(10000)
             .setSeekBackIncrementMs(10000)
             .build()
 
+        // Setup Player View
         playerView.keepScreenOn = true
         playerView.player = player
         playerView.subtitleView?.visibility = View.VISIBLE
 
+        // Build MediaSession
         mediaSession = MediaSession.Builder(this@PlayerActivity, player)
             .build()
 
+        // Prepare Custom Player View Buttons
+        prepareButtons()
+
+        // Add Listener for quality selection
+        player.addListener(getPlayerListener())
+
+        if (animeStreamUrl != null) {
+            prepareMediaSource()
+            player.setMediaSource(mediaSource)
+            player.prepare()
+            player.playWhenReady = true
+
+        } else {
+            Toast.makeText(this@PlayerActivity, "No Anime Website Url Found", Toast.LENGTH_LONG)
+                .show()
+        }
+
+
+    }
+
+    private fun prepareMediaSource() {
+        val headerMap = mutableMapOf(
+            "Accept" to "*/*",
+            "Connection" to "keep-alive",
+            "Upgrade-Insecure-Requests" to "1"
+        )
+        extraHeaders?.forEach { header ->
+            headerMap[header.key.toString()] = header.value.toString()
+        }
+
+        println(headerMap)
+
+        val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
+            .setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
+            .setDefaultRequestProperties(headerMap)
+            .setReadTimeoutMs(20000)
+            .setConnectTimeoutMs(20000)
+
+        val databaseProvider = StandaloneDatabaseProvider(this)
+        simpleCache = SimpleCache(
+            File(
+                this.cacheDir,
+                "exoplayer"
+            ).also { it.deleteOnExit() }, // Ensures always fresh file
+            LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
+            databaseProvider
+        )
+        val cacheFactory = CacheDataSource.Factory().apply {
+            setCache(simpleCache!!)
+            setUpstreamDataSourceFactory(dataSourceFactory)
+        }
+        mediaItem =
+            MediaItem.fromUri(animeStreamUrl!!)
+        mediaSource = if (isHls) {
+            HlsMediaSource.Factory(cacheFactory)
+                .setAllowChunklessPreparation(true)
+                .setLoadErrorHandlingPolicy(getMyErrorHandlingPolicy())
+                .createMediaSource(mediaItem)
+        } else {
+            ProgressiveMediaSource.Factory(cacheFactory)
+                .createMediaSource(mediaItem)
+        }
+
+        if (animeSub != null) {
+            val subStyle = CaptionStyleCompat(
+                Color.WHITE,
+                Color.TRANSPARENT,
+                Color.TRANSPARENT,
+                EDGE_TYPE_OUTLINE,
+                Color.BLACK,
+                null
+            )
+            playerView.subtitleView?.setStyle(subStyle)
+            val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(
+                    MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub))
+                        .setMimeType(MimeTypes.TEXT_VTT)
+                        .setLanguage("en")
+                        .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                        .build(),
+                    C.TIME_UNSET
+                )
+            mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
+        }
+    }
+
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    fun prepareButtons() {
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
                 onBackPressed()
             }
         }
+        // Fullscreen controls
+        var clickCount = 0
+        scaleBtn.setImageResource(R.drawable.ic_baseline_height_24)
+        scaleBtn.setOnClickListener {
+            val centerTextTimer = object : CountDownTimer(500, 1000) {
+                override fun onTick(millisUntilFinished: Long) {}
+                override fun onFinish() {
+                    centerText.visibility = View.GONE
+                }
+            }
+            when (clickCount) {
+                1 -> {
+                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
+                    centerText.visibility = View.VISIBLE
+                    centerText.text = getString(R.string.stretched)
+                    centerTextTimer.start()
+                    scaleBtn.setImageResource(R.drawable.ic_baseline_fullscreen_24)
+                    clickCount = 2
+                }
+                2 -> {
+                    if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
+                        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                    } else {
+                        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+                    }
+                    centerText.visibility = View.VISIBLE
+                    centerText.text = getString(R.string.height_fit)
+                    centerTextTimer.start()
+                    scaleBtn.setImageResource(R.drawable.ic_baseline_height_24)
+                    clickCount = 3
+                }
+                else -> {
+                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                    centerText.visibility = View.VISIBLE
+                    centerText.text = getString(R.string.zoom)
+                    centerTextTimer.start()
+                    scaleBtn.setImageResource(R.drawable.ic_baseline_zoom_out_map_24)
+                    clickCount = 1
+                }
+            }
+        }
 
-        val qualityMapUnsorted = mutableMapOf<String, Int>()
-        player.addListener(object : Player.Listener {
+        // For Screen Rotation
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        var flag = true
+        rotateBtn.setOnClickListener {
+            clickCount = 3
+            scaleBtn.setImageResource(R.drawable.ic_baseline_height_24)
+            if (flag) {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+                flag = false
+            } else {
+                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                flag = true
+
+            }
+        }
+    }
+
+    private fun getPlayerListener(): Player.Listener {
+        return object : Player.Listener {
             override fun onTracksChanged(tracks: Tracks) {
+                val qualityMapUnsorted = mutableMapOf<String, Int>()
                 // Update UI using current tracks.
                 for (trackGroup in tracks.groups) {
                     // Group level information.
@@ -162,175 +328,37 @@ class PlayerActivity : AppCompatActivity() {
 
                 }
             }
-        })
-
-        if (animeUrl != null) {
-
-            val headerMap = mutableMapOf(
-                "Accept" to "*/*",
-                "Connection" to "keep-alive",
-                "Upgrade-Insecure-Requests" to "1"
-            )
-
-            if (extraHeaders != null) {
-                for (header in extraHeaders) {
-                    headerMap[header.key.toString()] = header.value.toString()
-                }
-            }
-
-            println(headerMap)
-
-            val dataSourceFactory: DataSource.Factory = DefaultHttpDataSource.Factory()
-                .setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36")
-                .setDefaultRequestProperties(headerMap)
-                .setReadTimeoutMs(20000)
-                .setConnectTimeoutMs(20000)
-
-            val databaseProvider = StandaloneDatabaseProvider(this)
-            simpleCache = SimpleCache(
-                File(
-                    this.cacheDir,
-                    "exoplayer"
-                ).also { it.deleteOnExit() }, // Ensures always fresh file
-                LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
-                databaseProvider
-            )
-            val cacheFactory = CacheDataSource.Factory().apply {
-                setCache(simpleCache!!)
-                setUpstreamDataSourceFactory(dataSourceFactory)
-            }
-            mediaItem =
-                MediaItem.fromUri(animeUrl)
-            mediaSource = if (isHls) {
-                HlsMediaSource.Factory(cacheFactory)
-                    .setAllowChunklessPreparation(true)
-                    .setLoadErrorHandlingPolicy(getMyErrorHandlingPolicy())
-                    .createMediaSource(mediaItem)
-            } else {
-                ProgressiveMediaSource.Factory(cacheFactory)
-                    .createMediaSource(mediaItem)
-            }
-
-            if (animeSub != null) {
-                val subStyle = CaptionStyleCompat(
-                    Color.WHITE,
-                    Color.TRANSPARENT,
-                    Color.TRANSPARENT,
-                    EDGE_TYPE_OUTLINE,
-                    Color.BLACK,
-                    null
-                )
-                playerView.subtitleView?.setStyle(subStyle)
-                val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(
-                        MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub))
-                            .setMimeType(MimeTypes.TEXT_VTT)
-                            .setLanguage("en")
-                            .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                            .build(),
-                        C.TIME_UNSET
-                    )
-                mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
-            }
-
-            player.setMediaSource(mediaSource)
-            player.prepare()
-            player.playWhenReady = true
-
-        } else {
-            Toast.makeText(this@PlayerActivity, "No Anime Website Url Found", Toast.LENGTH_LONG)
-                .show()
         }
+    }
 
-        // Fullscreen controls
-        var clickCount = 0
-        btnScale.setImageResource(R.drawable.ic_baseline_height_24)
-        btnScale.setOnClickListener {
-            val centerTextTimer = object : CountDownTimer(500, 1000) {
-                override fun onTick(millisUntilFinished: Long) {}
-                override fun onFinish() {
-                    centerText.visibility = View.GONE
-                }
-            }
-            when (clickCount) {
-                1 -> {
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FILL
-                    centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.stretched)
-                    centerTextTimer.start()
-                    btnScale.setImageResource(R.drawable.ic_baseline_fullscreen_24)
-                    clickCount = 2
-                }
-                2 -> {
-                    if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
-                        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-                    } else {
-                        playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
-                    }
-                    centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.height_fit)
-                    centerTextTimer.start()
-                    btnScale.setImageResource(R.drawable.ic_baseline_height_24)
-                    clickCount = 3
-                }
-                else -> {
-                    playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                    centerText.visibility = View.VISIBLE
-                    centerText.text = getString(R.string.zoom)
-                    centerTextTimer.start()
-                    btnScale.setImageResource(R.drawable.ic_baseline_zoom_out_map_24)
-                    clickCount = 1
-                }
-            }
-        }
+    private fun releasePlayer() {
+        player.pause()
+        player.stop()
+        player.release()
+        mediaSession.release()
+    }
 
-        // For Screen Rotation
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        var flag = true
-        rotate.setOnClickListener {
-            clickCount = 3
-            btnScale.setImageResource(R.drawable.ic_baseline_height_24)
-            if (flag) {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
-                flag = false
-            } else {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-                flag = true
-
-            }
-        }
-
+    private fun releaseCache() {
+        simpleCache?.release()
+        simpleCache = null
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        player.stop()
-        player.release()
-        mediaSession.release()
-        CoroutineScope(Dispatchers.IO).launch {
-            simpleCache?.release()
-            simpleCache = null
-            withContext(Dispatchers.Main) {
-                finish()
-                startActivity(
-                    Intent(this@PlayerActivity, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                    }
-                )
+        releasePlayer()
+        releaseCache()
+        finish()
+        startActivity(
+            Intent(this@PlayerActivity, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
             }
-        }
-
+        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        player.stop()
-        player.release()
-        mediaSession.release()
-        simpleCache?.release()
-        simpleCache = null
+        releasePlayer()
+        releaseCache()
         finish()
     }
 

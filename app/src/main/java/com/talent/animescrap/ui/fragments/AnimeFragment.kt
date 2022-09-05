@@ -185,7 +185,7 @@ class AnimeFragment : Fragment() {
     private fun startPlayer(
         animeStreamLink: AnimeStreamLink,
         animeName: String,
-        animeEp: String = "Episode ${binding.episodeSpinner.selectedItem}"
+        animeEp: String = binding.episodeSpinner.selectedItem.toString()
     ) {
 
         val settingsPreferenceManager =
@@ -208,7 +208,8 @@ class AnimeFragment : Fragment() {
                 putExtra("anime_name", animeName)
                 putExtra("anime_episode", animeEp)
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra("anime_url", animeStreamLink.link)
+                putExtra("anime_stream_url", animeStreamLink.link)
+                putExtra("anime_url", contentLink!!)
                 putExtra("is_hls", animeStreamLink.isHls)
                 if(animeStreamLink.subsLink.isNotBlank()) putExtra("anime_sub", animeStreamLink.subsLink)
                 if(!animeStreamLink.extraHeaders.isNullOrEmpty()) putExtra("headers", animeStreamLink.extraHeaders)

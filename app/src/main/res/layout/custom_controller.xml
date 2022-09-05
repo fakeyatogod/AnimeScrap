@@ -151,12 +151,12 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/exo_rew"
+                        android:id="@+id/prev_ep"
                         android:layout_width="30dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:contentDescription="@string/prev_button_text"
-                        android:src="@drawable/ic_baseline_fast_rewind_24" />
+                        android:src="@drawable/ic_baseline_navigate_before_24" />
 
                     <ImageView
                         android:id="@+id/exo_play_pause"
@@ -168,12 +168,12 @@
                         android:minHeight="64dp" />
 
                     <ImageView
-                        android:id="@+id/exo_ffwd"
+                        android:id="@+id/next_ep"
                         android:layout_width="30dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
                         android:contentDescription="@string/next_button_text"
-                        android:src="@drawable/ic_baseline_fast_forward_24" />
+                        android:src="@drawable/ic_baseline_navigate_next_24" />
 
                 </LinearLayout>
 
