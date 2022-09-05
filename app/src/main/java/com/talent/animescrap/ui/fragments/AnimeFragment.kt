@@ -56,14 +56,16 @@ class AnimeFragment : Fragment() {
         _binding = FragmentAnimeBinding.inflate(inflater, container, false)
 
         selectedSource = PreferenceManager
-                .getDefaultSharedPreferences(requireActivity())
+            .getDefaultSharedPreferences(requireActivity())
             .getString("source", "yugen")!!
 
         animeStreamViewModel.animeStreamLink.observe(viewLifecycleOwner) {
             binding.progressbarInPage.visibility = View.GONE
             binding.pageLayout.visibility = View.VISIBLE
             println("ob = $it")
-            if(it.link.isNotBlank()) animeName?.let { name -> startPlayer(it, name) }
+            if (it.link.isNotBlank()) animeName?.let { name -> startPlayer(it, name) }
+            else Toast.makeText(requireContext(), "No Streaming Url Found", Toast.LENGTH_SHORT)
+                .show()
         }
 
         binding.animeDetailsTxt.movementMethod = ScrollingMovementMethod()
@@ -144,7 +146,7 @@ class AnimeFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupSpinner(animeEpisodes: Map<String,String>) {
+    private fun setupSpinner(animeEpisodes: Map<String, String>) {
 
         val epList = animeEpisodes.keys.toList().reversed()
         val arrayAdapter =
@@ -175,7 +177,10 @@ class AnimeFragment : Fragment() {
 
             binding.progressbarInPage.visibility = View.VISIBLE
             binding.pageLayout.visibility = View.GONE
-            animeStreamViewModel.setAnimeLink(contentLink!!,animeEpisodes[binding.episodeSpinner.selectedItem]!!)
+            animeStreamViewModel.setAnimeLink(
+                contentLink!!,
+                animeEpisodes[binding.episodeSpinner.selectedItem]!!
+            )
 
         }
 
@@ -211,8 +216,14 @@ class AnimeFragment : Fragment() {
                 putExtra("anime_stream_url", animeStreamLink.link)
                 putExtra("anime_url", contentLink!!)
                 putExtra("is_hls", animeStreamLink.isHls)
-                if(animeStreamLink.subsLink.isNotBlank()) putExtra("anime_sub", animeStreamLink.subsLink)
-                if(!animeStreamLink.extraHeaders.isNullOrEmpty()) putExtra("headers", animeStreamLink.extraHeaders)
+                if (animeStreamLink.subsLink.isNotBlank()) putExtra(
+                    "anime_sub",
+                    animeStreamLink.subsLink
+                )
+                if (!animeStreamLink.extraHeaders.isNullOrEmpty()) putExtra(
+                    "headers",
+                    animeStreamLink.extraHeaders
+                )
                 startActivity(this)
                 requireActivity().overridePendingTransition(R.anim.pop_in, R.anim.fade_out)
 
