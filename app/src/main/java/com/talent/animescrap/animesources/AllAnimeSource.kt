@@ -20,10 +20,12 @@ class AllAnimeSource : AnimeSource {
             val res = Utils().getJson(url)!!
 
             val data = res.asJsonObject["data"].asJsonObject["show"].asJsonObject
-            val animeCover = data["thumbnail"].asString
+            val animeCover = allAnimeImage(data["thumbnail"].asString)
+            println(animeCover)
             val animeName = data["name"].asString
             val animDesc =
-                if (!data["description"].isJsonNull) Jsoup.parseBodyFragment(data["description"].asString).text() else "No Description"
+                if (!data["description"].isJsonNull) Jsoup.parseBodyFragment(data["description"].asString)
+                    .text() else "No Description"
 
             val num =
                 data["lastEpisodeInfo"].asJsonObject["sub"].asJsonObject["episodeString"].asString
@@ -47,7 +49,7 @@ class AllAnimeSource : AnimeSource {
             Utils().getJson(url)!!["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
         for (json in res) {
             val name = json.asJsonObject["name"].asString
-            val image = json.asJsonObject["thumbnail"].asString
+            val image = allAnimeImage(json.asJsonObject["thumbnail"].asString)
             val id = json.asJsonObject["_id"].asString
             animeList.add(SimpleAnime(name, image, id))
         }
@@ -63,7 +65,7 @@ class AllAnimeSource : AnimeSource {
                 Utils().getJson(url)!!["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
             for (json in res) {
                 val name = json.asJsonObject["name"].asString
-                val image = json.asJsonObject["thumbnail"].asString
+                val image = allAnimeImage(json.asJsonObject["thumbnail"].asString)
                 val id = json.asJsonObject["_id"].asString
                 animeList.add(SimpleAnime(name, image, id))
             }
@@ -80,7 +82,7 @@ class AllAnimeSource : AnimeSource {
             for (json in res) {
                 val animeCard = json.asJsonObject["anyCard"].asJsonObject
                 val name = animeCard["name"].asString
-                val image = animeCard["thumbnail"].asString
+                val image = allAnimeImage(animeCard["thumbnail"].asString)
                 val id = animeCard["_id"].asString
                 animeList.add(SimpleAnime(name, image, id))
             }
@@ -99,13 +101,14 @@ class AllAnimeSource : AnimeSource {
                 Utils().getJson(url)!!["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
 
             val sortedSources =
-                res.sortedBy { if (!it.asJsonObject["priority"].isJsonNull) it.asJsonObject["priority"].asDouble else 0.0 }.reversed()
+                res.sortedBy { if (!it.asJsonObject["priority"].isJsonNull) it.asJsonObject["priority"].asDouble else 0.0 }
+                    .reversed()
             println(sortedSources)
             println("sorted")
             for (sourceUrlHolder in sortedSources) {
                 println(sourceUrlHolder)
                 val sourceUrl = sourceUrlHolder.asJsonObject["sourceUrl"].asString
-                if(isThese(sourceUrl)) continue
+                if (isThese(sourceUrl)) continue
                 if (sourceUrl.contains("apivtwo")) {
                     val apiUrl =
                         Utils().getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
@@ -130,14 +133,29 @@ class AllAnimeSource : AnimeSource {
                 )
             }
 
-            return@withContext AnimeStreamLink("","",false)
+            return@withContext AnimeStreamLink("", "", false)
         }
 
-    fun isThese( url : String) : Boolean {
-        val unwantedSources = listOf("goload","streamsb","ok.ru","streamlare","mp4upload")
+    private fun isThese(url: String): Boolean {
+        val unwantedSources = listOf("goload", "streamsb", "ok.ru", "streamlare", "mp4upload")
         unwantedSources.forEach { source ->
             if (url.contains(source)) return true
         }
         return false
     }
+
+    private fun allAnimeImage(imageUrl: String) =
+        if (imageUrl.contains("kickassanime")) "https://wp.youtube-anime.com/${
+            imageUrl.replace(
+                "https://",
+                ""
+            )
+        }?w=250"
+        else if (imageUrl.contains("_Show_")) "https://wp.youtube-anime.com/aln.youtube-anime.com/images/${
+            imageUrl.replaceAfterLast(
+                ".",
+                "css"
+            )
+        }"
+        else imageUrl
 }
