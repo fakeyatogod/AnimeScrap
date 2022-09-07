@@ -32,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class AnimeFragment : Fragment() {
 
-    private val animeStreamViewModel by viewModels<AnimeStreamViewModel>()
+    private val animeStreamViewModel: AnimeStreamViewModel by viewModels()
     private var _binding: FragmentAnimeBinding? = null
 
     // This property is only valid between onCreateView and
@@ -44,11 +44,12 @@ class AnimeFragment : Fragment() {
     private lateinit var animeDetails: AnimeDetails
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var lastWatchedPrefString: String
-
+    private var isExternalPlayerEnabled = false
     private val args: AnimeFragmentArgs by navArgs()
     private val animeDetailsViewModel: AnimeDetailsViewModel by viewModels()
     private lateinit var selectedSource: String
     private lateinit var settingsPreferenceManager: SharedPreferences
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,13 +58,15 @@ class AnimeFragment : Fragment() {
 
         settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
         selectedSource = settingsPreferenceManager.getString("source", "yugen")!!
-
-        animeStreamViewModel.animeStreamLink.observe(viewLifecycleOwner) {
-            binding.progressbarInPage.visibility = View.GONE
-            binding.pageLayout.visibility = View.VISIBLE
-            if (it.link.isNotBlank()) animeName?.let { name -> startExternalPlayer(it, name) }
-            else Toast.makeText(requireContext(), "No Streaming Url Found", Toast.LENGTH_SHORT)
-                .show()
+        isExternalPlayerEnabled = settingsPreferenceManager.getBoolean("external_player", false)
+        if (isExternalPlayerEnabled) {
+            animeStreamViewModel.animeStreamLink.observe(viewLifecycleOwner) {
+                binding.progressbarInPage.visibility = View.GONE
+                binding.pageLayout.visibility = View.VISIBLE
+                if (it.link.isNotBlank()) animeName?.let { name -> startExternalPlayer(it, name) }
+                else Toast.makeText(requireContext(), "No Streaming Url Found", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
 
         binding.animeDetailsTxt.movementMethod = ScrollingMovementMethod()
@@ -177,8 +180,6 @@ class AnimeFragment : Fragment() {
             binding.pageLayout.visibility = View.GONE
 
             // Navigate to Internal Player
-            val isExternalPlayerEnabled =
-                settingsPreferenceManager.getBoolean("external_player", false)
             if (!isExternalPlayerEnabled) {
                 val navController =
                     requireActivity().findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)

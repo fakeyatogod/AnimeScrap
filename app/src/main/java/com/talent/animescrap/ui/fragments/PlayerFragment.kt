@@ -12,12 +12,12 @@ import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsets
 import android.widget.*
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.media3.common.*
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DataSource
@@ -41,13 +41,15 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentPlayerBinding
+import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
 
-
+@AndroidEntryPoint
 class PlayerFragment : Fragment() {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
@@ -70,16 +72,16 @@ class PlayerFragment : Fragment() {
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var isPipEnabled: Boolean = true
     private var animeUrl: String? = null
-    private var animeEpisodeNumber: String? = null
     private var animeSub: String? = null
     private var animeEpisode: String? = null
     private var animeTotalEpisode: String? = null
     private var animeName: String? = null
     private var animeStreamUrl: String? = null
-    private var extraHeaders: HashMap<*, *>? = null
+    private var extraHeaders: HashMap<String, String>? = null
     private var isHls: Boolean = true
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
+    private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,6 +105,12 @@ class PlayerFragment : Fragment() {
 
         println("ANIME PLAYER $animeName $animeEpisode $animeUrl")
 
+        if (animeUrl != null && animeEpisode != null) {
+            animeStreamViewModelInPlayer.setAnimeLink(
+                animeUrl!!,
+                animeEpisode!!
+            )
+        }
         /// Player Views
         playerView = binding.exoPlayerView
         playerView.doubleTapOverlay = binding.doubleTapOverlay
@@ -135,21 +143,19 @@ class PlayerFragment : Fragment() {
         // Add Listener for quality selection
         player.addListener(getPlayerListener())
 
-        if (animeStreamUrl != null) {
-            prepareMediaSource()
-            player.setMediaSource(mediaSource)
-            player.prepare()
-            player.playWhenReady = true
-
-        } else {
-            Toast.makeText(requireContext(), "No Anime Website Url Found", Toast.LENGTH_LONG)
-                .show()
+        animeStreamViewModelInPlayer.animeStreamLink.observe(viewLifecycleOwner) { animeStreamLink ->
+            if (animeStreamLink.link.isNotBlank()) {
+                animeStreamUrl = animeStreamLink.link
+                if (animeStreamLink.subsLink.isNotBlank()) animeSub = animeStreamLink.subsLink
+                if (!animeStreamLink.extraHeaders.isNullOrEmpty()) extraHeaders =
+                    animeStreamLink.extraHeaders
+                isHls = animeStreamLink.isHls
+                prepareMediaSource()
+            } else {
+                Toast.makeText(requireContext(), "No Streaming Url Found", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
-
-
-
-
-
 
         return binding.root
     }
@@ -161,7 +167,7 @@ class PlayerFragment : Fragment() {
             "Upgrade-Insecure-Requests" to "1"
         )
         extraHeaders?.forEach { header ->
-            headerMap[header.key.toString()] = header.value.toString()
+            headerMap[header.key] = header.value
         }
 
         println(headerMap)
@@ -173,6 +179,8 @@ class PlayerFragment : Fragment() {
             .setConnectTimeoutMs(20000)
 
         val databaseProvider = StandaloneDatabaseProvider(requireContext())
+        simpleCache?.release()
+        simpleCache
         simpleCache = SimpleCache(
             File(
                 activity?.cacheDir,
@@ -218,6 +226,9 @@ class PlayerFragment : Fragment() {
                 )
             mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
         }
+        player.setMediaSource(mediaSource)
+        player.prepare()
+        player.playWhenReady = true
     }
 
     private fun getPlayerListener(): Player.Listener {
@@ -240,6 +251,10 @@ class PlayerFragment : Fragment() {
                         val qualityMapSorted = mutableMapOf<String, Int>()
                         qualityMapUnsorted.entries.sortedBy { it.key.replace("p", "").toInt() }
                             .reversed().forEach { qualityMapSorted[it.key] = it.value }
+
+                        // Set Default Auto Text
+                        qualityBtn.text = resources.getString(R.string.quality_btn_txt)
+
                         qualityBtn.setOnClickListener {
                             showQuality(qualityMapSorted, trackGroup)
                         }
@@ -279,7 +294,7 @@ class PlayerFragment : Fragment() {
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
-                // onBackPressed()
+                activity?.onBackPressed()
             }
         }
         // Fullscreen controls
@@ -444,6 +459,7 @@ class PlayerFragment : Fragment() {
 
     private fun showSystemUi() {
         WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
-        WindowCompat.getInsetsController(requireActivity().window, playerView).show(WindowInsetsCompat.Type.systemBars())
+        WindowCompat.getInsetsController(requireActivity().window, playerView)
+            .show(WindowInsetsCompat.Type.systemBars())
     }
 }

@@ -9,7 +9,6 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -83,7 +82,7 @@ class MainActivity : AppCompatActivity() {
                 search.isVisible = false
                 settings.isVisible = false
             }
-            if(destination.id == R.id.navigation_player){
+            if (destination.id == R.id.navigation_player) {
                 binding.toolbar.visibility = View.GONE
             }
         }

@@ -24,7 +24,9 @@
         </activity>
         <activity
             android:name=".ui.activities.MainActivity"
-            android:theme="@style/Theme.AnimeScrap" />
+            android:supportsPictureInPicture="true"
+            android:theme="@style/Theme.AnimeScrap"
+            tools:targetApi="n" />
         <activity
             android:name=".ui.activities.PlayerActivity"
             android:autoRemoveFromRecents="true"
