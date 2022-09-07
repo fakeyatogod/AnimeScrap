@@ -63,4 +63,14 @@ class SearchFragment : Fragment() {
         return binding.root
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (activity != null) {
+            if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+            } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 4)
+            }
+        }
+    }
 }

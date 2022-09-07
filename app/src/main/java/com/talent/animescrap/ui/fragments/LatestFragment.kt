@@ -1,6 +1,8 @@
 package com.talent.animescrap.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -68,5 +70,16 @@ class LatestFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (activity != null) {
+            if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 2)
+            } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 4)
+            }
+        }
     }
 }

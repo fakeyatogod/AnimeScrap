@@ -94,6 +94,9 @@
             android:name="anime_episode"
             app:argType="string" />
         <argument
+            android:name="total_episodes"
+            app:argType="string" />
+        <argument
             android:name="anime_url"
             app:argType="string" />
     </fragment>

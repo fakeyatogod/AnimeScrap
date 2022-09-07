@@ -185,6 +185,7 @@ class AnimeFragment : Fragment() {
                 val action = AnimeFragmentDirections.actionNavigationAnimeToNavigationPlayer(
                     animeName!!,
                     animeEpisodes[binding.episodeSpinner.selectedItem]!!,
+                    animeEpisodes.size.toString(),
                     contentLink!!
                 )
                 navController.navigate(action)
