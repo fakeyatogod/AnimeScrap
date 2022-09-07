@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
             }
             TransitionManager.beginDelayedTransition(bottomNavView, transition)
             if (destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
-                || destination.id == R.id.settingsFragment
+                || destination.id == R.id.settingsFragment|| destination.id == R.id.navigation_player
             ) {
                 bottomNavView.visibility = View.GONE
             } else {

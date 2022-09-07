@@ -57,5 +57,8 @@
 
     <string name="anime_details_error_message">Something went wrong, unable to connect to the server. Please check your network connection</string>
     <string name="no_favorites_text">Your Favorites will show here</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="player">Player</string>
 
 </resources>

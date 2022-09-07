@@ -9,10 +9,10 @@
         android:name=".AnimeScrapApplication"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AnimeScrap">
+        android:theme="@style/Theme.AnimeScrap"
+        android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.activities.SplashActivity"
             android:exported="true"
@@ -24,14 +24,15 @@
         </activity>
         <activity
             android:name=".ui.activities.MainActivity"
+            android:configChanges="orientation|screenSize|layoutDirection|smallestScreenSize|screenLayout"
             android:theme="@style/Theme.AnimeScrap" />
         <activity
             android:name=".ui.activities.PlayerActivity"
-            android:launchMode="singleTask"
-            android:taskAffinity=":pip"
             android:autoRemoveFromRecents="true"
             android:configChanges="orientation|screenSize|layoutDirection|keyboardHidden|smallestScreenSize|screenLayout"
+            android:launchMode="singleTask"
             android:supportsPictureInPicture="true"
+            android:taskAffinity=":pip"
             android:theme="@style/Theme.MaterialComponents.Light.NoActionBar.FullScreen"
             tools:targetApi="n" />
     </application>

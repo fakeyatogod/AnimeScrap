@@ -16,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -24,7 +25,6 @@ import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -48,22 +48,20 @@ class AnimeFragment : Fragment() {
     private val args: AnimeFragmentArgs by navArgs()
     private val animeDetailsViewModel: AnimeDetailsViewModel by viewModels()
     private lateinit var selectedSource: String
-
+    private lateinit var settingsPreferenceManager: SharedPreferences
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAnimeBinding.inflate(inflater, container, false)
 
-        selectedSource = PreferenceManager
-            .getDefaultSharedPreferences(requireActivity())
-            .getString("source", "yugen")!!
+        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        selectedSource = settingsPreferenceManager.getString("source", "yugen")!!
 
         animeStreamViewModel.animeStreamLink.observe(viewLifecycleOwner) {
             binding.progressbarInPage.visibility = View.GONE
             binding.pageLayout.visibility = View.VISIBLE
-            println("ob = $it")
-            if (it.link.isNotBlank()) animeName?.let { name -> startPlayer(it, name) }
+            if (it.link.isNotBlank()) animeName?.let { name -> startExternalPlayer(it, name) }
             else Toast.makeText(requireContext(), "No Streaming Url Found", Toast.LENGTH_SHORT)
                 .show()
         }
@@ -177,65 +175,62 @@ class AnimeFragment : Fragment() {
 
             binding.progressbarInPage.visibility = View.VISIBLE
             binding.pageLayout.visibility = View.GONE
-            animeStreamViewModel.setAnimeLink(
-                contentLink!!,
-                animeEpisodes[binding.episodeSpinner.selectedItem]!!
-            )
+
+            // Navigate to Internal Player
+            val isExternalPlayerEnabled =
+                settingsPreferenceManager.getBoolean("external_player", false)
+            if (!isExternalPlayerEnabled) {
+                val navController =
+                    requireActivity().findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
+                val action = AnimeFragmentDirections.actionNavigationAnimeToNavigationPlayer(
+                    animeName!!,
+                    animeEpisodes[binding.episodeSpinner.selectedItem]!!,
+                    contentLink!!
+                )
+                navController.navigate(action)
+            } else {
+                animeStreamViewModel.setAnimeLink(
+                    contentLink!!,
+                    animeEpisodes[binding.episodeSpinner.selectedItem]!!
+                )
+            }
 
         }
 
 
     }
 
-    private fun startPlayer(
+    private fun startExternalPlayer(
         animeStreamLink: AnimeStreamLink,
         animeName: String,
-        animeEp: String = binding.episodeSpinner.selectedItem.toString()
     ) {
+        val title = "$animeName Episode ${binding.episodeSpinner.selectedItem}"
 
-        val settingsPreferenceManager =
-            PreferenceManager.getDefaultSharedPreferences(activity as Context)
-        val isExternalPlayerEnabled =
-            settingsPreferenceManager.getBoolean("external_player", false)
+        val customIntent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(Uri.parse(animeStreamLink.link), "video/*")
+            if (!animeStreamLink.extraHeaders.isNullOrEmpty())
+                putExtra("headers", animeStreamLink.extraHeaders.toString())
+            if (animeStreamLink.subsLink.isNotBlank())
+                putExtra("subs", Uri.parse(animeStreamLink.subsLink))
+            putExtra("title", title)
+        }
         val isMX =
             settingsPreferenceManager.getBoolean("mx_player", false)
-        if (isExternalPlayerEnabled) {
-            if (isMX) {
-                startMX(animeStreamLink.link)
-            } else {
-                Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(Uri.parse(animeStreamLink.link), "video/*")
-                    startActivity(Intent.createChooser(this, "Play using"))
-                }
-            }
-        } else {
-            Intent(activity, PlayerActivity::class.java).apply {
-                putExtra("anime_name", animeName)
-                putExtra("anime_episode", animeEp)
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-                putExtra("anime_stream_url", animeStreamLink.link)
-                putExtra("anime_url", contentLink!!)
-                putExtra("is_hls", animeStreamLink.isHls)
-                if (animeStreamLink.subsLink.isNotBlank()) putExtra(
-                    "anime_sub",
-                    animeStreamLink.subsLink
-                )
-                if (!animeStreamLink.extraHeaders.isNullOrEmpty()) putExtra(
-                    "headers",
-                    animeStreamLink.extraHeaders
-                )
-                startActivity(this)
-                requireActivity().overridePendingTransition(R.anim.pop_in, R.anim.fade_out)
 
-            }
+        if (isMX) {
+            startMX(customIntent)
+        } else {
+            startActivity(Intent.createChooser(customIntent, "Play using"))
         }
+
 
     }
 
-    private fun startMX(animeStreamUrl: String) {
+    private fun startMX(
+        customIntent: Intent
+    ) {
         try {
-            Intent(Intent.ACTION_VIEW).apply {
-                setDataAndType(Uri.parse(animeStreamUrl), "application/x-mpegURL")
+            customIntent.apply {
                 setPackage("com.mxtech.videoplayer.pro")
                 startActivity(this)
             }
@@ -246,19 +241,17 @@ class AnimeFragment : Fragment() {
             )
             try {
                 Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(Uri.parse(animeStreamUrl), "application/x-mpegURL")
-                    setPackage("com.mxtech.videoplayer.ad")
-                    startActivity(this)
+                    customIntent.apply {
+                        setPackage("com.mxtech.videoplayer.ad")
+                        startActivity(this)
+                    }
                 }
             } catch (e: ActivityNotFoundException) {
                 Log.i(
                     R.string.app_name.toString(),
                     "No version of MX Player is installed, falling back to other external player"
                 )
-                Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(Uri.parse(animeStreamUrl), "video/*")
-                    startActivity(Intent.createChooser(this, "Play using"))
-                }
+                startActivity(Intent.createChooser(customIntent, "Play using"))
             }
         }
     }
