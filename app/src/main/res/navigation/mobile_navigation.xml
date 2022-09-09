@@ -73,31 +73,10 @@
             android:name="animeLink"
             app:argType="string"
             app:nullable="true" />
-        <action
-            android:id="@+id/action_navigation_anime_to_navigation_player"
-            app:destination="@id/navigation_player" />
     </fragment>
+
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.talent.animescrap.ui.fragments.SettingsFragment"
         android:label="@string/settings" />
-
-    <fragment
-        android:id="@+id/navigation_player"
-        android:name="com.talent.animescrap.ui.fragments.PlayerFragment"
-        android:label="@string/player"
-        tools:layout="@layout/fragment_player">
-        <argument
-            android:name="anime_name"
-            app:argType="string" />
-        <argument
-            android:name="anime_episode"
-            app:argType="string" />
-        <argument
-            android:name="total_episodes"
-            app:argType="string" />
-        <argument
-            android:name="anime_url"
-            app:argType="string" />
-    </fragment>
 </navigation>
