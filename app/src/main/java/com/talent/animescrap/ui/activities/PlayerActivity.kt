@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.*
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -35,10 +36,11 @@ import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
 import androidx.media3.session.MediaSession
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.CaptionStyleCompat
-import androidx.media3.ui.CaptionStyleCompat.EDGE_TYPE_OUTLINE
 import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
+import com.talent.animescrap.databinding.ActivityPlayerBinding
+import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -49,6 +51,9 @@ import java.net.CookiePolicy
 
 @AndroidEntryPoint
 class PlayerActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityPlayerBinding
+
 
     private lateinit var player: ExoPlayer
     private lateinit var playerView: DoubleTapPlayerView
@@ -67,61 +72,46 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var isPipEnabled: Boolean = true
     private var animeUrl: String? = null
-    private var animeEpisodeNumber: String? = null
     private var animeSub: String? = null
     private var animeEpisode: String? = null
+    private var animeTotalEpisode: String? = null
     private var animeName: String? = null
     private var animeStreamUrl: String? = null
-    private var extraHeaders: HashMap<*, *>? = null
+    private var extraHeaders: HashMap<String, String>? = null
     private var isHls: Boolean = true
-    private val mCookieManager = CookieManager()
     private var simpleCache: SimpleCache? = null
+    private val mCookieManager = CookieManager()
+    private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_player)
+        binding = ActivityPlayerBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        bottomSheet = BottomSheetDialog(this@PlayerActivity)
-        bottomSheet.setContentView(R.layout.bottom_sheet_layout)
-
-        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
-        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
-
-        println(isPipEnabled)
-        if (isPipEnabled) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setPictureInPictureParams(
-                    PictureInPictureParams.Builder()
-                        .setAutoEnterEnabled(true)
-                        .build()
-                )
-            }
-        }
-
+        // Accept All Cookies
         mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         CookieHandler.setDefault(mCookieManager)
 
-        // Intent Arguments
-        animeName = intent.getStringExtra("anime_name")
-        animeEpisodeNumber = intent.getStringExtra("anime_episode")
-        animeEpisode = "Episode $animeEpisodeNumber"
-        animeStreamUrl = intent.getStringExtra("anime_stream_url")
-        animeUrl = intent.getStringExtra("anime_url")
-        animeSub = intent.getStringExtra("anime_sub")
-        isHls = intent.getBooleanExtra("is_hls", true)
-        extraHeaders = intent.getSerializableExtra("headers") as HashMap<*, *>?
+        // Prepare PiP
+        preparePip()
 
+        // Arguments
+        animeName = intent.getStringExtra("animeName")
+        animeEpisode = intent.getStringExtra("animeEpisode")
+        animeTotalEpisode = intent.getStringExtra("animeTotalEpisode")
+        animeUrl = intent.getStringExtra("animeUrl")
+
+        println("ANIME PLAYER $animeName $animeEpisode $animeUrl")
+
+        if (animeUrl != null && animeEpisode != null) {
+            animeStreamViewModelInPlayer.setAnimeLink(
+                animeUrl!!,
+                animeEpisode!!
+            )
+        }
         /// Player Views
-        playerView = findViewById(R.id.exoPlayerView)
-        playerView.doubleTapOverlay = findViewById(R.id.double_tap_overlay)
-
-        // Custom player views
-        scaleBtn = playerView.findViewById(R.id.btn_fullscreen)
-        centerText = playerView.findViewById(R.id.centerText)
-        rotateBtn = playerView.findViewById(R.id.rotate)
-        qualityBtn = playerView.findViewById(R.id.quality_selection_btn)
-        prevEpBtn = playerView.findViewById(R.id.prev_ep)
-        nextEpBtn = playerView.findViewById(R.id.next_ep)
+        playerView = binding.exoPlayerView
+        playerView.doubleTapOverlay = binding.doubleTapOverlay
 
         // Set Video Name
         videoNameTextView = playerView.findViewById(R.id.videoName)
@@ -142,7 +132,7 @@ class PlayerActivity : AppCompatActivity() {
         playerView.subtitleView?.visibility = View.VISIBLE
 
         // Build MediaSession
-        mediaSession = MediaSession.Builder(this@PlayerActivity, player)
+        mediaSession = MediaSession.Builder(this, player)
             .build()
 
         // Prepare Custom Player View Buttons
@@ -151,16 +141,20 @@ class PlayerActivity : AppCompatActivity() {
         // Add Listener for quality selection
         player.addListener(getPlayerListener())
 
-        if (animeStreamUrl != null) {
-            prepareMediaSource()
-            player.setMediaSource(mediaSource)
-            player.prepare()
-            player.playWhenReady = true
-
-        } else {
-            Toast.makeText(this@PlayerActivity, "No Anime Website Url Found", Toast.LENGTH_LONG)
-                .show()
+        animeStreamViewModelInPlayer.animeStreamLink.observe(this) { animeStreamLink ->
+            if (animeStreamLink.link.isNotBlank()) {
+                animeStreamUrl = animeStreamLink.link
+                if (animeStreamLink.subsLink.isNotBlank()) animeSub = animeStreamLink.subsLink
+                if (!animeStreamLink.extraHeaders.isNullOrEmpty()) extraHeaders =
+                    animeStreamLink.extraHeaders
+                isHls = animeStreamLink.isHls
+                prepareMediaSource()
+            } else {
+                Toast.makeText(this, "No Streaming Url Found", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
+
 
 
     }
@@ -172,7 +166,7 @@ class PlayerActivity : AppCompatActivity() {
             "Upgrade-Insecure-Requests" to "1"
         )
         extraHeaders?.forEach { header ->
-            headerMap[header.key.toString()] = header.value.toString()
+            headerMap[header.key] = header.value
         }
 
         println(headerMap)
@@ -184,11 +178,10 @@ class PlayerActivity : AppCompatActivity() {
             .setConnectTimeoutMs(20000)
 
         val databaseProvider = StandaloneDatabaseProvider(this)
+        simpleCache?.release()
+        simpleCache
         simpleCache = SimpleCache(
-            File(
-                this.cacheDir,
-                "exoplayer"
-            ).also { it.deleteOnExit() }, // Ensures always fresh file
+            File(cacheDir, "exoplayer").also { it.deleteOnExit() }, // Ensures always fresh file
             LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
             databaseProvider
         )
@@ -213,7 +206,7 @@ class PlayerActivity : AppCompatActivity() {
                 Color.WHITE,
                 Color.TRANSPARENT,
                 Color.TRANSPARENT,
-                EDGE_TYPE_OUTLINE,
+                CaptionStyleCompat.EDGE_TYPE_OUTLINE,
                 Color.BLACK,
                 null
             )
@@ -229,11 +222,71 @@ class PlayerActivity : AppCompatActivity() {
                 )
             mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
         }
+        player.setMediaSource(mediaSource)
+        player.prepare()
+        player.playWhenReady = true
     }
 
+    private fun getPlayerListener(): Player.Listener {
+        return object : Player.Listener {
+            override fun onTracksChanged(tracks: Tracks) {
+                val qualityMapUnsorted = mutableMapOf<String, Int>()
+                // Update UI using current tracks.
+                for (trackGroup in tracks.groups) {
+                    // Group level information.
+                    if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
+                        for (i in 0 until trackGroup.length) {
+                            val trackFormat = trackGroup.getTrackFormat(i).height
+                            println(trackGroup.getTrackFormat(i))
+                            println(trackGroup.isTrackSupported(i))
+                            println(trackGroup.isTrackSelected(i))
+                            if (trackGroup.isTrackSupported(i) && trackGroup.isTrackSelected(i)) {
+                                qualityMapUnsorted["${trackFormat}p"] = i
+                            }
+                        }
+                        val qualityMapSorted = mutableMapOf<String, Int>()
+                        qualityMapUnsorted.entries.sortedBy { it.key.replace("p", "").toInt() }
+                            .reversed().forEach { qualityMapSorted[it.key] = it.value }
+
+                        // Set Default Auto Text
+                        qualityBtn.text = resources.getString(R.string.quality_btn_txt)
+
+                        qualityBtn.setOnClickListener {
+                            showQuality(qualityMapSorted, trackGroup)
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun preparePip() {
+        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
+
+        println(isPipEnabled)
+        if (isPipEnabled) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setPictureInPictureParams(
+                    PictureInPictureParams.Builder()
+                        .setAutoEnterEnabled(true)
+                        .build()
+                )
+            }
+        }
+    }
 
     @SuppressLint("SourceLockedOrientationActivity")
     fun prepareButtons() {
+
+        // Custom player views
+        scaleBtn = playerView.findViewById(R.id.btn_fullscreen)
+        centerText = playerView.findViewById(R.id.centerText)
+        rotateBtn = playerView.findViewById(R.id.rotate)
+        qualityBtn = playerView.findViewById(R.id.quality_selection_btn)
+        prevEpBtn = playerView.findViewById(R.id.prev_ep)
+        nextEpBtn = playerView.findViewById(R.id.next_ep)
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
@@ -301,90 +354,11 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun getPlayerListener(): Player.Listener {
-        return object : Player.Listener {
-            override fun onTracksChanged(tracks: Tracks) {
-                val qualityMapUnsorted = mutableMapOf<String, Int>()
-                // Update UI using current tracks.
-                for (trackGroup in tracks.groups) {
-                    // Group level information.
-                    if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
-                        for (i in 0 until trackGroup.length) {
-                            val trackFormat = trackGroup.getTrackFormat(i).height
-                            println(trackGroup.getTrackFormat(i))
-                            println(trackGroup.isTrackSupported(i))
-                            println(trackGroup.isTrackSelected(i))
-                            if (trackGroup.isTrackSupported(i) && trackGroup.isTrackSelected(i)) {
-                                qualityMapUnsorted["${trackFormat}p"] = i
-                            }
-                        }
-                        val qualityMapSorted = mutableMapOf<String, Int>()
-                        qualityMapUnsorted.entries.sortedBy { it.key.replace("p", "").toInt() }
-                            .reversed().forEach { qualityMapSorted[it.key] = it.value }
-                        qualityBtn.setOnClickListener {
-                            showQuality(qualityMapSorted, trackGroup)
-                        }
-                    }
-
-                }
-            }
-        }
-    }
-
-    private fun releasePlayer() {
-        player.pause()
-        player.stop()
-        player.release()
-        mediaSession.release()
-    }
-
-    private fun releaseCache() {
-        simpleCache?.release()
-        simpleCache = null
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        releasePlayer()
-        releaseCache()
-        finish()
-        startActivity(
-            Intent(this@PlayerActivity, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            }
-        )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        releasePlayer()
-        releaseCache()
-        finish()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        hideSystemUi()
-    }
-
-    private fun hideSystemUi() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, playerView).let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-    }
-
-    private fun getMyErrorHandlingPolicy(): DefaultLoadErrorHandlingPolicy {
-        return object : DefaultLoadErrorHandlingPolicy() {
-            override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo): Long {
-                return 10000
-            }
-        }
-    }
 
     private fun showQuality(qualities: MutableMap<String, Int>, trackGroup: Tracks.Group) {
+
+        bottomSheet = BottomSheetDialog(this)
+        bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
         val list = bottomSheet.findViewById<ListView>(R.id.listView)
 
@@ -414,6 +388,58 @@ class PlayerActivity : AppCompatActivity() {
             bottomSheet.dismiss()
         }
 
+    }
+
+    private fun getMyErrorHandlingPolicy(): DefaultLoadErrorHandlingPolicy {
+        return object : DefaultLoadErrorHandlingPolicy() {
+            override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo): Long {
+                return 10000
+            }
+        }
+    }
+
+    private fun releasePlayer() {
+        releaseCache()
+        player.pause()
+        player.stop()
+        player.release()
+        mediaSession.release()
+    }
+
+    private fun releaseCache() {
+        simpleCache?.release()
+        simpleCache = null
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        releasePlayer()
+        finish()
+        startActivity(
+            Intent(this@PlayerActivity, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+            }
+        )
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        releasePlayer()
+        finish()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        hideSystemUi()
+    }
+
+    private fun hideSystemUi() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowInsetsControllerCompat(window, playerView).let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
     }
 
     override fun onPictureInPictureModeChanged(

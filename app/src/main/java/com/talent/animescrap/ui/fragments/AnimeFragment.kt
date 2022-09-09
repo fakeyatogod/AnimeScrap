@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -25,6 +24,7 @@ import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
+import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -181,15 +181,23 @@ class AnimeFragment : Fragment() {
 
             // Navigate to Internal Player
             if (!isExternalPlayerEnabled) {
-                val navController =
-                    requireActivity().findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
-                val action = AnimeFragmentDirections.actionNavigationAnimeToNavigationPlayer(
-                    animeName!!,
-                    animeEpisodes[binding.episodeSpinner.selectedItem]!!,
-                    animeEpisodes.size.toString(),
-                    contentLink!!
-                )
-                navController.navigate(action)
+                /*           val navController =
+                               requireActivity().findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
+                           val action = AnimeFragmentDirections.actionNavigationAnimeToNavigationPlayer(
+                               animeName!!,
+                               animeEpisodes[binding.episodeSpinner.selectedItem]!!,
+                               animeEpisodes.size.toString(),
+                               contentLink!!
+                           )
+                           navController.navigate(action)*/
+
+                startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
+                    putExtra("animeName", animeName!!)
+                    putExtra("animeEpisode", animeEpisodes[binding.episodeSpinner.selectedItem]!!)
+                    putExtra("animeTotalEpisode", animeEpisodes.size.toString())
+                    putExtra("animeUrl", contentLink!!)
+                })
+
             } else {
                 animeStreamViewModel.setAnimeLink(
                     contentLink!!,

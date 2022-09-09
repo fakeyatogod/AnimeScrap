@@ -7,9 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/black"
     android:orientation="vertical"
-    tools:context=".ui.activities.PlayerActivity"
-    tools:ignore="Overdraw"
-    tools:viewBindingIgnore="true">
+    tools:context=".ui.activities.PlayerActivity">
 
 
     <com.talent.animescrap.widgets.DoubleTapPlayerView
