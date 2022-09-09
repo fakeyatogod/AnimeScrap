@@ -176,9 +176,6 @@ class AnimeFragment : Fragment() {
                     if (this == "Not Started Yet") this else "Last Watched : $this/${animeEpisodes.size}"
             }
 
-            binding.progressbarInPage.visibility = View.VISIBLE
-            binding.pageLayout.visibility = View.GONE
-
             // Navigate to Internal Player
             if (!isExternalPlayerEnabled) {
                 /*           val navController =
@@ -199,6 +196,8 @@ class AnimeFragment : Fragment() {
                 })
 
             } else {
+                binding.progressbarInPage.visibility = View.VISIBLE
+                binding.pageLayout.visibility = View.GONE
                 animeStreamViewModel.setAnimeLink(
                     contentLink!!,
                     animeEpisodes[binding.episodeSpinner.selectedItem]!!

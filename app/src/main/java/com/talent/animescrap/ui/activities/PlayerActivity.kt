@@ -156,7 +156,6 @@ class PlayerActivity : AppCompatActivity() {
         }
 
 
-
     }
 
     private fun prepareMediaSource() {
@@ -287,6 +286,20 @@ class PlayerActivity : AppCompatActivity() {
         qualityBtn = playerView.findViewById(R.id.quality_selection_btn)
         prevEpBtn = playerView.findViewById(R.id.prev_ep)
         nextEpBtn = playerView.findViewById(R.id.next_ep)
+
+        nextEpBtn.setOnClickListener {
+            animeEpisode = "${animeEpisode!!.toInt() + 1}"
+            println(animeEpisode)
+            if (animeEpisode!!.toInt() > animeTotalEpisode!!.toInt() || animeEpisode!!.toInt() < 1)
+                onBackPressed()
+            else {
+                animeStreamViewModelInPlayer.setAnimeLink(
+                    animeUrl!!,
+                    animeEpisode!!
+                )
+            }
+        }
+
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
