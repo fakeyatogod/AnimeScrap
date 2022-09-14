@@ -15,7 +15,7 @@ class AllAnimeSource : AnimeSource {
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
             val url =
-                "$mainUrl/graphql?variables=%7B%22_id%22%3A%22${contentLink}%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22af4b72c51f94ed3b1bd6405ab279881ad84b3ba519ebc2382a1736d34c3c1bf6%22%7D%7D"
+                "$mainUrl/graphql?variables=%7B%22_id%22%3A%22${contentLink}%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22afcdaedfd46f36448916b5f7db84d2bdbb72fded428ad8755179a03845c57b96%22%7D%7D"
             println(url)
             val res = Utils().getJson(url)!!
 
