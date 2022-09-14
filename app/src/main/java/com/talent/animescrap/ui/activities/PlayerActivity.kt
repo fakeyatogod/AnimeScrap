@@ -69,6 +69,8 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
     private lateinit var mediaSession: MediaSession
+    private lateinit var animeEpisodeMap: HashMap<*, *>
+    private lateinit var qualityMapUnsorted: MutableMap<String, Int>
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var isPipEnabled: Boolean = true
     private var animeUrl: String? = null
@@ -83,6 +85,7 @@ class PlayerActivity : AppCompatActivity() {
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
@@ -97,18 +100,13 @@ class PlayerActivity : AppCompatActivity() {
 
         // Arguments
         animeName = intent.getStringExtra("animeName")
-        animeEpisode = intent.getStringExtra("animeEpisode")
+        animeEpisode = intent.getStringExtra("animeEpisodeIndex")
         animeTotalEpisode = intent.getStringExtra("animeTotalEpisode")
         animeUrl = intent.getStringExtra("animeUrl")
 
         println("ANIME PLAYER $animeName $animeEpisode $animeUrl")
+        animeEpisodeMap = intent.getSerializableExtra("animeEpisodeMap") as HashMap<*, *>
 
-        if (animeUrl != null && animeEpisode != null) {
-            animeStreamViewModelInPlayer.setAnimeLink(
-                animeUrl!!,
-                animeEpisode!!
-            )
-        }
         /// Player Views
         playerView = binding.exoPlayerView
         playerView.doubleTapOverlay = binding.doubleTapOverlay
@@ -118,7 +116,7 @@ class PlayerActivity : AppCompatActivity() {
         videoEpTextView = playerView.findViewById(R.id.videoEpisode)
         videoNameTextView.isSelected = true
         videoNameTextView.text = animeName
-        videoEpTextView.text = animeEpisode
+        updateEpisodeName()
 
         // Build ExoPlayer
         player = ExoPlayer.Builder(this)
@@ -141,6 +139,15 @@ class PlayerActivity : AppCompatActivity() {
         // Add Listener for quality selection
         player.addListener(getPlayerListener())
 
+        if (animeUrl != null && animeEpisode != null) {
+            animeStreamViewModelInPlayer.setAnimeLink(
+                animeUrl!!,
+                animeEpisodeMap[animeEpisode!!] as String
+            )
+            centerText.text = getString(R.string.loading_episode)
+            centerText.visibility = View.VISIBLE
+        }
+
         animeStreamViewModelInPlayer.animeStreamLink.observe(this) { animeStreamLink ->
             if (animeStreamLink.link.isNotBlank()) {
                 animeStreamUrl = animeStreamLink.link
@@ -148,7 +155,9 @@ class PlayerActivity : AppCompatActivity() {
                 if (!animeStreamLink.extraHeaders.isNullOrEmpty()) extraHeaders =
                     animeStreamLink.extraHeaders
                 isHls = animeStreamLink.isHls
+                qualityMapUnsorted = mutableMapOf()
                 prepareMediaSource()
+                centerText.visibility = View.GONE
             } else {
                 Toast.makeText(this, "No Streaming Url Found", Toast.LENGTH_SHORT)
                     .show()
@@ -228,8 +237,13 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun getPlayerListener(): Player.Listener {
         return object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                super.onPlaybackStateChanged(playbackState)
+                if (playbackState == Player.STATE_ENDED) {
+                    setNewEpisode()
+                }
+            }
             override fun onTracksChanged(tracks: Tracks) {
-                val qualityMapUnsorted = mutableMapOf<String, Int>()
                 // Update UI using current tracks.
                 for (trackGroup in tracks.groups) {
                     // Group level information.
@@ -246,9 +260,6 @@ class PlayerActivity : AppCompatActivity() {
                         val qualityMapSorted = mutableMapOf<String, Int>()
                         qualityMapUnsorted.entries.sortedBy { it.key.replace("p", "").toInt() }
                             .reversed().forEach { qualityMapSorted[it.key] = it.value }
-
-                        // Set Default Auto Text
-                        qualityBtn.text = resources.getString(R.string.quality_btn_txt)
 
                         qualityBtn.setOnClickListener {
                             showQuality(qualityMapSorted, trackGroup)
@@ -276,6 +287,30 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
+    fun updateEpisodeName() {
+        videoEpTextView.text = "${resources.getString(R.string.episode)} $animeEpisode"
+    }
+
+    private fun setNewEpisode(increment: Int = 1) {
+        animeEpisode = "${animeEpisode!!.toInt() + increment}"
+        println(animeEpisode)
+        if (animeEpisode!!.toInt() > animeTotalEpisode!!.toInt() || animeEpisode!!.toInt() < 1)
+            onBackPressed()
+        else {
+            animeStreamViewModelInPlayer.setAnimeLink(
+                animeUrl!!,
+                animeEpisodeMap[animeEpisode!!] as String
+            )
+            centerText.text = getString(R.string.loading_episode)
+            centerText.visibility = View.VISIBLE
+            updateEpisodeName()
+            qualityMapUnsorted = mutableMapOf()
+            // Set Default Auto Text
+            qualityBtn.text = resources.getString(R.string.quality_btn_txt)
+        }
+    }
+
     @SuppressLint("SourceLockedOrientationActivity")
     fun prepareButtons() {
 
@@ -288,16 +323,10 @@ class PlayerActivity : AppCompatActivity() {
         nextEpBtn = playerView.findViewById(R.id.next_ep)
 
         nextEpBtn.setOnClickListener {
-            animeEpisode = "${animeEpisode!!.toInt() + 1}"
-            println(animeEpisode)
-            if (animeEpisode!!.toInt() > animeTotalEpisode!!.toInt() || animeEpisode!!.toInt() < 1)
-                onBackPressed()
-            else {
-                animeStreamViewModelInPlayer.setAnimeLink(
-                    animeUrl!!,
-                    animeEpisode!!
-                )
-            }
+            setNewEpisode(1)
+        }
+        prevEpBtn.setOnClickListener {
+            setNewEpisode(-1)
         }
 
         // Back Button

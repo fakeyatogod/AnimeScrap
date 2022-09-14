@@ -30,6 +30,8 @@
     <string name="synopsis_header_title">Synopsis:</string>
     <string name="not_started_yet">Not Started Yet</string>
     <string name="select_episode">Select Episode</string>
+    <string name="episode">Episode</string>
+    <string name="loading_episode">Loading Episode</string>
 
     <string name="back_to_home">back to home</string>
 

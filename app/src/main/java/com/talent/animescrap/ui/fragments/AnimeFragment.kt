@@ -190,7 +190,8 @@ class AnimeFragment : Fragment() {
 
                 startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
                     putExtra("animeName", animeName!!)
-                    putExtra("animeEpisode", animeEpisodes[binding.episodeSpinner.selectedItem]!!)
+                    putExtra("animeEpisodeIndex", binding.episodeSpinner.selectedItem as String)
+                    putExtra("animeEpisodeMap", animeEpisodes as HashMap<String, String>)
                     putExtra("animeTotalEpisode", animeEpisodes.size.toString())
                     putExtra("animeUrl", contentLink!!)
                 })
