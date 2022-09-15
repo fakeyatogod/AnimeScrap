@@ -5,6 +5,7 @@
         <item>Zoro</item>
 <!--        <item>FakeGogo</item>-->
         <item>AllAnime</item>
+        <item>Enime</item>
     </string-array>
 
     <string-array name="sources_values">
@@ -12,5 +13,6 @@
         <item>zoro</item>
 <!--        <item>fake_gogo</item>-->
         <item>allanime</item>
+        <item>enime</item>
     </string-array>
 </resources>

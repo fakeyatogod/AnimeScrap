@@ -55,6 +55,9 @@ class AnimeRepositoryImpl @Inject constructor(
             "allanime" -> {
                 AllAnimeSource()
             }
+            "enime" -> {
+                EnimeSource()
+            }
             else -> {
                 YugenSource()
             }
