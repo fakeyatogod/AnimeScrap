@@ -122,8 +122,8 @@
                     android:padding="4dp"
                     app:bar_height="2dp"
                     app:buffered_color="#BCB9B9"
-                    app:played_color="#FF0000"
-                    app:unplayed_color="#3E3C3C" />
+                    app:played_color="?attr/colorPrimary"
+                    app:unplayed_color="#66B5B5B5" />
 
                 <TextView
                     android:id="@+id/exo_duration"

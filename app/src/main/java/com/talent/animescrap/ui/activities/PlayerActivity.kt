@@ -54,7 +54,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
 
-
+    private lateinit var sharedPreferences: SharedPreferences
     private lateinit var loadingLayout: LinearLayout
     private lateinit var player: ExoPlayer
     private lateinit var playerView: DoubleTapPlayerView
@@ -98,6 +98,9 @@ class PlayerActivity : AppCompatActivity() {
 
         // Prepare PiP
         preparePip()
+
+        // Initialize SharedPreferences
+        sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
 
         // Arguments
         animeName = intent.getStringExtra("animeName")
@@ -147,6 +150,8 @@ class PlayerActivity : AppCompatActivity() {
                 animeUrl!!,
                 animeEpisodeMap[animeEpisode!!] as String
             )
+            if (animeEpisode!!.toInt() < 2) prevEpBtn.isEnabled = false
+            if (animeEpisode!!.toInt() == animeTotalEpisode!!.toInt()) nextEpBtn.isEnabled = false
         }
 
         animeStreamViewModelInPlayer.animeStreamLink.observe(this) { animeStreamLink ->
@@ -305,12 +310,17 @@ class PlayerActivity : AppCompatActivity() {
                 animeUrl!!,
                 animeEpisodeMap[animeEpisode!!] as String
             )
+            if (animeEpisode!!.toInt() < 2) prevEpBtn.isEnabled = false
+            if (animeEpisode!!.toInt() == animeTotalEpisode!!.toInt()) nextEpBtn.isEnabled = false
+            player.clearMediaItems()
             player.stop()
             loadingLayout.visibility = View.VISIBLE
             updateEpisodeName()
             qualityMapUnsorted = mutableMapOf()
             // Set Default Auto Text
             qualityBtn.text = resources.getString(R.string.quality_btn_txt)
+            sharedPreferences.edit()
+                .putString(animeUrl!!, animeEpisode!!).apply()
         }
     }
 

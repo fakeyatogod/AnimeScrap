@@ -278,4 +278,13 @@ class AnimeFragment : Fragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::animeDetails.isInitialized) {
+            sharedPreferences.getString(contentLink, "Not Started Yet").apply {
+                binding.lastWatchedTxt.text =
+                    if (this == "Not Started Yet") this else "Last Watched : $this/${animeDetails.animeEpisodes.size}"
+            }
+        }
+    }
 }

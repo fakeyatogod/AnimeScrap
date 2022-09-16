@@ -35,9 +35,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="40dp"
+        android:layout_marginHorizontal="80dp"
+        android:padding="10dp"
         android:gravity="center"
-        android:visibility="gone"
         android:id="@+id/loading_layout"
         android:orientation="vertical">
 
@@ -45,6 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
+            android:textSize="24sp"
             android:text="@string/loading_episode"
             android:textColor="@color/white" />
 
