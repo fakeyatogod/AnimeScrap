@@ -55,6 +55,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var binding: ActivityPlayerBinding
 
 
+    private lateinit var loadingLayout: LinearLayout
     private lateinit var player: ExoPlayer
     private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
@@ -110,6 +111,7 @@ class PlayerActivity : AppCompatActivity() {
         /// Player Views
         playerView = binding.exoPlayerView
         playerView.doubleTapOverlay = binding.doubleTapOverlay
+        loadingLayout = binding.loadingLayout
 
         // Set Video Name
         videoNameTextView = playerView.findViewById(R.id.videoName)
@@ -140,12 +142,11 @@ class PlayerActivity : AppCompatActivity() {
         player.addListener(getPlayerListener())
 
         if (animeUrl != null && animeEpisode != null) {
+            loadingLayout.visibility = View.VISIBLE
             animeStreamViewModelInPlayer.setAnimeLink(
                 animeUrl!!,
                 animeEpisodeMap[animeEpisode!!] as String
             )
-            centerText.text = getString(R.string.loading_episode)
-            centerText.visibility = View.VISIBLE
         }
 
         animeStreamViewModelInPlayer.animeStreamLink.observe(this) { animeStreamLink ->
@@ -157,7 +158,7 @@ class PlayerActivity : AppCompatActivity() {
                 isHls = animeStreamLink.isHls
                 qualityMapUnsorted = mutableMapOf()
                 prepareMediaSource()
-                centerText.visibility = View.GONE
+                loadingLayout.visibility = View.GONE
             } else {
                 Toast.makeText(this, "No Streaming Url Found", Toast.LENGTH_SHORT)
                     .show()
@@ -304,8 +305,8 @@ class PlayerActivity : AppCompatActivity() {
                 animeUrl!!,
                 animeEpisodeMap[animeEpisode!!] as String
             )
-            centerText.text = getString(R.string.loading_episode)
-            centerText.visibility = View.VISIBLE
+            player.stop()
+            loadingLayout.visibility = View.VISIBLE
             updateEpisodeName()
             qualityMapUnsorted = mutableMapOf()
             // Set Default Auto Text

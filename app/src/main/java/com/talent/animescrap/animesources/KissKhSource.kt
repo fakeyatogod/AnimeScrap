@@ -87,9 +87,14 @@ class KissKhSource : AnimeSource {
             val res = Utils().getJson(url)!!.asJsonObject
             println(res)
 
-            val subReq = Utils().getJsonArray("$mainUrl/api/Sub/$animeEpCode")!!
-                .first().asJsonObject
-            val subs = if (res["default"].asBoolean) subReq["src"].asString else ""
+            var subs = ""
+            Utils().getJsonArray("$mainUrl/api/Sub/$animeEpCode")
+                .let {
+                    if (it != null && !it.isJsonNull && !it.isEmpty) {
+                        val subObj = it.first().asJsonObject
+                        subs = if (subObj["default"].asBoolean) subObj["src"].asString else ""
+                    }
+                }
 
             return@withContext AnimeStreamLink(res["Video"].asString, subs, true)
         }
