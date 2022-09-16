@@ -1,6 +1,7 @@
 package com.talent.animescrap.utils
 
 import com.github.kittinunf.fuel.Fuel
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.jsoup.Jsoup
@@ -22,6 +23,21 @@ open class Utils {
         val (bytes, _) = res
         if (bytes != null) {
             return JsonParser.parseString(String(bytes)).asJsonObject
+        }
+        return null
+    }
+
+    fun getJsonArray(
+        url: String,
+        mapOfHeaders: Map<String, String>? = null
+    ): JsonArray? {
+        val fuel = Fuel.get(url)
+        if (mapOfHeaders != null)
+            fuel.header(mapOfHeaders)
+        val res = fuel.response().third
+        val (bytes, _) = res
+        if (bytes != null) {
+            return JsonParser.parseString(String(bytes)).asJsonArray
         }
         return null
     }

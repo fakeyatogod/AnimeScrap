@@ -218,14 +218,15 @@ class PlayerActivity : AppCompatActivity() {
                 Color.BLACK,
                 null
             )
+            println(animeSub)
             playerView.subtitleView?.setStyle(subStyle)
             val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(
-                    MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub))
-                        .setMimeType(MimeTypes.TEXT_VTT)
-                        .setLanguage("en")
-                        .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                        .build(),
+                    MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub)).apply {
+                        if (animeSub!!.contains("srt")) setMimeType(MimeTypes.APPLICATION_SUBRIP) else setMimeType(MimeTypes.TEXT_VTT)
+                        setLanguage("en")
+                        setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                    }.build(),
                     C.TIME_UNSET
                 )
             mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
@@ -243,6 +244,7 @@ class PlayerActivity : AppCompatActivity() {
                     setNewEpisode()
                 }
             }
+
             override fun onTracksChanged(tracks: Tracks) {
                 // Update UI using current tracks.
                 for (trackGroup in tracks.groups) {
