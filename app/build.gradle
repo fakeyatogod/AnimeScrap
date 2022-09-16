@@ -14,8 +14,8 @@ android {
         applicationId "com.talent.animescrap"
         minSdkVersion 23
         targetSdkVersion 32
-        versionCode 11
-        versionName "2.0.5"
+        versionCode 12
+        versionName "2.1.0"
 
         kapt {
             arguments {
