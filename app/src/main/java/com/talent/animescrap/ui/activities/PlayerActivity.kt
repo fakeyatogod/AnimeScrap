@@ -258,9 +258,9 @@ class PlayerActivity : AppCompatActivity() {
                     if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
                         for (i in 0 until trackGroup.length) {
                             val trackFormat = trackGroup.getTrackFormat(i).height
-                            println(trackGroup.getTrackFormat(i))
-                            println(trackGroup.isTrackSupported(i))
-                            println(trackGroup.isTrackSelected(i))
+//                            println(trackGroup.getTrackFormat(i))
+//                            println(trackGroup.isTrackSupported(i))
+//                            println(trackGroup.isTrackSelected(i))
                             if (trackGroup.isTrackSupported(i) && trackGroup.isTrackSelected(i)) {
                                 qualityMapUnsorted["${trackFormat}p"] = i
                             }
@@ -312,7 +312,6 @@ class PlayerActivity : AppCompatActivity() {
             )
             if (animeEpisode!!.toInt() < 2) prevEpBtn.isEnabled = false
             if (animeEpisode!!.toInt() == animeTotalEpisode!!.toInt()) nextEpBtn.isEnabled = false
-            player.clearMediaItems()
             player.stop()
             loadingLayout.visibility = View.VISIBLE
             updateEpisodeName()
