@@ -7,6 +7,8 @@ import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -149,8 +151,8 @@ class PlayerActivity : AppCompatActivity() {
                 animeUrl!!,
                 animeEpisodeMap[animeEpisode!!] as String
             )
-            if (animeEpisode!!.toInt() < 2) prevEpBtn.isEnabled = false
-            if (animeEpisode!!.toInt() == animeTotalEpisode!!.toInt()) nextEpBtn.isEnabled = false
+            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
+            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
         }
 
         animeStreamViewModelInPlayer.animeStreamLink.observe(this) { animeStreamLink ->
@@ -310,8 +312,8 @@ class PlayerActivity : AppCompatActivity() {
                 animeUrl!!,
                 animeEpisodeMap[animeEpisode!!] as String
             )
-            if (animeEpisode!!.toInt() < 2) prevEpBtn.isEnabled = false
-            if (animeEpisode!!.toInt() == animeTotalEpisode!!.toInt()) nextEpBtn.isEnabled = false
+            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
+            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
             player.stop()
             loadingLayout.visibility = View.VISIBLE
             playerView.visibility = View.GONE
@@ -527,4 +529,11 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun ImageView.setImageViewEnabled(enabled: Boolean) = if(enabled) {
+        drawable.clearColorFilter()
+        isEnabled = true
+    } else {
+        drawable.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
+        isEnabled = false
+    }
 }
