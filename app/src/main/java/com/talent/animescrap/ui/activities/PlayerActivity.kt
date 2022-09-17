@@ -107,8 +107,6 @@ class PlayerActivity : AppCompatActivity() {
         animeEpisode = intent.getStringExtra("animeEpisodeIndex")
         animeTotalEpisode = intent.getStringExtra("animeTotalEpisode")
         animeUrl = intent.getStringExtra("animeUrl")
-
-        println("ANIME PLAYER $animeName $animeEpisode $animeUrl")
         animeEpisodeMap = intent.getSerializableExtra("animeEpisodeMap") as HashMap<*, *>
 
         /// Player Views
@@ -146,6 +144,7 @@ class PlayerActivity : AppCompatActivity() {
 
         if (animeUrl != null && animeEpisode != null) {
             loadingLayout.visibility = View.VISIBLE
+            playerView.visibility = View.GONE
             animeStreamViewModelInPlayer.setAnimeLink(
                 animeUrl!!,
                 animeEpisodeMap[animeEpisode!!] as String
@@ -162,8 +161,9 @@ class PlayerActivity : AppCompatActivity() {
                     animeStreamLink.extraHeaders
                 isHls = animeStreamLink.isHls
                 qualityMapUnsorted = mutableMapOf()
-                prepareMediaSource()
                 loadingLayout.visibility = View.GONE
+                playerView.visibility = View.VISIBLE
+                prepareMediaSource()
             } else {
                 Toast.makeText(this, "No Streaming Url Found", Toast.LENGTH_SHORT)
                     .show()
@@ -314,6 +314,7 @@ class PlayerActivity : AppCompatActivity() {
             if (animeEpisode!!.toInt() == animeTotalEpisode!!.toInt()) nextEpBtn.isEnabled = false
             player.stop()
             loadingLayout.visibility = View.VISIBLE
+            playerView.visibility = View.GONE
             updateEpisodeName()
             qualityMapUnsorted = mutableMapOf()
             // Set Default Auto Text

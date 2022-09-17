@@ -32,10 +32,12 @@
         android:visibility="invisible" />
 
     <LinearLayout
+        android:background="@color/black"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
         android:gravity="center"
+        android:padding="10dp"
         android:id="@+id/loading_layout"
         android:orientation="vertical">
 
@@ -44,6 +46,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             android:textAlignment="center"
+            android:fontFamily="sans-serif-condensed-medium"
             android:text="@string/loading_episode"
             android:textColor="@color/white" />
 
