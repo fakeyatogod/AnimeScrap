@@ -1,5 +1,4 @@
 <resources>
-    <!-- Reply Preference -->
     <string-array name="sources_entries">
         <item>Yugen</item>
         <item>Zoro</item>
@@ -16,5 +15,18 @@
         <item>allanime</item>
         <item>enime</item>
         <item>kiss_kh</item>
+    </string-array>
+
+    <!-- Reply Preference -->
+    <string-array name="dark_mode_entries">
+        <item>Off</item>
+        <item>On</item>
+        <item>Follow system</item>
+    </string-array>
+
+    <string-array name="dark_mode_values">
+        <item>off</item>
+        <item>on</item>
+        <item>follow_system</item>
     </string-array>
 </resources>

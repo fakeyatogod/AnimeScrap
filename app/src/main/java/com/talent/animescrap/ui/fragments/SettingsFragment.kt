@@ -4,8 +4,8 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.preference.ListPreference
-import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
@@ -50,9 +50,24 @@ class SettingsFragment : PreferenceFragmentCompat() {
             return@setOnPreferenceChangeListener true
         }
 
+        findPreference<ListPreference>("dark_mode")?.setOnPreferenceChangeListener { _, newValue ->
+            when (newValue.toString()) {
+                "on" -> {
+                    setDefaultNightMode(MODE_NIGHT_YES)
+                }
+                "off" -> {
+                    setDefaultNightMode(MODE_NIGHT_NO)
+                }
+                else -> {
+                    setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
+                }
+            }
+            return@setOnPreferenceChangeListener true
+        }
+
         // Hide theme section in versions that don't support dynamic colors.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            findPreference<PreferenceCategory>("theme")?.isVisible = false
+            findPreference<SwitchPreferenceCompat>("dynamic_colors")?.isVisible = false
         }
 
     }

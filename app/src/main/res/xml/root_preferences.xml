@@ -11,6 +11,14 @@
             app:summaryOn="@string/dynamic_colors_enabled_summary"
             app:title="@string/dynamic_colors_title" />
 
+        <ListPreference
+            app:defaultValue="follow_system"
+            app:entries="@array/dark_mode_entries"
+            app:entryValues="@array/dark_mode_values"
+            app:key="dark_mode"
+            app:title="@string/dark_mode_pref_title"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/source_cat_title">
