@@ -13,7 +13,6 @@
 ### 👇 Downloads
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="65">](https://github.com/fakeyatogod/AnimeScrap/releases/latest)
 
-
 ### ✨ Features
 - Compatible with Android 6.0 and above (API 23+)
 - Comes in both light and dark mode.
@@ -42,11 +41,17 @@
 
 
 ### 🤝 Thanks
+- Enime
+- CloudStream
+- Saikou
 - To me for being so dumb
 
 ### ♥️ Donations
 If this project helped you a little bit, please consider donating to support further development. You can do that just by treating yourself with a nice ice cream. Cheers
 
+
+### 🗒️ NOTE
+THE CONTENT ON THIS APP IS NOT MINE NOR IS IT HOSTED BY ME OR THE APP. THESE BELONG TO THEIR RESPECTIVE OWNERS. This app just demostrates on how it is possible to build a app that can scrape websites and use their content.
 
 ### ©️ License
 ```
