@@ -28,5 +28,6 @@
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="elevationOverlayColor">@color/md_theme_dark_surfaceTint</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
+        <item name="android:statusBarColor">@color/md_theme_dark_background</item>
     </style>
 </resources>
