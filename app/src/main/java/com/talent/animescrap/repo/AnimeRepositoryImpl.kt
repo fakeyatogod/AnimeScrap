@@ -52,6 +52,9 @@ class AnimeRepositoryImpl @Inject constructor(
             "allanime" -> {
                 AllAnimeSource()
             }
+            "allanime_dub" -> {
+                AllAnimeDubSource()
+            }
             "enime" -> {
                 EnimeSource()
             }
