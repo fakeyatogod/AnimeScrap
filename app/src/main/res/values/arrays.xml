@@ -1,8 +1,8 @@
 <resources>
+    <!-- Source Preference -->
     <string-array name="sources_entries">
         <item>Yugen</item>
         <item>Zoro</item>
-<!--        <item>FakeGogo</item>-->
         <item>AllAnime</item>
         <item>Enime</item>
         <item>KissKh</item>
@@ -11,13 +11,12 @@
     <string-array name="sources_values">
         <item>yugen</item>
         <item>zoro</item>
-<!--        <item>fake_gogo</item>-->
         <item>allanime</item>
         <item>enime</item>
         <item>kiss_kh</item>
     </string-array>
 
-    <!-- Reply Preference -->
+    <!-- Dark Mode Preference -->
     <string-array name="dark_mode_entries">
         <item>Off</item>
         <item>On</item>

@@ -49,9 +49,6 @@ class AnimeRepositoryImpl @Inject constructor(
             "zoro" -> {
                 ZoroSource()
             }
-            "fake_gogo" -> {
-                FakeGogoSource()
-            }
             "allanime" -> {
                 AllAnimeSource()
             }
