@@ -2,12 +2,13 @@ package com.talent.animescrap.utils
 
 import com.github.kittinunf.fuel.Fuel
 import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-open class Utils {
+object Utils {
     fun getJsoup(url: String): Document {
         return Jsoup.connect(url).ignoreContentType(true).get()
     }
@@ -15,29 +16,14 @@ open class Utils {
     fun getJson(
         url: String,
         mapOfHeaders: Map<String, String>? = null
-    ): JsonObject? {
+    ): JsonElement? {
         val fuel = Fuel.get(url)
         if (mapOfHeaders != null)
             fuel.header(mapOfHeaders)
         val res = fuel.response().third
         val (bytes, _) = res
         if (bytes != null) {
-            return JsonParser.parseString(String(bytes)).asJsonObject
-        }
-        return null
-    }
-
-    fun getJsonArray(
-        url: String,
-        mapOfHeaders: Map<String, String>? = null
-    ): JsonArray? {
-        val fuel = Fuel.get(url)
-        if (mapOfHeaders != null)
-            fuel.header(mapOfHeaders)
-        val res = fuel.response().third
-        val (bytes, _) = res
-        if (bytes != null) {
-            return JsonParser.parseString(String(bytes)).asJsonArray
+            return JsonParser.parseString(String(bytes))
         }
         return null
     }

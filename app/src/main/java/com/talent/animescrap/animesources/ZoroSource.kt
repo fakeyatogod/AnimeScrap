@@ -3,7 +3,8 @@ package com.talent.animescrap.animesources
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils
+import com.talent.animescrap.utils.Utils.getJson
+import com.talent.animescrap.utils.Utils.getJsoup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
@@ -11,14 +12,14 @@ import org.jsoup.Jsoup
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class ZoroSource : AnimeSource, Utils() {
+class ZoroSource : AnimeSource {
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
 
             // Get Ep List
             val animeCode = contentLink.split("-").last()
             val url = "https://zoro.to/ajax/v2/episode/list/${animeCode}"
-            val html = getJson(url)!!.get("html")!!.asString
+            val html = getJson(url)!!.asJsonObject.get("html")!!.asString
             val eps = Jsoup.parse(html).select(".ss-list > a[href].ssl-item.ep-item")
             val epMap = mutableMapOf<String, String>()
             eps.forEach { ep ->
@@ -92,7 +93,7 @@ class ZoroSource : AnimeSource, Utils() {
             println(animeUrl)
             println(animeEpCode)
             val url = "https://zoro.to/ajax/v2/episode/servers?episodeId=$animeEpCode"
-            val html = getJson(url)!!.get("html")!!.asString
+            val html = getJson(url)!!.asJsonObject.get("html")!!.asString
             val items = Jsoup.parse(html).select(".server-item[data-type][data-id]")
             println(items.first()?.text())
             val servers = items.map {
@@ -109,7 +110,7 @@ class ZoroSource : AnimeSource, Utils() {
                 val link =
                     "https://zoro.to/ajax/v2/episode/sources?id=${it.second}"
                 if (it.first == "sub")
-                    rapidLinks.add(getJson(link)!!.get("link")!!.asString)
+                    rapidLinks.add(getJson(link)!!.asJsonObject.get("link")!!.asString)
             }
             val rapidUrl = rapidLinks.firstOrNull { it.contains("rapid") }
                 ?: ""
@@ -126,7 +127,7 @@ class ZoroSource : AnimeSource, Utils() {
                     "Referer" to "https://zoro.to/",
                     "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0"
                 )
-            )!!
+            )!!.asJsonObject
             println(json)
             val m3u8 = json["sources"]!!.asJsonArray[0].asJsonObject["file"].toString().trim('"')
             val subtitle = mutableMapOf<String, String>()
@@ -165,7 +166,7 @@ class ZoroSource : AnimeSource, Utils() {
         .build()
 
     private suspend fun wss(): String = withContext(Dispatchers.IO) {
-        var sId = Utils().getJsoup("https://api.enime.moe/tool/rapid-cloud/server-id").text()
+        var sId = getJsoup("https://api.enime.moe/tool/rapid-cloud/server-id").text()
         if (sId.isEmpty()) {
             val latch = CountDownLatch(1)
             val listener = object : WebSocketListener() {

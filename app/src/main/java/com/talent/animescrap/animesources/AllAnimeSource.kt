@@ -3,7 +3,7 @@ package com.talent.animescrap.animesources
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils
+import com.talent.animescrap.utils.Utils.getJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -17,7 +17,7 @@ class AllAnimeSource : AnimeSource {
             val url =
                 "$mainUrl/allanimeapi?variables=%7B%22_id%22%3A%22${contentLink}%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22afcdaedfd46f36448916b5f7db84d2bdbb72fded428ad8755179a03845c57b96%22%7D%7D"
             println(url)
-            val res = Utils().getJson(url)!!
+            val res = getJson(url)!!.asJsonObject
 
             val data = res.asJsonObject["data"].asJsonObject["show"].asJsonObject
             val animeCover = allAnimeImage(data["thumbnail"].asString)
@@ -46,7 +46,7 @@ class AllAnimeSource : AnimeSource {
                 )
             }%22%7D%2C%22limit%22%3A26%2C%22page%22%3A1%2C%22translationType%22%3A%22sub%22%2C%22countryOrigin%22%3A%22ALL%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22d2670e3e27ee109630991152c8484fce5ff5e280c523378001f9a23dc1839068%22%7D%7D"""
         val res =
-            Utils().getJson(url)!!["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
+            getJson(url)!!.asJsonObject["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
         for (json in res) {
             val name = json.asJsonObject["name"].asString
             val image = allAnimeImage(json.asJsonObject["thumbnail"].asString)
@@ -62,7 +62,7 @@ class AllAnimeSource : AnimeSource {
             val url =
                 """$mainUrl/allanimeapi?variables=%7B%22search%22%3A%7B%22allowAdult%22%3Afalse%2C%22allowUnknown%22%3Afalse%2C%22isManga%22%3Afalse%7D%2C%22limit%22%3A26%2C%22page%22%3A1%2C%22translationType%22%3A%22sub%22%2C%22countryOrigin%22%3A%22ALL%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%229c7a8bc1e095a34f2972699e8105f7aaf9082c6e1ccd56eab99c2f1a971152c6%22%7D%7D"""
             val res =
-                Utils().getJson(url)!!["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
+                getJson(url)!!.asJsonObject["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
             for (json in res) {
                 val name = json.asJsonObject["name"].asString
                 val image = allAnimeImage(json.asJsonObject["thumbnail"].asString)
@@ -78,7 +78,7 @@ class AllAnimeSource : AnimeSource {
             val url =
                 """$mainUrl/allanimeapi?variables=%7B%22type%22%3A%22anime%22%2C%22size%22%3A30%2C%22dateRange%22%3A7%2C%22page%22%3A1%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%226f6fe5663e3e9ea60bdfa693f878499badab83e7f18b56acdba5f8e8662002aa%22%7D%7D"""
             val res =
-                Utils().getJson(url)!!["data"].asJsonObject["queryPopular"].asJsonObject["recommendations"].asJsonArray
+                getJson(url)!!.asJsonObject["data"].asJsonObject["queryPopular"].asJsonObject["recommendations"].asJsonArray
             for (json in res) {
                 val animeCard = json.asJsonObject["anyCard"].asJsonObject
                 val name = animeCard["name"].asString
@@ -98,7 +98,7 @@ class AllAnimeSource : AnimeSource {
             val url =
                 """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22sub%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2229f49ce1a69320b2ab11a475fd114e5c07b03a7dc683f77dd502ca42b26df232%22%7D%7D"""
             val res =
-                Utils().getJson(url)!!["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
+                getJson(url)!!.asJsonObject["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
 
             val sortedSources =
                 res.sortedBy { if (!it.asJsonObject["priority"].isJsonNull) it.asJsonObject["priority"].asDouble else 0.0 }
@@ -111,9 +111,9 @@ class AllAnimeSource : AnimeSource {
                 if (isThese(sourceUrl)) continue
                 if (sourceUrl.contains("apivtwo")) {
                     val apiUrl =
-                        Utils().getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
+                        getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
 
-                    val resSource = Utils().getJson(
+                    val resSource = getJson(
                         "$apiUrl/${
                             sourceUrl.replace("clock", "clock.json")
                         }"

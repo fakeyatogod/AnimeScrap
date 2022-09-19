@@ -3,9 +3,10 @@ package com.talent.animescrap.animesources
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils
+import com.talent.animescrap.utils.Utils.getJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
 
 class KissKhSource : AnimeSource {
 
@@ -15,7 +16,7 @@ class KissKhSource : AnimeSource {
         withContext(Dispatchers.IO) {
             val url = "$mainUrl/api/DramaList/Drama/$contentLink?isq=false"
             println(url)
-            val res = Utils().getJson(url)!!
+            val res = getJson(url)!!.asJsonObject
 
             val animeCover = res["thumbnail"].asString
             println(animeCover)
@@ -37,7 +38,7 @@ class KissKhSource : AnimeSource {
         val animeList = arrayListOf<SimpleAnime>()
         val url = "$mainUrl/api/DramaList/Search?q=$searchedText&type=0"
         println(url)
-        val res = Utils().getJsonArray(url)!!
+        val res = getJson(url)!!.asJsonArray
         for (json in res) {
             val name = json.asJsonObject["title"].asString
             val image = json.asJsonObject["thumbnail"].asString
@@ -52,7 +53,7 @@ class KissKhSource : AnimeSource {
             val animeList = arrayListOf<SimpleAnime>()
             val url =
                 "$mainUrl/api/DramaList/List?page=1&type=0&sub=0&country=0&status=0&order=2&pageSize=40"
-            val res = Utils().getJson(url)!!["data"].asJsonArray
+            val res = getJson(url)!!.asJsonObject["data"].asJsonArray
             for (json in res) {
                 val name = json.asJsonObject["title"].asString
                 val image = json.asJsonObject["thumbnail"].asString
@@ -67,7 +68,7 @@ class KissKhSource : AnimeSource {
             val animeList = arrayListOf<SimpleAnime>()
             val url =
                 "$mainUrl/api/DramaList/List?page=1&type=0&sub=0&country=0&status=0&order=1&pageSize=40"
-            val res = Utils().getJson(url)!!["data"].asJsonArray
+            val res = getJson(url)!!.asJsonObject["data"].asJsonArray
             for (json in res) {
                 val name = json.asJsonObject["title"].asString
                 val image = json.asJsonObject["thumbnail"].asString
@@ -84,11 +85,11 @@ class KissKhSource : AnimeSource {
             println(animeEpCode)
 
             val url = "$mainUrl/api/DramaList/Episode/$animeEpCode.png?err=false&ts=&time="
-            val res = Utils().getJson(url)!!.asJsonObject
+            val res = getJson(url)!!.asJsonObject
             println(res)
 
             var subs = ""
-            Utils().getJsonArray("$mainUrl/api/Sub/$animeEpCode")
+            getJson("$mainUrl/api/Sub/$animeEpCode")?.asJsonArray
                 .let {
                     if (it != null && !it.isJsonNull && !it.isEmpty) {
                         val subObj = it.first().asJsonObject

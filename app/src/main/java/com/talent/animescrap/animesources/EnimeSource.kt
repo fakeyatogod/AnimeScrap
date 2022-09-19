@@ -3,7 +3,7 @@ package com.talent.animescrap.animesources
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils
+import com.talent.animescrap.utils.Utils.getJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -15,7 +15,7 @@ class EnimeSource : AnimeSource {
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
             val url = "$mainUrl/anime/$contentLink"
-            val res = Utils().getJson(url)!!
+            val res = getJson(url)!!
             val data = res.asJsonObject
 
             val animeCover = data["coverImage"].asString
@@ -36,7 +36,7 @@ class EnimeSource : AnimeSource {
     override suspend fun searchAnime(searchedText: String) = withContext(Dispatchers.IO) {
         val animeList = arrayListOf<SimpleAnime>()
         val url = "$mainUrl/search/$searchedText"
-        val res = Utils().getJson(url)!!["data"].asJsonArray
+        val res = getJson(url)!!.asJsonObject["data"].asJsonArray
         for (anime in res) {
             val image = anime.asJsonObject["coverImage"].asString
             val name = anime.asJsonObject["title"].asJsonObject["romaji"].asString
@@ -50,7 +50,7 @@ class EnimeSource : AnimeSource {
         withContext(Dispatchers.IO) {
             val animeList = arrayListOf<SimpleAnime>()
             val url = "$mainUrl/recent"
-            val res = Utils().getJson(url)!!["data"].asJsonArray
+            val res = getJson(url)!!.asJsonObject["data"].asJsonArray
             for (animeRecent in res) {
                 val anime = animeRecent.asJsonObject["anime"]
                 val image = anime.asJsonObject["coverImage"].asString
@@ -65,7 +65,7 @@ class EnimeSource : AnimeSource {
         withContext(Dispatchers.IO) {
             val animeList = arrayListOf<SimpleAnime>()
             val url = "$mainUrl/popular"
-            val res = Utils().getJson(url)!!["data"].asJsonArray
+            val res = getJson(url)!!.asJsonObject["data"].asJsonArray
             for (anime in res) {
                 val image = anime.asJsonObject["coverImage"].asString
                 val name = anime.asJsonObject["title"].asJsonObject["romaji"].asString
@@ -78,7 +78,7 @@ class EnimeSource : AnimeSource {
     override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             val url = "$mainUrl/source/$animeEpCode"
-            val res = Utils().getJson(url)!!.asJsonObject
+            val res = getJson(url)!!.asJsonObject
             val streamLink = res["url"].asString
             val subs = if (res["subtitle"] != null) res["subtitle"].asString else ""
             return@withContext AnimeStreamLink(streamLink, subs, true, null)
