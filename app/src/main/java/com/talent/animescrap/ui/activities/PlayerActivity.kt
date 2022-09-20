@@ -62,6 +62,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var player: ExoPlayer
     private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
+    private lateinit var subsToggleButton: ToggleButton
     private lateinit var rotateBtn: ImageView
     private lateinit var scaleBtn: ImageView
     private lateinit var prevEpBtn: ImageView
@@ -219,6 +220,8 @@ class PlayerActivity : AppCompatActivity() {
         }
 
         if (animeSub != null) {
+            subsToggleButton.isChecked = true
+            subsToggleButton.visibility = View.VISIBLE
             val subStyle = CaptionStyleCompat(
                 Color.WHITE,
                 Color.TRANSPARENT,
@@ -239,6 +242,9 @@ class PlayerActivity : AppCompatActivity() {
                     C.TIME_UNSET
                 )
             mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
+        } else {
+            subsToggleButton.isChecked = false
+            subsToggleButton.visibility = View.GONE
         }
         player.setMediaSource(mediaSource)
         player.prepare()
@@ -337,6 +343,15 @@ class PlayerActivity : AppCompatActivity() {
         qualityBtn = playerView.findViewById(R.id.quality_selection_btn)
         prevEpBtn = playerView.findViewById(R.id.prev_ep)
         nextEpBtn = playerView.findViewById(R.id.next_ep)
+        subsToggleButton = playerView.findViewById(R.id.subs_toggle_btn)
+        
+        subsToggleButton.setOnCheckedChangeListener { _,isChecked ->
+            if (isChecked) {
+                playerView.subtitleView?.visibility = View.VISIBLE
+            } else {
+                playerView.subtitleView?.visibility = View.GONE
+            }
+        }
 
         nextEpBtn.setOnClickListener {
             setNewEpisode(1)

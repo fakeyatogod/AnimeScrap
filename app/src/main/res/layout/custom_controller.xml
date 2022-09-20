@@ -83,6 +83,7 @@
             </LinearLayout>
 
             <ToggleButton
+                android:id="@+id/subs_toggle_btn"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:background="@drawable/subs_toggle_image_selector"
