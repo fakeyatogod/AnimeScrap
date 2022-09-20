@@ -1,7 +1,5 @@
 package com.talent.animescrap.ui.activities
 
-import android.app.PictureInPictureParams
-import android.os.Build
 import android.os.Bundle
 import android.transition.Slide
 import android.transition.TransitionManager
@@ -14,7 +12,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityMainBottomNavBinding

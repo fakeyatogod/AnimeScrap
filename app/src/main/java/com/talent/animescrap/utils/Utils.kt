@@ -1,7 +1,6 @@
 package com.talent.animescrap.utils
 
 import com.github.kittinunf.fuel.Fuel
-import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser

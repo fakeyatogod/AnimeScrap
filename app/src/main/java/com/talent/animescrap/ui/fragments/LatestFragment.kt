@@ -1,8 +1,6 @@
 package com.talent.animescrap.ui.fragments
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater

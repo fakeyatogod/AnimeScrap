@@ -74,13 +74,13 @@ internal class CircleClipTapView(context: Context, attrs: AttributeSet) : View(c
 
     var performAtEnd: () -> Unit = { }
 
-    var arcSize: Float = 80f
+    private var arcSize: Float = 80f
         set(value) {
             field = value
             updatePathShape()
         }
 
-    var animationDuration: Long
+    private var animationDuration: Long
         get() = valueAnimator?.duration ?: 650
         set(value) {
             getCircleAnimator().duration = value
@@ -145,16 +145,21 @@ internal class CircleClipTapView(context: Context, attrs: AttributeSet) : View(c
                 }
 
                 addListener(object : Animator.AnimatorListener {
-                    override fun onAnimationStart(animation: Animator?) {
+
+
+                    override fun onAnimationStart(p0: Animator) {
                         visibility = VISIBLE
                     }
 
-                    override fun onAnimationEnd(animation: Animator?) {
+                    override fun onAnimationEnd(p0: Animator) {
                         if (!forceReset) performAtEnd()
                     }
 
-                    override fun onAnimationRepeat(animation: Animator?) {}
-                    override fun onAnimationCancel(animation: Animator?) {}
+                    override fun onAnimationCancel(p0: Animator) {
+                    }
+
+                    override fun onAnimationRepeat(p0: Animator) {
+                    }
                 })
             }
         }
@@ -169,9 +174,9 @@ internal class CircleClipTapView(context: Context, attrs: AttributeSet) : View(c
         getCircleAnimator().start()
     }
 
-    fun endAnimation() {
-        getCircleAnimator().end()
-    }
+//    fun endAnimation() {
+//        getCircleAnimator().end()
+//    }
 
     /*
         Others: Drawing and Measurements
