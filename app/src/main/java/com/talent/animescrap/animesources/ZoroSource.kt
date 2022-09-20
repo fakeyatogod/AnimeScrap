@@ -1,5 +1,7 @@
 package com.talent.animescrap.animesources
 
+import android.util.Base64
+import com.google.gson.JsonParser
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
@@ -9,8 +11,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
 import org.jsoup.Jsoup
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.util.*
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 class ZoroSource : AnimeSource {
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
@@ -129,7 +137,19 @@ class ZoroSource : AnimeSource {
                 )
             )!!.asJsonObject
             println(json)
-            val m3u8 = json["sources"]!!.asJsonArray[0].asJsonObject["file"].toString().trim('"')
+            val source = if (!json["sources"]!!.isJsonArray) {
+                println("haha")
+                val key =
+                    getJson("https://raw.githubusercontent.com/consumet/rapidclown/main/key.txt")!!.asString
+                val decryptedText = decrypt(json["sources"]!!.asString, key)
+                JsonParser.parseString(decryptedText).asJsonArray
+            } else {
+                json["sources"]!!.asJsonArray
+            }
+
+
+            println(source)
+            val m3u8 = source[0].asJsonObject["file"].toString().trim('"')
             val subtitle = mutableMapOf<String, String>()
 
             json["tracks"]!!.asJsonArray.forEach {
@@ -152,6 +172,44 @@ class ZoroSource : AnimeSource {
             )
         }
 
+    private fun decryptSourceUrl(decryptionKey: ByteArray, sourceUrl: String): String {
+        val cipherData = Base64.decode(sourceUrl, Base64.DEFAULT)
+        val encrypted = cipherData.copyOfRange(16, cipherData.size)
+        val aesCBC = Cipher.getInstance("AES/CBC/PKCS5Padding")
+
+        Objects.requireNonNull(aesCBC).init(
+            Cipher.DECRYPT_MODE, SecretKeySpec(
+                decryptionKey.copyOfRange(0, 32),
+                "AES"
+            ),
+            IvParameterSpec(decryptionKey.copyOfRange(32, decryptionKey.size))
+        )
+        val decryptedData = aesCBC!!.doFinal(encrypted)
+        return String(decryptedData, StandardCharsets.UTF_8)
+    }
+
+    private fun md5(input: ByteArray): ByteArray {
+        return MessageDigest.getInstance("MD5").digest(input)
+    }
+
+    private fun generateKey(salt: ByteArray, secret: ByteArray): ByteArray {
+        var key = md5(secret + salt)
+        var currentKey = key
+        while (currentKey.size < 48) {
+            key = md5(key + secret + salt)
+            currentKey += key
+        }
+        return currentKey
+    }
+
+    private fun decrypt(input: String, key: String): String {
+        return decryptSourceUrl(
+            generateKey(
+                Base64.decode(input, Base64.DEFAULT).copyOfRange(8, 16),
+                key.toByteArray()
+            ), input
+        )
+    }
 
     fun String.findBetween(a: String, b: String): String? {
         val start = this.indexOf(a)
@@ -189,9 +247,7 @@ class ZoroSource : AnimeSource {
                     .url("wss://ws1.rapid-cloud.co/socket.io/?EIO=4&transport=websocket").build(),
                 listener
             )
-            Thread {
-                latch.await(30, TimeUnit.SECONDS)
-            }.start()
+            latch.await(30, TimeUnit.SECONDS)
         }
         return@withContext sId
     }
