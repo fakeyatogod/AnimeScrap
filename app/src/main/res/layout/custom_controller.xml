@@ -37,6 +37,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:weightSum="8">
 
             <ImageView
@@ -81,6 +82,14 @@
                     tools:text="Episode 100" />
             </LinearLayout>
 
+            <ToggleButton
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:background="@drawable/subs_toggle_image_selector"
+                android:textOn=""
+                android:textOff=""
+                android:textSize="0sp"
+                android:text=""/>
             <Button
                 android:id="@+id/quality_selection_btn"
                 android:layout_width="wrap_content"
