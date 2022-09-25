@@ -23,7 +23,7 @@ class AnimeStreamViewModel @Inject constructor(
     fun setAnimeLink(animeUrl: String, animeEpCode: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeRepository.getStreamLink(animeUrl,animeEpCode).apply {
+                animeRepository.getStreamLink(animeUrl, animeEpCode).apply {
                     _animeStreamLink.postValue(this@apply)
                 }
             }

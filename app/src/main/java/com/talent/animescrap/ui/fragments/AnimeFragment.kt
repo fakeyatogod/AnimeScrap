@@ -31,7 +31,8 @@ import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-@UnstableApi @AndroidEntryPoint
+@UnstableApi
+@AndroidEntryPoint
 class AnimeFragment : Fragment() {
 
     private val animeStreamViewModel: AnimeStreamViewModel by viewModels()
@@ -191,12 +192,15 @@ class AnimeFragment : Fragment() {
                            navController.navigate(action)*/
 
                 startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
-                    putExtra("animePlayingDetails", AnimePlayingDetails(
-                        animeName = animeName!!,
-                        animeUrl = animeMainLink!!,
-                        animeEpisodeIndex = binding.episodeSpinner.selectedItem as String,
-                        animeEpisodeMap = animeEpisodes as HashMap<String, String>,
-                        animeTotalEpisode = animeEpisodes.size.toString()))
+                    putExtra(
+                        "animePlayingDetails", AnimePlayingDetails(
+                            animeName = animeName!!,
+                            animeUrl = animeMainLink!!,
+                            animeEpisodeIndex = binding.episodeSpinner.selectedItem as String,
+                            animeEpisodeMap = animeEpisodes as HashMap<String, String>,
+                            animeTotalEpisode = animeEpisodes.size.toString()
+                        )
+                    )
                 })
 
             } else {

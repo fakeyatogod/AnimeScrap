@@ -21,7 +21,7 @@ class SplashActivity : AppCompatActivity() {
         settingsPreferenceManager.getBoolean("dynamic_colors", true).also {
             if (it) DynamicColors.applyToActivitiesIfAvailable(application)
         }
-        settingsPreferenceManager.getString("dark_mode","follow_system").also {
+        settingsPreferenceManager.getString("dark_mode", "follow_system").also {
             when (it.toString()) {
                 "on" -> {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)

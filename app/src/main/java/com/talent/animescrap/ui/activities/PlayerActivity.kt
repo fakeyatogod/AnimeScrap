@@ -54,7 +54,8 @@ import java.net.CookieManager
 import java.net.CookiePolicy
 
 
-@UnstableApi @AndroidEntryPoint
+@UnstableApi
+@AndroidEntryPoint
 class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
@@ -112,11 +113,12 @@ class PlayerActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
 
         // Arguments
-        val animePlayingDetails : AnimePlayingDetails? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.getParcelableExtra("animePlayingDetails", AnimePlayingDetails::class.java)
-        } else {
-            @Suppress("DEPRECATION") intent.getParcelableExtra("animePlayingDetails")
-        }
+        val animePlayingDetails: AnimePlayingDetails? =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                intent.getParcelableExtra("animePlayingDetails", AnimePlayingDetails::class.java)
+            } else {
+                @Suppress("DEPRECATION") intent.getParcelableExtra("animePlayingDetails")
+            }
         animeName = animePlayingDetails?.animeName
         animeEpisode = animePlayingDetails?.animeEpisodeIndex
         animeTotalEpisode = animePlayingDetails?.animeTotalEpisode
@@ -246,7 +248,9 @@ class PlayerActivity : AppCompatActivity() {
             val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(
                     MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeSub)).apply {
-                        if (animeSub!!.contains("srt")) setMimeType(MimeTypes.APPLICATION_SUBRIP) else setMimeType(MimeTypes.TEXT_VTT)
+                        if (animeSub!!.contains("srt")) setMimeType(MimeTypes.APPLICATION_SUBRIP) else setMimeType(
+                            MimeTypes.TEXT_VTT
+                        )
                         setLanguage("en")
                         setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
                     }.build(),
@@ -354,8 +358,8 @@ class PlayerActivity : AppCompatActivity() {
         prevEpBtn = playerView.findViewById(R.id.prev_ep)
         nextEpBtn = playerView.findViewById(R.id.next_ep)
         subsToggleButton = playerView.findViewById(R.id.subs_toggle_btn)
-        
-        subsToggleButton.setOnCheckedChangeListener { _,isChecked ->
+
+        subsToggleButton.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 playerView.subtitleView?.visibility = View.VISIBLE
             } else {
@@ -498,7 +502,7 @@ class PlayerActivity : AppCompatActivity() {
         callback.handleOnBackPressed()
     }
 
-    private val callback = object: OnBackPressedCallback(true) {
+    private val callback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             releasePlayer()
             finish()
@@ -560,7 +564,7 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun ImageView.setImageViewEnabled(enabled: Boolean) = if(enabled) {
+    private fun ImageView.setImageViewEnabled(enabled: Boolean) = if (enabled) {
         drawable.clearColorFilter()
         isEnabled = true
     } else {

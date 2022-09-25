@@ -1,11 +1,10 @@
 package com.talent.animescrap.animesources
 
-import com.github.kittinunf.fuel.Fuel
-import com.google.gson.JsonParser
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils.getJsoup
+import com.talent.animescrap.utils.Utils.postJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -102,18 +101,9 @@ class YugenSource : AnimeSource {
             val id = yugenEmbedLink.split("/")
             val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
 
-            println(dataMap)
-
-            val fuel = Fuel.post(apiRequest, dataMap.toList()).header(mapOfHeaders)
-            val res = fuel.response().third
-            val (bytes, _) = res
-            if (bytes != null) {
-                val linkDetails = JsonParser.parseString(String(bytes)).asJsonObject
-                val link = linkDetails.get("hls")
-                return@withContext AnimeStreamLink(link.asString, "", true)
-            }
-
-            return@withContext AnimeStreamLink("", "", false)
+            val linkDetails = postJson(apiRequest, mapOfHeaders, dataMap)!!.asJsonObject
+            val link = linkDetails["hls"]
+            return@withContext AnimeStreamLink(link.asString, "", true)
 
         }
 }
