@@ -24,6 +24,7 @@ import coil.load
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
 import com.talent.animescrap.model.AnimeDetails
+import com.talent.animescrap.model.AnimePlayingDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
@@ -40,7 +41,7 @@ class AnimeFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private var contentLink: String? = "null"
+    private var animeMainLink: String? = "null"
     private var animeName: String? = null
     private lateinit var animeDetails: AnimeDetails
     private lateinit var sharedPreferences: SharedPreferences
@@ -72,9 +73,9 @@ class AnimeFragment : Fragment() {
 
         binding.animeDetailsTxt.movementMethod = ScrollingMovementMethod()
 
-        contentLink = args.animeLink
+        animeMainLink = args.animeLink
 
-        if (contentLink == "null") {
+        if (animeMainLink == "null") {
             findNavController().popBackStack()
             Toast.makeText(activity, "Some Unexpected error occurred", Toast.LENGTH_SHORT).show()
         }
@@ -85,21 +86,21 @@ class AnimeFragment : Fragment() {
                 AppCompatActivity.MODE_PRIVATE
             )
         lastWatchedPrefString =
-            sharedPreferences.getString(contentLink, "Not Started Yet").toString()
+            sharedPreferences.getString(animeMainLink, "Not Started Yet").toString()
 
         // Check Favorite
-        contentLink?.let { animeDetailsViewModel.checkFavorite(it, selectedSource) }
+        animeMainLink?.let { animeDetailsViewModel.checkFavorite(it, selectedSource) }
         animeDetailsViewModel.isAnimeFav.observe(viewLifecycleOwner) { isFav ->
             if (isFav) {
                 inFav()
                 binding.favCard.setOnClickListener {
-                    animeDetailsViewModel.removeFav(contentLink!!, selectedSource)
+                    animeDetailsViewModel.removeFav(animeMainLink!!, selectedSource)
                 }
             } else {
                 notInFav()
                 binding.favCard.setOnClickListener {
                     animeDetailsViewModel.addToFav(
-                        contentLink!!,
+                        animeMainLink!!,
                         animeDetails.animeName,
                         animeDetails.animeCover,
                         selectedSource
@@ -141,8 +142,8 @@ class AnimeFragment : Fragment() {
             }
         }
 
-        println(contentLink)
-        contentLink?.let { animeDetailsViewModel.getAnimeDetails(it) }
+        println(animeMainLink)
+        animeMainLink?.let { animeDetailsViewModel.getAnimeDetails(it) }
 
 
         return binding.root
@@ -165,14 +166,14 @@ class AnimeFragment : Fragment() {
 
             // Store Last Watched Episode
             sharedPreferences.edit()
-                .putString(contentLink, binding.episodeSpinner.selectedItem.toString()).apply()
+                .putString(animeMainLink, binding.episodeSpinner.selectedItem.toString()).apply()
 
             // Update to new value
             sharedPreferences = requireActivity().getSharedPreferences(
                 "LastWatchedPref",
                 AppCompatActivity.MODE_PRIVATE
             )
-            sharedPreferences.getString(contentLink, "Not Started Yet").apply {
+            sharedPreferences.getString(animeMainLink, "Not Started Yet").apply {
                 binding.lastWatchedTxt.text =
                     if (this == "Not Started Yet") this else "Last Watched : $this/${animeEpisodes.size}"
             }
@@ -190,18 +191,19 @@ class AnimeFragment : Fragment() {
                            navController.navigate(action)*/
 
                 startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
-                    putExtra("animeName", animeName!!)
-                    putExtra("animeEpisodeIndex", binding.episodeSpinner.selectedItem as String)
-                    putExtra("animeEpisodeMap", animeEpisodes as HashMap<String, String>)
-                    putExtra("animeTotalEpisode", animeEpisodes.size.toString())
-                    putExtra("animeUrl", contentLink!!)
+                    putExtra("animePlayingDetails", AnimePlayingDetails(
+                        animeName = animeName!!,
+                        animeUrl = animeMainLink!!,
+                        animeEpisodeIndex = binding.episodeSpinner.selectedItem as String,
+                        animeEpisodeMap = animeEpisodes as HashMap<String, String>,
+                        animeTotalEpisode = animeEpisodes.size.toString()))
                 })
 
             } else {
                 binding.progressbarInPage.visibility = View.VISIBLE
                 binding.pageLayout.visibility = View.GONE
                 animeStreamViewModel.setAnimeLink(
-                    contentLink!!,
+                    animeMainLink!!,
                     animeEpisodes[binding.episodeSpinner.selectedItem]!!
                 )
             }
@@ -282,7 +284,7 @@ class AnimeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if (::animeDetails.isInitialized) {
-            sharedPreferences.getString(contentLink, "Not Started Yet").apply {
+            sharedPreferences.getString(animeMainLink, "Not Started Yet").apply {
                 binding.lastWatchedTxt.text =
                     if (this == "Not Started Yet") this else "Last Watched : $this/${animeDetails.animeEpisodes.size}"
             }

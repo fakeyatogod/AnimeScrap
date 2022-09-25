@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.View
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -43,6 +44,7 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityPlayerBinding
+import com.talent.animescrap.model.AnimePlayingDetails
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,7 +76,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
     private lateinit var mediaSession: MediaSession
-    private lateinit var animeEpisodeMap: HashMap<*, *>
+    private lateinit var animeEpisodeMap: HashMap<String, String>
     private lateinit var qualityMapUnsorted: MutableMap<String, Int>
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var isPipEnabled: Boolean = true
@@ -100,6 +102,9 @@ class PlayerActivity : AppCompatActivity() {
         mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         CookieHandler.setDefault(mCookieManager)
 
+        // Back Pressed
+        onBackPressedDispatcher.addCallback(this@PlayerActivity, callback)
+
         // Prepare PiP
         preparePip()
 
@@ -107,11 +112,16 @@ class PlayerActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
 
         // Arguments
-        animeName = intent.getStringExtra("animeName")
-        animeEpisode = intent.getStringExtra("animeEpisodeIndex")
-        animeTotalEpisode = intent.getStringExtra("animeTotalEpisode")
-        animeUrl = intent.getStringExtra("animeUrl")
-        animeEpisodeMap = intent.getSerializableExtra("animeEpisodeMap") as HashMap<*, *>
+        val animePlayingDetails : AnimePlayingDetails? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("animePlayingDetails", AnimePlayingDetails::class.java)
+        } else {
+            @Suppress("DEPRECATION") intent.getParcelableExtra("animePlayingDetails")
+        }
+        animeName = animePlayingDetails?.animeName
+        animeEpisode = animePlayingDetails?.animeEpisodeIndex
+        animeTotalEpisode = animePlayingDetails?.animeTotalEpisode
+        animeUrl = animePlayingDetails?.animeUrl
+        animeEpisodeMap = animePlayingDetails!!.animeEpisodeMap
 
         /// Player Views
         playerView = binding.exoPlayerView
@@ -169,8 +179,9 @@ class PlayerActivity : AppCompatActivity() {
                 playerView.visibility = View.VISIBLE
                 prepareMediaSource()
             } else {
-                Toast.makeText(this, "No Streaming Url Found", Toast.LENGTH_SHORT)
+                Toast.makeText(this, "No streaming URL found", Toast.LENGTH_SHORT)
                     .show()
+                backPressed()
             }
         }
 
@@ -304,16 +315,15 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    fun updateEpisodeName() {
-        videoEpTextView.text = "${resources.getString(R.string.episode)} $animeEpisode"
+    private fun updateEpisodeName() {
+        videoEpTextView.text = resources.getString(R.string.episode, animeEpisode)
     }
 
     private fun setNewEpisode(increment: Int = 1) {
         animeEpisode = "${animeEpisode!!.toInt() + increment}"
         println(animeEpisode)
         if (animeEpisode!!.toInt() > animeTotalEpisode!!.toInt() || animeEpisode!!.toInt() < 1)
-            onBackPressed()
+            backPressed()
         else {
             animeStreamViewModelInPlayer.setAnimeLink(
                 animeUrl!!,
@@ -363,7 +373,7 @@ class PlayerActivity : AppCompatActivity() {
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
-                onBackPressed()
+                backPressed()
             }
         }
         // Fullscreen controls
@@ -484,15 +494,20 @@ class PlayerActivity : AppCompatActivity() {
         simpleCache = null
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        releasePlayer()
-        finish()
-        startActivity(
-            Intent(this@PlayerActivity, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            }
-        )
+    private fun backPressed() {
+        callback.handleOnBackPressed()
+    }
+
+    private val callback = object: OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            releasePlayer()
+            finish()
+            startActivity(
+                Intent(this@PlayerActivity, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                }
+            )
+        }
     }
 
     override fun onDestroy() {
