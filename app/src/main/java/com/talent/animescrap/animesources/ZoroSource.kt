@@ -127,7 +127,7 @@ class ZoroSource : AnimeSource {
                     "/embed-6/",
                     ""
                 ).replace("/embed-6/", "").replace("?z=", "")
-            }"
+            }".replace("?vast=1","")
             println(rapidUrl)
             println(jsonLink)
             val json = getJson(
