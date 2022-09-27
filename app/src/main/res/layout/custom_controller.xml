@@ -121,7 +121,7 @@
                     android:text="@string/_0_00"
                     android:textColor="@android:color/white" />
 
-                <androidx.media3.ui.DefaultTimeBar
+                <com.google.android.exoplayer2.ui.DefaultTimeBar
                     android:id="@+id/exo_progress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -221,7 +221,7 @@
             android:contentDescription="@string/unlock"
             android:src="@drawable/ic_baseline_lock_open_24"
             android:visibility="invisible" />-->
-    <androidx.media3.ui.SubtitleView
+    <com.google.android.exoplayer2.ui.SubtitleView
         android:id="@+id/exo_subtitles"
         android:layout_margin="10dp"
         android:layout_width="match_parent"

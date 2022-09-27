@@ -61,14 +61,12 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    // ExoPlayer Media3 + HLS + UI
-    def media3_version = "1.0.0-beta02"
-    implementation "androidx.media3:media3-exoplayer:$media3_version"
-    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
-    implementation "androidx.media3:media3-ui:$media3_version"
-
-    // Media Session
-    implementation "androidx.media3:media3-session:$media3_version"
+    // ExoPlayer + HLS + UI + MediaSession
+    def exo_version = "2.18.1"
+    implementation "com.google.android.exoplayer:exoplayer:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
+    implementation "com.google.android.exoplayer:exoplayer-hls:$exo_version"
+    implementation "com.google.android.exoplayer:extension-mediasession:$exo_version"
 
     // MVVM
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'

@@ -16,7 +16,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.media3.common.util.UnstableApi
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -31,7 +30,6 @@ import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
-@UnstableApi
 @AndroidEntryPoint
 class AnimeFragment : Fragment() {
 

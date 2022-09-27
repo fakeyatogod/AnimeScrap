@@ -13,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.support.v4.media.session.MediaSessionCompat
 import android.view.View
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
@@ -21,26 +22,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.media3.common.*
-import androidx.media3.common.util.UnstableApi
-import androidx.media3.database.StandaloneDatabaseProvider
-import androidx.media3.datasource.DataSource
-import androidx.media3.datasource.DefaultHttpDataSource
-import androidx.media3.datasource.cache.CacheDataSource
-import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor
-import androidx.media3.datasource.cache.SimpleCache
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.hls.HlsMediaSource
-import androidx.media3.exoplayer.source.MediaSource
-import androidx.media3.exoplayer.source.MergingMediaSource
-import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import androidx.media3.exoplayer.source.SingleSampleMediaSource
-import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
-import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy
-import androidx.media3.session.MediaSession
-import androidx.media3.ui.AspectRatioFrameLayout
-import androidx.media3.ui.CaptionStyleCompat
 import androidx.preference.PreferenceManager
+import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.MergingMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.source.SingleSampleMediaSource
+import com.google.android.exoplayer2.source.hls.HlsMediaSource
+import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.CaptionStyleCompat
+import com.google.android.exoplayer2.upstream.DataSource
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
+import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy
+import com.google.android.exoplayer2.upstream.cache.CacheDataSource
+import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
+import com.google.android.exoplayer2.upstream.cache.SimpleCache
+import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityPlayerBinding
@@ -54,7 +55,6 @@ import java.net.CookieManager
 import java.net.CookiePolicy
 
 
-@UnstableApi
 @AndroidEntryPoint
 class PlayerActivity : AppCompatActivity() {
 
@@ -76,7 +76,8 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var mediaSource: MediaSource
     private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
-    private lateinit var mediaSession: MediaSession
+    private lateinit var mediaSession: MediaSessionCompat
+    private lateinit var mediaSessionConnector: MediaSessionConnector
     private lateinit var animeEpisodeMap: HashMap<String, String>
     private lateinit var qualityMapUnsorted: MutableMap<String, Int>
     private lateinit var settingsPreferenceManager: SharedPreferences
@@ -149,8 +150,10 @@ class PlayerActivity : AppCompatActivity() {
         playerView.subtitleView?.visibility = View.VISIBLE
 
         // Build MediaSession
-        mediaSession = MediaSession.Builder(this, player)
-            .build()
+        mediaSession = MediaSessionCompat(this, "AnimeScrap Media Session")
+        mediaSessionConnector = MediaSessionConnector(mediaSession).apply {
+            setPlayer(player)
+        }
 
         // Prepare Custom Player View Buttons
         prepareButtons()
@@ -523,6 +526,11 @@ class PlayerActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         hideSystemUi()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mediaSession.isActive = true
     }
 
     private fun hideSystemUi() {
