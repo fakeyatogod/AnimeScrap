@@ -76,7 +76,7 @@
     </fragment>
 
     <fragment
-        android:id="@+id/settingsFragment"
+        android:id="@+id/navigation_settings"
         android:name="com.talent.animescrap.ui.fragments.SettingsFragment"
         android:label="@string/settings" />
 </navigation>
