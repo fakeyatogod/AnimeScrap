@@ -2,10 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".AnimeScrapApplication"
+        android:banner="@mipmap/ic_launcher"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -18,7 +26,9 @@
             android:theme="@style/Theme.AnimeScrap">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
