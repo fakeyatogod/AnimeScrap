@@ -6,7 +6,6 @@ import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.Gravity
 import android.view.Menu
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
@@ -56,36 +55,30 @@ class MainActivity : AppCompatActivity() {
                 addTarget(railView)
             }
             TransitionManager.beginDelayedTransition(railView, transition2)
-            if (destination.id == R.id.navigation_anime) {
-                if (!isLandscape)
-                    bottomNavView.visibility = View.GONE
-                else
+            when (destination.id) {
+                R.id.navigation_anime -> {
+                    bottomNavView.isVisible = false
                     railView.isVisible = false
-            } else if (destination.id == R.id.navigation_search
-                || destination.id == R.id.navigation_settings
-            ) {
-                if (!isLandscape)
-                    bottomNavView.visibility = View.GONE
-            } else {
-                if (!isLandscape)
-                    bottomNavView.visibility = View.VISIBLE
-                else
-                    railView.isVisible = true
+                }
+                R.id.navigation_search, R.id.navigation_settings -> {
+                    bottomNavView.isVisible = false
+                }
+                else -> {
+                    if (isLandscape) {
+                        railView.isVisible = true
+                        bottomNavView.isVisible = false
+                    } else {
+                        bottomNavView.isVisible = true
+                        railView.isVisible = false
+                    }
+                }
             }
         }
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottomNavView.setupWithNavController(navController)
         railView.setupWithNavController(navController)
 
-        if (isLandscape) {
-            railView.isVisible = true
-            bottomNavView.isVisible = false
-            binding.toolbar.isVisible = false
-        } else {
-            railView.isVisible = false
-            bottomNavView.isVisible = true
-            binding.toolbar.isVisible = true
-        }
+        binding.toolbar.isVisible = !isLandscape
     }
 
 
