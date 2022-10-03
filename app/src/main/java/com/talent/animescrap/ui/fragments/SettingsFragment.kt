@@ -1,9 +1,12 @@
 package com.talent.animescrap.ui.fragments
 
+import android.app.UiModeManager
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
@@ -68,6 +71,11 @@ class SettingsFragment : PreferenceFragmentCompat() {
         // Hide theme section in versions that don't support dynamic colors.
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             findPreference<SwitchPreferenceCompat>("dynamic_colors")?.isVisible = false
+        }
+
+        val uiModeManager = requireActivity().getSystemService(AppCompatActivity.UI_MODE_SERVICE) as UiModeManager
+        if(uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION) {
+            findPreference<SwitchPreferenceCompat>("pip")?.isVisible = false
         }
 
     }

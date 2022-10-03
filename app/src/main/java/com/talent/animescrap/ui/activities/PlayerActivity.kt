@@ -2,6 +2,7 @@ package com.talent.animescrap.ui.activities
 
 import android.annotation.SuppressLint
 import android.app.PictureInPictureParams
+import android.app.UiModeManager
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isVisible
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
@@ -90,6 +92,7 @@ class PlayerActivity : AppCompatActivity() {
     private var animeStreamUrl: String? = null
     private var extraHeaders: HashMap<String, String>? = null
     private var isHls: Boolean = true
+    private var isTV: Boolean = false
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
@@ -103,6 +106,10 @@ class PlayerActivity : AppCompatActivity() {
         // Accept All Cookies
         mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         CookieHandler.setDefault(mCookieManager)
+
+        // Check TV
+        val uiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+        isTV = uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
 
         // Back Pressed
         onBackPressedDispatcher.addCallback(this@PlayerActivity, callback)
@@ -310,8 +317,7 @@ class PlayerActivity : AppCompatActivity() {
         settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
         isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
 
-        println(isPipEnabled)
-        if (isPipEnabled) {
+        if (isPipEnabled && !isTV) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 setPictureInPictureParams(
                     PictureInPictureParams.Builder()
@@ -425,6 +431,11 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
+        if (isTV) {
+            rotateBtn.isVisible = false
+            rotateBtn.isFocusable = false
+            rotateBtn.isActivated = false
+        }
         // For Screen Rotation
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         var flag = true
@@ -509,11 +520,13 @@ class PlayerActivity : AppCompatActivity() {
         override fun handleOnBackPressed() {
             releasePlayer()
             finish()
+            if (!isTV){
             startActivity(
                 Intent(this@PlayerActivity, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                 }
             )
+            }
         }
     }
 
@@ -560,7 +573,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onUserLeaveHint() {
-        if (isPipEnabled) {
+        if (isPipEnabled && !isTV) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     enterPictureInPictureMode(
@@ -575,8 +588,10 @@ class PlayerActivity : AppCompatActivity() {
     private fun ImageView.setImageViewEnabled(enabled: Boolean) = if (enabled) {
         drawable.clearColorFilter()
         isEnabled = true
+        isFocusable = true
     } else {
         drawable.colorFilter = PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN)
         isEnabled = false
+        isFocusable = false
     }
 }

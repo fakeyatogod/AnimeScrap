@@ -7,6 +7,7 @@
     android:layout_height="match_parent">
 
     <View
+        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/gradient_shape" />
@@ -17,6 +18,7 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:focusable="false"
             android:id="@+id/centerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -49,9 +51,12 @@
                 android:contentDescription="@string/back_to_home"
                 android:minWidth="26dp"
                 android:minHeight="26dp"
-                android:src="@drawable/ic_baseline_arrow_back_24" />
+                android:background="@drawable/background_selector"
+                android:src="@drawable/ic_baseline_arrow_back_24"
+                android:focusable="true" />
 
             <LinearLayout
+                android:focusable="false"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -113,6 +118,7 @@
                 android:padding="4dp">
 
                 <TextView
+                    android:focusable="false"
                     android:id="@+id/exo_position"
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
@@ -131,11 +137,13 @@
                     android:contentDescription="@string/timer_bar"
                     android:padding="4dp"
                     app:bar_height="2dp"
+                    app:scrubber_dragged_size="20dp"
                     app:buffered_color="#BCB9B9"
                     app:played_color="?attr/colorPrimary"
                     app:unplayed_color="#66B5B5B5" />
 
                 <TextView
+                    android:focusable="false"
                     android:id="@+id/exo_duration"
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
@@ -161,6 +169,7 @@
                     android:orientation="horizontal">
 
                     <ImageView
+                        android:background="@drawable/background_selector"
                         android:id="@+id/prev_ep"
                         android:layout_width="30dp"
                         android:layout_height="wrap_content"
@@ -169,6 +178,7 @@
                         android:src="@drawable/ic_baseline_navigate_before_24" />
 
                     <ImageView
+                        android:background="@drawable/background_selector"
                         android:id="@+id/exo_play_pause"
                         style="@style/ExoStyledControls.Button.Center.PlayPause"
                         android:layout_width="wrap_content"
@@ -178,6 +188,7 @@
                         android:minHeight="64dp" />
 
                     <ImageView
+                        android:background="@drawable/background_selector"
                         android:id="@+id/next_ep"
                         android:layout_width="30dp"
                         android:layout_height="wrap_content"
@@ -188,6 +199,7 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:background="@drawable/background_selector"
                     android:id="@+id/rotate"
                     android:layout_width="26dp"
                     android:layout_height="wrap_content"
@@ -198,6 +210,7 @@
                     android:src="@drawable/ic_baseline_screen_rotation_24" />
 
                 <ImageView
+                    android:background="@drawable/background_selector"
                     android:id="@+id/btn_fullscreen"
                     android:layout_width="28dp"
                     android:layout_height="wrap_content"
@@ -210,20 +223,13 @@
         </LinearLayout>
 
     </RelativeLayout>
-
-    <!--    <ImageView
-            android:id="@+id/lock"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginBottom="20dp"
-            android:contentDescription="@string/unlock"
-            android:src="@drawable/ic_baseline_lock_open_24"
-            android:visibility="invisible" />-->
     <com.google.android.exoplayer2.ui.SubtitleView
+        android:focusable="false"
         android:id="@+id/exo_subtitles"
-        android:layout_margin="10dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp" />
 </RelativeLayout>
