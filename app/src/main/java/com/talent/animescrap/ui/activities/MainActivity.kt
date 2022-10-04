@@ -6,6 +6,7 @@ import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.Gravity
 import android.view.Menu
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
@@ -49,12 +50,12 @@ class MainActivity : AppCompatActivity() {
                 duration = 200
                 addTarget(bottomNavView)
             }
-            TransitionManager.beginDelayedTransition(bottomNavView, transition)
+            TransitionManager.beginDelayedTransition(bottomNavView.parent as ViewGroup, transition)
             val transition2 = Slide(Gravity.START).apply {
                 duration = 200
                 addTarget(railView)
             }
-            TransitionManager.beginDelayedTransition(railView, transition2)
+            TransitionManager.beginDelayedTransition(railView.parent as ViewGroup, transition2)
             when (destination.id) {
                 R.id.navigation_anime -> {
                     bottomNavView.isVisible = false
