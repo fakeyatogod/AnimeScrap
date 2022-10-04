@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +29,9 @@ import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
+import com.talent.animescrap.utils.CircularRevealTransition
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class AnimeFragment : Fragment() {
@@ -132,7 +135,13 @@ class AnimeFragment : Fragment() {
                     error(R.drawable.ic_broken_image)
                 }
                 binding.errorCard?.visibility = View.GONE
+                val transition = CircularRevealTransition().apply {
+                    duration = 600
+                    addTarget(binding.pageLayout)
+                }
+                TransitionManager.beginDelayedTransition(binding.pageLayout.parent as ViewGroup, transition)
                 binding.pageLayout.visibility = View.VISIBLE
+
 
                 animeName = animeDetails.animeName
                 setupSpinner(animeDetails.animeEpisodes)
@@ -292,4 +301,5 @@ class AnimeFragment : Fragment() {
             }
         }
     }
+
 }
