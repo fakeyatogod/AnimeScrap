@@ -12,9 +12,7 @@
         tools:layout="@layout/fragment_favorite">
         <action
             android:id="@+id/action_navigation_favorite_to_navigation_anime"
-            app:destination="@id/navigation_anime"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/expand_in">
+            app:destination="@id/navigation_anime">
             <argument
                 android:name="animeLink"
                 android:defaultValue="null"
@@ -29,9 +27,7 @@
         tools:layout="@layout/fragment_latest">
         <action
             android:id="@+id/action_navigation_latest_to_navigation_anime"
-            app:destination="@id/navigation_anime"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/expand_in">
+            app:destination="@id/navigation_anime">
             <argument
                 android:name="animeLink"
                 android:defaultValue="null"
@@ -46,9 +42,7 @@
         tools:layout="@layout/fragment_trending">
         <action
             android:id="@+id/action_navigation_trending_to_navigation_anime"
-            app:destination="@id/navigation_anime"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/expand_in">
+            app:destination="@id/navigation_anime">
             <argument
                 android:name="animeLink"
                 android:defaultValue="null"
@@ -62,9 +56,7 @@
         tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_navigation_search_to_navigation_anime"
-            app:destination="@id/navigation_anime"
-            app:exitAnim="@anim/fade_out"
-            app:popEnterAnim="@anim/expand_in">
+            app:destination="@id/navigation_anime">
             <argument
                 android:name="animeLink"
                 android:defaultValue="null"
