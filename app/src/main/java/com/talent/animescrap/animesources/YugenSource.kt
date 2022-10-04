@@ -102,8 +102,8 @@ class YugenSource : AnimeSource {
             val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
 
             val linkDetails = postJson(apiRequest, mapOfHeaders, dataMap)!!.asJsonObject
-            val link = linkDetails["hls"]
-            return@withContext AnimeStreamLink(link.asString, "", true)
+            val link = linkDetails["hls"].asJsonArray.first().asString
+            return@withContext AnimeStreamLink(link, "", true)
 
         }
 }
