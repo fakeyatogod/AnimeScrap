@@ -136,7 +136,7 @@ class AnimeFragment : Fragment() {
                 }
                 binding.errorCard?.visibility = View.GONE
                 val transition = CircularRevealTransition().apply {
-                    duration = 600
+                    duration = 200
                     addTarget(binding.pageLayout)
                 }
                 TransitionManager.beginDelayedTransition(binding.pageLayout.parent as ViewGroup, transition)
