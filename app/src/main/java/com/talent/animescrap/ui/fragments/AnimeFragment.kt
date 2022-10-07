@@ -135,11 +135,6 @@ class AnimeFragment : Fragment() {
                     error(R.drawable.ic_broken_image)
                 }
                 binding.errorCard?.visibility = View.GONE
-                val transition = Fade().apply {
-                    duration = 400
-                    addTarget(binding.pageLayout)
-                }
-                TransitionManager.beginDelayedTransition(binding.pageLayout.parent as ViewGroup, transition)
                 binding.pageLayout.visibility = View.VISIBLE
 
 
