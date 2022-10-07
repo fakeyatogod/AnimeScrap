@@ -15,6 +15,7 @@
 
 ### ✨ Features
 - Compatible with Android 6.0 and above (API 23+)
+- Supports Android TV.
 - Comes in both light and dark mode.
 - Supports dynamic colors on A12+.
 - Supports external video player
@@ -36,7 +37,7 @@
 - [Fuel](https://github.com/kittinunf/fuel) - The easiest HTTP networking library for Kotlin/Android.
 - [Gson](https://github.com/google/gson) - Useful to parse JSON into Java Objects.
 - [Swiperefreshlayout](https://developer.android.com/jetpack/androidx/releases/swiperefreshlayout) - For swipe to refresh layouts
-- [Media3/ExoPlayer](https://developer.android.com/jetpack/androidx/releases/media3) - For video playback
+- [ExoPlayer](https://exoplayer.dev/) - For video playback
 - [Dagger-Hilt](https://dagger.dev/hilt/) For [Dependency injection (DI)](https://developer.android.com/training/dependency-injection)
 
 
