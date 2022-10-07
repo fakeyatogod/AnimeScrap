@@ -36,6 +36,7 @@ import com.google.android.exoplayer2.source.hls.HlsMediaSource
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.CaptionStyleCompat
+import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
@@ -155,6 +156,9 @@ class PlayerActivity : AppCompatActivity() {
         playerView.keepScreenOn = true
         playerView.player = player
         playerView.subtitleView?.visibility = View.VISIBLE
+
+        // 10 sec increment when seeking in TV - d-pad scenarios
+        playerView.findViewById<DefaultTimeBar>(R.id.exo_progress).setKeyTimeIncrement(10000)
 
         // Build MediaSession
         mediaSession = MediaSessionCompat(this, "AnimeScrap Media Session")
