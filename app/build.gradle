@@ -4,8 +4,8 @@ plugins {
     id 'androidx.navigation.safeargs'
     id 'dagger.hilt.android.plugin'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
 }
-apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 33
@@ -15,7 +15,8 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 13
-        versionName "2.2.1"
+        versionName "2.2.2"
+        archivesBaseName = "AnimeScrap"
 
         kapt {
             arguments {
