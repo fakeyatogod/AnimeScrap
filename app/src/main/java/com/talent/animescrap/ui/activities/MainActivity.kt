@@ -1,12 +1,16 @@
 package com.talent.animescrap.ui.activities
 
+import android.app.DownloadManager
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.Gravity
 import android.view.Menu
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
@@ -16,8 +20,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigationrail.NavigationRailView
+import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityMainBinding
+import com.talent.animescrap.ui.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,6 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,12 +57,18 @@ class MainActivity : AppCompatActivity() {
                 duration = 200
                 addTarget(bottomNavView)
             }
-            TransitionManager.beginDelayedTransition(bottomNavView.parent as ViewGroup, bottomNavTransition)
+            TransitionManager.beginDelayedTransition(
+                bottomNavView.parent as ViewGroup,
+                bottomNavTransition
+            )
             val railViewNavTransition = Slide(Gravity.START).apply {
                 duration = 200
                 addTarget(railView)
             }
-            TransitionManager.beginDelayedTransition(railView.parent as ViewGroup, railViewNavTransition)
+            TransitionManager.beginDelayedTransition(
+                railView.parent as ViewGroup,
+                railViewNavTransition
+            )
             when (destination.id) {
                 R.id.navigation_anime -> {
                     bottomNavView.isVisible = false
@@ -76,6 +89,28 @@ class MainActivity : AppCompatActivity() {
         railView.setupWithNavController(navController)
 
         binding.toolbar.isVisible = !isLandscape
+
+        mainViewModel.isUpdateAvailable.observe(this) { updateDetails ->
+            if (updateDetails.first) {
+                Snackbar.make(
+                    binding.container, getString(R.string.update_available), Snackbar.LENGTH_LONG
+                ).setAction("Update") {
+                    val request = DownloadManager.Request(Uri.parse(updateDetails.second))
+                    val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+                    val downloadTitle =
+                        updateDetails.second.replaceBeforeLast("/", "").replace("/", "")
+                    request.setTitle(downloadTitle)
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    request.setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, downloadTitle)
+                    downloadManager.enqueue(request)
+                    Snackbar.make(
+                        binding.container,
+                        getString(R.string.downloading_update),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }.show()
+            }
+        }
     }
 
 

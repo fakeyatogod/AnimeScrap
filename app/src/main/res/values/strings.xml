@@ -63,5 +63,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="player">Player</string>
     <string name="dark_mode_pref_title">Dark Mode</string>
+    <string name="update_available">Update Available</string>
+    <string name="downloading_update">Downloading Update</string>
 
 </resources>
