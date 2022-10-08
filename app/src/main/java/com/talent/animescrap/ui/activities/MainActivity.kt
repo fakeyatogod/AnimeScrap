@@ -46,16 +46,16 @@ class MainActivity : AppCompatActivity() {
             )
         )
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            val transition = Slide(Gravity.BOTTOM).apply {
+            val bottomNavTransition = Slide(Gravity.BOTTOM).apply {
                 duration = 200
                 addTarget(bottomNavView)
             }
-            TransitionManager.beginDelayedTransition(bottomNavView.parent as ViewGroup, transition)
-            val transition2 = Slide(Gravity.START).apply {
+            TransitionManager.beginDelayedTransition(bottomNavView.parent as ViewGroup, bottomNavTransition)
+            val railViewNavTransition = Slide(Gravity.START).apply {
                 duration = 200
                 addTarget(railView)
             }
-            TransitionManager.beginDelayedTransition(railView.parent as ViewGroup, transition2)
+            TransitionManager.beginDelayedTransition(railView.parent as ViewGroup, railViewNavTransition)
             when (destination.id) {
                 R.id.navigation_anime -> {
                     bottomNavView.isVisible = false
@@ -63,15 +63,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_search, R.id.navigation_settings -> {
                     bottomNavView.isVisible = false
+                    railView.isVisible = isLandscape
                 }
                 else -> {
-                    if (isLandscape) {
-                        railView.isVisible = true
-                        bottomNavView.isVisible = false
-                    } else {
-                        bottomNavView.isVisible = true
-                        railView.isVisible = false
-                    }
+                    railView.isVisible = isLandscape
+                    bottomNavView.isVisible = !isLandscape
                 }
             }
         }
