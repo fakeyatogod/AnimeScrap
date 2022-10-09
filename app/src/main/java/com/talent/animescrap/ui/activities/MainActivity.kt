@@ -23,7 +23,7 @@ import com.google.android.material.navigationrail.NavigationRailView
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityMainBinding
-import com.talent.animescrap.ui.viewmodels.MainViewModel
+import com.talent.animescrap.ui.viewmodels.UpdateViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,7 +31,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private val mainViewModel: MainViewModel by viewModels()
+    private val updateViewModel: UpdateViewModel by viewModels()
+    private var updateMessageIgnored = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,27 +91,39 @@ class MainActivity : AppCompatActivity() {
 
         binding.toolbar.isVisible = !isLandscape
 
-        mainViewModel.isUpdateAvailable.observe(this) { updateDetails ->
-            if (updateDetails.first) {
-                Snackbar.make(
-                    binding.container, getString(R.string.update_available), Snackbar.LENGTH_LONG
-                ).setAction("Update") {
-                    val request = DownloadManager.Request(Uri.parse(updateDetails.second))
-                    val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-                    val downloadTitle =
-                        updateDetails.second.replaceBeforeLast("/", "").replace("/", "")
-                    request.setTitle(downloadTitle)
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                    request.setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, downloadTitle)
-                    downloadManager.enqueue(request)
-                    Snackbar.make(
-                        binding.container,
-                        getString(R.string.downloading_update),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
-                }.show()
+        updateViewModel.isUpdateAvailable.observe(this) { updateDetails ->
+            if (updateDetails.first && !updateMessageIgnored) {
+                showUpdateSnackBar(updateDetails.second)
+                updateMessageIgnored = true
             }
         }
+    }
+
+    fun showUpdateSnackBar(updateLink: String) {
+        Snackbar.make(
+            binding.container, getString(R.string.update_available), Snackbar.LENGTH_LONG
+        ).setAction("Update") {
+            val request = DownloadManager.Request(Uri.parse(updateLink))
+            val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+            val downloadTitle = updateLink.replaceBeforeLast("/", "").replace("/", "")
+            request.apply {
+                setTitle(downloadTitle)
+                setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, downloadTitle)
+            }
+            downloadManager.enqueue(request)
+            Snackbar.make(
+                binding.container,
+                getString(R.string.downloading_update),
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }.show()
+    }
+
+    fun showNoUpdateSnackBar() {
+        Snackbar.make(
+            binding.container, getString(R.string.update_not_available), Snackbar.LENGTH_LONG
+        ).show()
     }
 
 

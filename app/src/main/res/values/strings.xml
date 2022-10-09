@@ -64,6 +64,9 @@
     <string name="player">Player</string>
     <string name="dark_mode_pref_title">Dark Mode</string>
     <string name="update_available">Update Available</string>
+    <string name="update_not_available">No Update Available</string>
     <string name="downloading_update">Downloading Update</string>
+    <string name="check_update_pref_summary">Check for newer version of the app</string>
+    <string name="check_update_pref">Check for updates</string>
 
 </resources>

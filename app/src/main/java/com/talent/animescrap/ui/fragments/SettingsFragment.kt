@@ -8,11 +8,15 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.lifecycle.ViewModelProvider
 import androidx.preference.ListPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
+import com.talent.animescrap.ui.activities.MainActivity
+import com.talent.animescrap.ui.viewmodels.UpdateViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 
@@ -73,9 +77,28 @@ class SettingsFragment : PreferenceFragmentCompat() {
             findPreference<SwitchPreferenceCompat>("dynamic_colors")?.isVisible = false
         }
 
-        val uiModeManager = requireActivity().getSystemService(AppCompatActivity.UI_MODE_SERVICE) as UiModeManager
-        if(uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION) {
+        val uiModeManager =
+            requireActivity().getSystemService(AppCompatActivity.UI_MODE_SERVICE) as UiModeManager
+        if (uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION) {
             findPreference<SwitchPreferenceCompat>("pip")?.isVisible = false
+        }
+
+        findPreference<Preference>("check_update")?.setOnPreferenceClickListener {
+            if (activity != null) {
+                val updateViewModel = (activity as MainActivity).run {
+                    ViewModelProvider(this)[UpdateViewModel::class.java]
+                }
+                updateViewModel.checkForNewUpdate()
+                updateViewModel.isUpdateAvailable.observe(viewLifecycleOwner) { updateDetails ->
+                    if (updateDetails.first) {
+                        (activity as MainActivity).showUpdateSnackBar(updateDetails.second)
+                    } else {
+                        (activity as MainActivity).showNoUpdateSnackBar()
+
+                    }
+                }
+            }
+            return@setOnPreferenceClickListener true
         }
 
     }

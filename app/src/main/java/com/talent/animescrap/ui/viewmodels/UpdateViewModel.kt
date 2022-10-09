@@ -10,17 +10,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 
-class MainViewModel : ViewModel() {
+class UpdateViewModel : ViewModel() {
     private val githubReleaseLink = "https://github.com/fakeyatogod/AnimeScrap/releases/latest"
     private val githubAPKLink =
         "https://github.com/fakeyatogod/AnimeScrap/releases/download/TAG/AnimeScrap-vTAG.apk"
 
     private val _isUpdateAvailable = MutableLiveData<Pair<Boolean, String>>().apply {
-        getRelease()
+        checkForNewUpdate()
     }
     val isUpdateAvailable: LiveData<Pair<Boolean, String>> = _isUpdateAvailable
 
-    private fun getRelease() {
+    fun checkForNewUpdate() {
         val currentVersion = BuildConfig.VERSION_NAME
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

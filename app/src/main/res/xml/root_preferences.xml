@@ -54,4 +54,11 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="Update">
+        <Preference
+            app:key="check_update"
+            app:summary="@string/check_update_pref_summary"
+            app:title="@string/check_update_pref" />
+    </PreferenceCategory>
+
 </PreferenceScreen>
