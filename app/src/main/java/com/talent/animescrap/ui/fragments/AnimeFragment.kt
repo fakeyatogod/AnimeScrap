@@ -1,27 +1,26 @@
 package com.talent.animescrap.ui.fragments
 
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
-import android.transition.Fade
-import android.transition.TransitionManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import coil.load
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
 import com.talent.animescrap.model.AnimeDetails
@@ -53,6 +52,7 @@ class AnimeFragment : Fragment() {
     private val animeDetailsViewModel: AnimeDetailsViewModel by viewModels()
     private lateinit var selectedSource: String
     private lateinit var settingsPreferenceManager: SharedPreferences
+    private lateinit var bottomSheet: BottomSheetDialog
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -156,7 +156,8 @@ class AnimeFragment : Fragment() {
 
         val epList = animeEpisodes.keys.toList().reversed()
         val arrayAdapter =
-            ArrayAdapter(activity as Context, android.R.layout.simple_spinner_item, epList)
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, epList)
+        setupEpListBottomSheet(epList as MutableList<String>)
         arrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         binding.episodeSpinner.adapter = arrayAdapter
 
@@ -164,7 +165,7 @@ class AnimeFragment : Fragment() {
         if (lastWatchedPrefString in epList)
             binding.episodeSpinner.setSelection(epList.indexOf(lastWatchedPrefString))
 
-        binding.epCard.setOnClickListener { binding.episodeSpinner.performClick() }
+        binding.epCard.setOnClickListener { /*binding.episodeSpinner.performClick() */ bottomSheet.show() }
         binding.playCard.setOnClickListener {
 
             // Store Last Watched Episode
@@ -294,6 +295,59 @@ class AnimeFragment : Fragment() {
                 binding.lastWatchedTxt.text =
                     if (this == "Not Started Yet") this else "Last Watched : $this/${animeDetails.animeEpisodes.size}"
             }
+        }
+    }
+
+    private fun setupEpListBottomSheet(epList: MutableList<String>) {
+        val arr = ArrayAdapter(
+            requireContext(),
+            R.layout.support_simple_spinner_dropdown_item,
+            epList
+        )
+        bottomSheet = BottomSheetDialog(requireContext())
+        bottomSheet.setContentView(R.layout.episode_bottom_sheet_layout)
+
+        val list = bottomSheet.findViewById<ListView>(R.id.listView)
+        val editText = bottomSheet.findViewById<EditText>(R.id.text_input_edit_text)
+        val spinner = bottomSheet.findViewById<Spinner>(R.id.sub_dub_spinner)
+        ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            listOf("SUB", "DUB")
+        ).apply {
+            setDropDownViewResource(R.layout.spinner_dropdown_item)
+            spinner?.adapter = this
+        }
+        val ascDscImageBtn =
+            bottomSheet.findViewById<ImageView>(R.id.asc_dsc_image_button)
+        editText?.addTextChangedListener {
+            val searchedText = it.toString()
+            arr.filter.filter(searchedText)
+        }
+        var isDown = true
+        ascDscImageBtn?.setOnClickListener {
+            epList.reverse()
+            arr.notifyDataSetChanged()
+            val upIcon =
+                ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_arrow_upward_24)
+            val downIcon = ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_baseline_arrow_downward_24
+            )
+            ascDscImageBtn.apply {
+                if (isDown)
+                    this.setImageDrawable(downIcon)
+                else
+                    this.setImageDrawable(upIcon)
+                isDown = !isDown
+            }
+        }
+        list?.adapter = arr
+        bottomSheet.behavior.peekHeight = 1000
+        bottomSheet.behavior.isDraggable = false
+
+        list?.setOnItemClickListener { _, view, _, _ ->
+            bottomSheet.dismiss()
         }
     }
 
