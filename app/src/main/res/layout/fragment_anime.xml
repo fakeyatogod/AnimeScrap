@@ -164,28 +164,31 @@
                         android:paddingHorizontal="12dp"
                         android:paddingVertical="6dp">
 
-                        <LinearLayout
+                        <RelativeLayout
                             android:layout_width="wrap_content"
                             android:layout_height="22dp"
                             android:gravity="center">
 
                             <ImageView
+                                android:id="@+id/imageViewEp"
                                 android:layout_width="16dp"
-                                android:layout_height="16dp"
-                                android:layout_gravity="center"
-                                android:scaleType="centerInside"
-                                android:src="@drawable/ic_episode"
-                                tools:ignore="ContentDescription" />
+                                android:layout_height="18dp"
+                                android:layout_centerVertical="true"
+                                android:contentDescription="@string/select_episode"
+                                android:paddingTop="2dp"
+                                android:src="@drawable/ic_episode" />
 
-                            <Spinner
-                                android:id="@+id/episodeSpinner"
+                            <TextView
+                                android:id="@+id/ep_text_view"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@null"
-                                android:contentDescription="@string/select_episode"
-                                android:textAlignment="center" />
-
-                        </LinearLayout>
+                                android:layout_centerVertical="true"
+                                android:layout_toEndOf="@+id/imageViewEp"
+                                android:fontFamily="sans-serif-condensed-medium"
+                                android:paddingHorizontal="6dp"
+                                android:textSize="14sp"
+                                tools:text="12 - DUB" />
+                        </RelativeLayout>
 
                         <TextView
                             android:layout_width="wrap_content"

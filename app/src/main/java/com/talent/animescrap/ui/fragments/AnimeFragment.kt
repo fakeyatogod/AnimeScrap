@@ -139,7 +139,7 @@ class AnimeFragment : Fragment() {
 
 
                 animeName = animeDetails.animeName
-                setupSpinner(animeDetails.animeEpisodes)
+                setupEpisodes(animeDetails.animeEpisodes)
             } else {
                 binding.errorCard?.visibility = View.VISIBLE
             }
@@ -152,25 +152,24 @@ class AnimeFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupSpinner(animeEpisodes: Map<String, String>) {
+    private fun setupEpisodes(animeEpisodes: Map<String, String>) {
 
         val epList = animeEpisodes.keys.toList().reversed()
-        val arrayAdapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, epList)
-        setupEpListBottomSheet(epList as MutableList<String>)
-        arrayAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
-        binding.episodeSpinner.adapter = arrayAdapter
 
         // Remember Last watched in binding.episodeSpinner
-        if (lastWatchedPrefString in epList)
-            binding.episodeSpinner.setSelection(epList.indexOf(lastWatchedPrefString))
+        binding.epTextView.text =
+            if (lastWatchedPrefString in epList) lastWatchedPrefString
+            else epList.first()
 
-        binding.epCard.setOnClickListener { /*binding.episodeSpinner.performClick() */ bottomSheet.show() }
+        // Setup Episode Bottom Sheet Dialog
+        setupEpListBottomSheet(epList as MutableList<String>)
+
+
+        binding.epCard.setOnClickListener { bottomSheet.show() }
         binding.playCard.setOnClickListener {
-
             // Store Last Watched Episode
             sharedPreferences.edit()
-                .putString(animeMainLink, binding.episodeSpinner.selectedItem.toString()).apply()
+                .putString(animeMainLink, binding.epTextView.text.toString()).apply()
 
             // Update to new value
             sharedPreferences = requireActivity().getSharedPreferences(
@@ -184,22 +183,13 @@ class AnimeFragment : Fragment() {
 
             // Navigate to Internal Player
             if (!isExternalPlayerEnabled) {
-                /*           val navController =
-                               requireActivity().findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
-                           val action = AnimeFragmentDirections.actionNavigationAnimeToNavigationPlayer(
-                               animeName!!,
-                               animeEpisodes[binding.episodeSpinner.selectedItem]!!,
-                               animeEpisodes.size.toString(),
-                               contentLink!!
-                           )
-                           navController.navigate(action)*/
 
                 startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
                     putExtra(
                         "animePlayingDetails", AnimePlayingDetails(
                             animeName = animeName!!,
                             animeUrl = animeMainLink!!,
-                            animeEpisodeIndex = binding.episodeSpinner.selectedItem as String,
+                            animeEpisodeIndex = binding.epTextView.text as String,
                             animeEpisodeMap = animeEpisodes as HashMap<String, String>,
                             animeTotalEpisode = animeEpisodes.size.toString()
                         )
@@ -211,7 +201,7 @@ class AnimeFragment : Fragment() {
                 binding.pageLayout.visibility = View.GONE
                 animeStreamViewModel.setAnimeLink(
                     animeMainLink!!,
-                    animeEpisodes[binding.episodeSpinner.selectedItem]!!
+                    animeEpisodes[binding.epTextView.text]!!
                 )
             }
 
@@ -224,7 +214,7 @@ class AnimeFragment : Fragment() {
         animeStreamLink: AnimeStreamLink,
         animeName: String,
     ) {
-        val title = "$animeName Episode ${binding.episodeSpinner.selectedItem}"
+        val title = "$animeName Episode ${binding.epTextView.text}"
 
         val customIntent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(Uri.parse(animeStreamLink.link), "video/*")
@@ -346,7 +336,11 @@ class AnimeFragment : Fragment() {
         bottomSheet.behavior.peekHeight = 1000
         bottomSheet.behavior.isDraggable = false
 
+        val pos = arr.getPosition(binding.epTextView.text.toString())
+        list?.setSelection(pos)
         list?.setOnItemClickListener { _, view, _, _ ->
+            val episodeString = (view as TextView).text.toString()
+            binding.epTextView.text = episodeString
             bottomSheet.dismiss()
         }
     }
