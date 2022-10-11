@@ -1,5 +1,6 @@
 package com.talent.animescrap.ui.fragments
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
@@ -11,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import android.widget.AdapterView.OnItemSelectedListener
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
@@ -53,6 +55,9 @@ class AnimeFragment : Fragment() {
     private lateinit var selectedSource: String
     private lateinit var settingsPreferenceManager: SharedPreferences
     private lateinit var bottomSheet: BottomSheetDialog
+    private lateinit var epList: List<String>
+    private lateinit var epType : String
+    private lateinit var epIndex : String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -152,34 +157,14 @@ class AnimeFragment : Fragment() {
         return binding.root
     }
 
-    private fun setupEpisodes(animeEpisodes: Map<String, String>) {
-
-        val epList = animeEpisodes.keys.toList().reversed()
-
-        // Remember Last watched in binding.episodeSpinner
-        binding.epTextView.text =
-            if (lastWatchedPrefString in epList) lastWatchedPrefString
-            else epList.first()
+    private fun setupEpisodes(animeEpisodesMap: Map<String, Map<String, String>>) {
 
         // Setup Episode Bottom Sheet Dialog
-        setupEpListBottomSheet(epList as MutableList<String>)
+        setupEpListBottomSheet(animeEpisodesMap)
 
 
         binding.epCard.setOnClickListener { bottomSheet.show() }
         binding.playCard.setOnClickListener {
-            // Store Last Watched Episode
-            sharedPreferences.edit()
-                .putString(animeMainLink, binding.epTextView.text.toString()).apply()
-
-            // Update to new value
-            sharedPreferences = requireActivity().getSharedPreferences(
-                "LastWatchedPref",
-                AppCompatActivity.MODE_PRIVATE
-            )
-            sharedPreferences.getString(animeMainLink, "Not Started Yet").apply {
-                binding.lastWatchedTxt.text =
-                    if (this == "Not Started Yet") this else "Last Watched : $this/${animeEpisodes.size}"
-            }
 
             // Navigate to Internal Player
             if (!isExternalPlayerEnabled) {
@@ -189,9 +174,9 @@ class AnimeFragment : Fragment() {
                         "animePlayingDetails", AnimePlayingDetails(
                             animeName = animeName!!,
                             animeUrl = animeMainLink!!,
-                            animeEpisodeIndex = binding.epTextView.text as String,
-                            animeEpisodeMap = animeEpisodes as HashMap<String, String>,
-                            animeTotalEpisode = animeEpisodes.size.toString()
+                            animeEpisodeIndex = epIndex,
+                            animeEpisodeMap = animeEpisodesMap[epType] as HashMap<String, String>,
+                            animeTotalEpisode = epList.size.toString()
                         )
                     )
                 })
@@ -201,7 +186,7 @@ class AnimeFragment : Fragment() {
                 binding.pageLayout.visibility = View.GONE
                 animeStreamViewModel.setAnimeLink(
                     animeMainLink!!,
-                    animeEpisodes[binding.epTextView.text]!!
+                    animeEpisodesMap[epType]!![epIndex]!!
                 )
             }
 
@@ -288,59 +273,83 @@ class AnimeFragment : Fragment() {
         }
     }
 
-    private fun setupEpListBottomSheet(epList: MutableList<String>) {
-        val arr = ArrayAdapter(
-            requireContext(),
-            R.layout.support_simple_spinner_dropdown_item,
-            epList
-        )
+    @SuppressLint("SetTextI18n")
+    private fun setupEpListBottomSheet(animeEpisodesMap: Map<String, Map<String, String>>) {
+
         bottomSheet = BottomSheetDialog(requireContext())
         bottomSheet.setContentView(R.layout.episode_bottom_sheet_layout)
+        bottomSheet.behavior.peekHeight = 1000
+        bottomSheet.behavior.isDraggable = false
 
         val list = bottomSheet.findViewById<ListView>(R.id.listView)
         val editText = bottomSheet.findViewById<EditText>(R.id.text_input_edit_text)
         val spinner = bottomSheet.findViewById<Spinner>(R.id.sub_dub_spinner)
+        val ascDscImageBtn = bottomSheet.findViewById<ImageView>(R.id.asc_dsc_image_button)
+        val upIcon =
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_arrow_upward_24)
+        val downIcon =
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_arrow_downward_24)
+
+        // Episodes aye
+        epType = animeEpisodesMap.keys.first()
+        epList = animeEpisodesMap[epType]!!.keys.toList()
+        epIndex = epList.first()
+        binding.epTextView.text = "$epIndex - $epType"
+
+        val adapterForEpList = ArrayAdapter(
+            requireContext(), R.layout.support_simple_spinner_dropdown_item,
+            epList
+        ).apply {
+            list?.adapter = this
+        }
+
         ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            listOf("SUB", "DUB")
+            animeEpisodesMap.keys.toList()
         ).apply {
             setDropDownViewResource(R.layout.spinner_dropdown_item)
             spinner?.adapter = this
         }
-        val ascDscImageBtn =
-            bottomSheet.findViewById<ImageView>(R.id.asc_dsc_image_button)
+
+        // Search
         editText?.addTextChangedListener {
             val searchedText = it.toString()
-            arr.filter.filter(searchedText)
+            adapterForEpList.filter.filter(searchedText)
         }
+
+        // Toggle Asc/Desc
         var isDown = true
         ascDscImageBtn?.setOnClickListener {
-            epList.reverse()
-            arr.notifyDataSetChanged()
-            val upIcon =
-                ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_arrow_upward_24)
-            val downIcon = ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.ic_baseline_arrow_downward_24
-            )
+            epList = epList.reversed()
+            adapterForEpList.notifyDataSetChanged()
             ascDscImageBtn.apply {
-                if (isDown)
-                    this.setImageDrawable(downIcon)
-                else
-                    this.setImageDrawable(upIcon)
+                if (isDown) this.setImageDrawable(downIcon)
+                else this.setImageDrawable(upIcon)
                 isDown = !isDown
             }
         }
-        list?.adapter = arr
-        bottomSheet.behavior.peekHeight = 1000
-        bottomSheet.behavior.isDraggable = false
 
-        val pos = arr.getPosition(binding.epTextView.text.toString())
+        //spinner type
+        spinner?.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                println(p2)
+                epType = animeEpisodesMap.keys.toList()[p2]
+                epList = animeEpisodesMap[epType]!!.keys.toList()
+                adapterForEpList.notifyDataSetChanged()
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+
+        }
+
+        val pos = adapterForEpList.getPosition(binding.epTextView.text.toString())
         list?.setSelection(pos)
         list?.setOnItemClickListener { _, view, _, _ ->
             val episodeString = (view as TextView).text.toString()
-            binding.epTextView.text = episodeString
+            epIndex = episodeString
+            binding.epTextView.text = "$epIndex - $epType"
             bottomSheet.dismiss()
         }
     }

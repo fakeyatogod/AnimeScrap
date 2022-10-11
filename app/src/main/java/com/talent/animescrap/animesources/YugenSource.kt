@@ -22,9 +22,9 @@ class YugenSource : AnimeSource {
             val animeName = animeContent.first()!!.text()
             val animDesc = animeContent[1].text()
 
-            val animeEpContent = (1..num.toInt()).associate { it.toString() to it.toString() }
+            val epMap = (1..num.toInt()).associate { it.toString() to it.toString() }
 
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, animeEpContent)
+            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
         }
 
 

@@ -30,7 +30,7 @@ class KissKhSource : AnimeSource {
                     ep.asJsonObject["id"].asString
 
             }
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, epMap)
+            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
         }
 
 

@@ -29,9 +29,9 @@ class AllAnimeSource : AnimeSource {
 
             val num =
                 data["lastEpisodeInfo"].asJsonObject["sub"].asJsonObject["episodeString"].asString
-            val animeEpContent = (1..num.toInt()).associate { it.toString() to it.toString() }
+            val epMap = (1..num.toInt()).associate { it.toString() to it.toString() }
 
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, animeEpContent)
+            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
         }
 
 

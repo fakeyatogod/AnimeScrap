@@ -42,7 +42,7 @@ class ZoroSource : AnimeSource {
             val animeName = doc.selectFirst(".anisc-detail > .film-name")?.text().toString()
             val animDesc = doc.selectFirst(".film-description.m-hide > .text")?.text().toString()
 
-            val details = AnimeDetails(animeName, animDesc, animeCover, epMap)
+            val details = AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
             println(details)
 
             return@withContext details

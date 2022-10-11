@@ -28,9 +28,9 @@ class AllAnimeDubSource : AnimeSource {
 
             val num =
                 data["lastEpisodeInfo"].asJsonObject["dub"].asJsonObject["episodeString"].asString
-            val animeEpContent = (1..num.toInt()).associate { it.toString() to it.toString() }
+            val epMap = (1..num.toInt()).associate { it.toString() to it.toString() }
 
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, animeEpContent)
+            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("DUB" to epMap))
         }
 
 
