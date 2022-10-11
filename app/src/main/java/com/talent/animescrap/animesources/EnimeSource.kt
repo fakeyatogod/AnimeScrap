@@ -17,19 +17,50 @@ class EnimeSource : AnimeSource {
             val url = "$mainUrl/anime/$contentLink"
             val res = getJson(url)!!
             val data = res.asJsonObject
-
             val animeCover = data["coverImage"].asString
             val animeName = data["title"].asJsonObject["romaji"].asString
-            val animDesc = Jsoup.parseBodyFragment(data["description"].asString).text()
+            val animDesc = if (data["description"].isJsonNull) "No Description" else Jsoup.parseBodyFragment(data["description"].asString).text()
 
             val eps = data["episodes"].asJsonArray
-            val epMap = mutableMapOf<String, String>()
-            eps.forEach { ep ->
-                epMap[ep.asJsonObject["number"].asString] =
+            val epMapMixed = mutableMapOf<String, String>()
+            for (ep in eps) {
+                if (!ep.asJsonObject["sources"].isJsonArray) continue
+                epMapMixed[ep.asJsonObject["number"].asString] =
                     ep.asJsonObject["sources"].asJsonArray.first().asJsonObject["id"].asString
             }
+            val epMapZoro = mutableMapOf<String, String>()
+            val epMapGogo = mutableMapOf<String, String>()
 
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
+            for (ep in eps) {
+                if (!ep.asJsonObject["sources"].isJsonArray) continue
+                if (ep.asJsonObject["sources"].asJsonArray.first().asJsonObject["target"].asString.contains(
+                        "/watch/"
+                    )
+                ) {
+                    epMapZoro[ep.asJsonObject["number"].asString] =
+                        ep.asJsonObject["sources"].asJsonArray.first().asJsonObject["id"].asString
+                } else {
+                    epMapGogo[ep.asJsonObject["number"].asString] =
+                        ep.asJsonObject["sources"].asJsonArray.first().asJsonObject["id"].asString
+                }
+                if (ep.asJsonObject["sources"].asJsonArray.size() > 1) {
+                    if (ep.asJsonObject["sources"].asJsonArray[1].asJsonObject["target"].asString.contains(
+                            "/watch/"
+                        )
+                    ) {
+                        epMapZoro[ep.asJsonObject["number"].asString] =
+                            ep.asJsonObject["sources"].asJsonArray[1].asJsonObject["id"].asString
+                    } else {
+                        epMapGogo[ep.asJsonObject["number"].asString] =
+                            ep.asJsonObject["sources"].asJsonArray[1].asJsonObject["id"].asString
+                    }
+                }
+            }
+
+            return@withContext AnimeDetails(
+                animeName, animDesc, animeCover,
+                mapOf("ANY" to epMapMixed, "ZORO" to epMapZoro, "GOGO" to epMapGogo)
+            )
         }
 
 

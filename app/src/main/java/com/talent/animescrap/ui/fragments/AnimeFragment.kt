@@ -55,7 +55,7 @@ class AnimeFragment : Fragment() {
     private lateinit var selectedSource: String
     private lateinit var settingsPreferenceManager: SharedPreferences
     private lateinit var bottomSheet: BottomSheetDialog
-    private lateinit var epList: List<String>
+    private lateinit var epList: MutableList<String>
     private lateinit var epType : String
     private lateinit var epIndex : String
 
@@ -176,7 +176,7 @@ class AnimeFragment : Fragment() {
                             animeUrl = animeMainLink!!,
                             animeEpisodeIndex = epIndex,
                             animeEpisodeMap = animeEpisodesMap[epType] as HashMap<String, String>,
-                            animeTotalEpisode = epList.size.toString()
+                            animeTotalEpisode = animeEpisodesMap[epType]!!.size.toString()
                         )
                     )
                 })
@@ -292,7 +292,7 @@ class AnimeFragment : Fragment() {
 
         // Episodes aye
         epType = animeEpisodesMap.keys.first()
-        epList = animeEpisodesMap[epType]!!.keys.toList()
+        epList = animeEpisodesMap[epType]!!.keys.toMutableList()
         epIndex = epList.first()
         binding.epTextView.text = "$epIndex - $epType"
 
@@ -321,7 +321,9 @@ class AnimeFragment : Fragment() {
         // Toggle Asc/Desc
         var isDown = true
         ascDscImageBtn?.setOnClickListener {
-            epList = epList.reversed()
+            println(epList)
+            epList.reverse()
+            println(epList)
             adapterForEpList.notifyDataSetChanged()
             ascDscImageBtn.apply {
                 if (isDown) this.setImageDrawable(downIcon)
@@ -335,7 +337,8 @@ class AnimeFragment : Fragment() {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
                 println(p2)
                 epType = animeEpisodesMap.keys.toList()[p2]
-                epList = animeEpisodesMap[epType]!!.keys.toList()
+                epList.clear()
+                epList.addAll(animeEpisodesMap[epType]!!.keys.toMutableList())
                 adapterForEpList.notifyDataSetChanged()
             }
 
