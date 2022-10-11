@@ -87,6 +87,7 @@ class PlayerActivity : AppCompatActivity() {
     private var isPipEnabled: Boolean = true
     private var animeUrl: String? = null
     private var animeSub: String? = null
+    private var epType: String? = null
     private var animeEpisode: String? = null
     private var animeTotalEpisode: String? = null
     private var animeName: String? = null
@@ -133,6 +134,7 @@ class PlayerActivity : AppCompatActivity() {
         animeTotalEpisode = animePlayingDetails?.animeTotalEpisode
         animeUrl = animePlayingDetails?.animeUrl
         animeEpisodeMap = animePlayingDetails!!.animeEpisodeMap
+        epType = animePlayingDetails!!.epType
 
         /// Player Views
         playerView = binding.exoPlayerView
@@ -177,7 +179,8 @@ class PlayerActivity : AppCompatActivity() {
             playerView.visibility = View.GONE
             animeStreamViewModelInPlayer.setAnimeLink(
                 animeUrl!!,
-                animeEpisodeMap[animeEpisode!!] as String
+                animeEpisodeMap[animeEpisode!!] as String,
+                listOf(epType!!)
             )
             prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
             nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
@@ -344,7 +347,8 @@ class PlayerActivity : AppCompatActivity() {
         else {
             animeStreamViewModelInPlayer.setAnimeLink(
                 animeUrl!!,
-                animeEpisodeMap[animeEpisode!!] as String
+                animeEpisodeMap[animeEpisode!!] as String,
+                listOf(epType!!)
             )
             prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
             nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())

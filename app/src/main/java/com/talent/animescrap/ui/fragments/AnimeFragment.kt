@@ -176,7 +176,8 @@ class AnimeFragment : Fragment() {
                             animeUrl = animeMainLink!!,
                             animeEpisodeIndex = epIndex,
                             animeEpisodeMap = animeEpisodesMap[epType] as HashMap<String, String>,
-                            animeTotalEpisode = animeEpisodesMap[epType]!!.size.toString()
+                            animeTotalEpisode = animeEpisodesMap[epType]!!.size.toString(),
+                            epType = epType
                         )
                     )
                 })
@@ -186,7 +187,8 @@ class AnimeFragment : Fragment() {
                 binding.pageLayout.visibility = View.GONE
                 animeStreamViewModel.setAnimeLink(
                     animeMainLink!!,
-                    animeEpisodesMap[epType]!![epIndex]!!
+                    animeEpisodesMap[epType]!![epIndex]!!,
+                    listOf(epType)
                 )
             }
 

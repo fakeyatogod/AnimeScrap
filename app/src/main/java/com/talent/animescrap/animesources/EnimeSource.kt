@@ -106,7 +106,7 @@ class EnimeSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             val url = "$mainUrl/source/$animeEpCode"
             val res = getJson(url)!!.asJsonObject

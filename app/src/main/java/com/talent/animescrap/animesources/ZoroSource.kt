@@ -33,7 +33,6 @@ class ZoroSource : AnimeSource {
             eps.forEach { ep ->
                 epMap[ep.attr("data-number")] = ep.attr("data-id")
             }
-            println(epMap)
 
             val animeUrl = "http://zoro.to/${contentLink}"
             val doc = getJsoup(animeUrl)
@@ -42,10 +41,7 @@ class ZoroSource : AnimeSource {
             val animeName = doc.selectFirst(".anisc-detail > .film-name")?.text().toString()
             val animDesc = doc.selectFirst(".film-description.m-hide > .text")?.text().toString()
 
-            val details = AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
-            println(details)
-
-            return@withContext details
+            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("ZORO" to epMap))
         }
 
 
@@ -96,22 +92,17 @@ class ZoroSource : AnimeSource {
             return@withContext simpleAnimeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
         withContext(Dispatchers.IO) {
-            println(animeUrl)
-            println(animeEpCode)
             val url = "https://zoro.to/ajax/v2/episode/servers?episodeId=$animeEpCode"
             val html = getJson(url)!!.asJsonObject.get("html")!!.asString
             val items = Jsoup.parse(html).select(".server-item[data-type][data-id]")
-            println(items.first()?.text())
             val servers = items.map {
                 Pair(
                     if (it.attr("data-type") == "sub") "sub" else "dub",
                     it.attr("data-id")
                 )
             }
-            println(items)
-            println(servers)
 
             val rapidLinks = arrayListOf<String>()
             servers.distinctBy { it.second }.map {
@@ -128,17 +119,13 @@ class ZoroSource : AnimeSource {
                     ""
                 ).replace("/embed-6/", "").replace("?z=", "")
             }".replace("?vast=1","")
-            println(rapidUrl)
-            println(jsonLink)
             val json = getJson(
                 jsonLink, mapOfHeaders = mapOf(
                     "Referer" to "https://zoro.to/",
                     "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0"
                 )
             )!!.asJsonObject
-            println(json)
             val source = if (!json["sources"]!!.isJsonArray) {
-                println("haha")
                 val key =
                     getJson("https://raw.githubusercontent.com/consumet/rapidclown/main/key.txt")!!.asString
                 val decryptedText = decrypt(json["sources"]!!.asString, key)
@@ -148,7 +135,6 @@ class ZoroSource : AnimeSource {
             }
 
 
-            println(source)
             val m3u8 = source[0].asJsonObject["file"].toString().trim('"')
             val subtitle = mutableMapOf<String, String>()
 
@@ -158,8 +144,6 @@ class ZoroSource : AnimeSource {
                         it.asJsonObject["file"].toString().trim('"')
             }
 
-            println(m3u8)
-            println(subtitle)
             val sId = ZoroSource().wss()
 
             return@withContext AnimeStreamLink(

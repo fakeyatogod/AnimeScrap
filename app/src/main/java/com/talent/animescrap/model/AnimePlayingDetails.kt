@@ -9,5 +9,6 @@ data class AnimePlayingDetails(
     val animeUrl: String,
     val animeEpisodeIndex: String,
     val animeEpisodeMap: HashMap<String, String>,
-    val animeTotalEpisode: String
+    val animeTotalEpisode: String,
+    val epType: String
 ) : Parcelable

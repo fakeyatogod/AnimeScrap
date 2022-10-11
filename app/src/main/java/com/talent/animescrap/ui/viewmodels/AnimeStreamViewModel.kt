@@ -20,10 +20,10 @@ class AnimeStreamViewModel @Inject constructor(
     private val _animeStreamLink: MutableLiveData<AnimeStreamLink> = MutableLiveData()
     val animeStreamLink: LiveData<AnimeStreamLink> = _animeStreamLink
 
-    fun setAnimeLink(animeUrl: String, animeEpCode: String) {
+    fun setAnimeLink(animeUrl: String, animeEpCode: String, extras: List<String>) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                animeRepository.getStreamLink(animeUrl, animeEpCode).apply {
+                animeRepository.getStreamLink(animeUrl, animeEpCode, extras).apply {
                     _animeStreamLink.postValue(this@apply)
                 }
             }

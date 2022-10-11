@@ -27,11 +27,18 @@ class AllAnimeSource : AnimeSource {
                 if (!data["description"].isJsonNull) Jsoup.parseBodyFragment(data["description"].asString)
                     .text() else "No Description"
 
-            val num =
+            val subNum =
                 data["lastEpisodeInfo"].asJsonObject["sub"].asJsonObject["episodeString"].asString
-            val epMap = (1..num.toInt()).associate { it.toString() to it.toString() }
-
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
+            val subEpMap = (1..subNum.toInt()).associate { it.toString() to it.toString() }
+            val allEps = mutableMapOf("SUB" to subEpMap)
+            try {
+                val dubNum =
+                    data["lastEpisodeInfo"].asJsonObject["dub"].asJsonObject["episodeString"].asString
+                val dubEpMap = (1..dubNum.toInt()).associate { it.toString() to it.toString() }
+                allEps["DUB"] = dubEpMap
+            } catch (_: Exception) {
+            }
+            return@withContext AnimeDetails(animeName, animDesc, animeCover, allEps)
         }
 
 
@@ -89,14 +96,16 @@ class AllAnimeSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
         withContext(Dispatchers.IO) {
 
             println(animeUrl)
             println(animeEpCode)
 
+            val type = if ( extras?.first() == "DUB") "dub" else "sub"
+            println(type)
             val url =
-                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22sub%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2229f49ce1a69320b2ab11a475fd114e5c07b03a7dc683f77dd502ca42b26df232%22%7D%7D"""
+                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2229f49ce1a69320b2ab11a475fd114e5c07b03a7dc683f77dd502ca42b26df232%22%7D%7D"""
             val res =
                 getJson(url)!!.asJsonObject["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
 

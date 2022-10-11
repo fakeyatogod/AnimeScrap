@@ -78,7 +78,7 @@ class KissKhSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
         withContext(Dispatchers.IO) {
 
             println(animeUrl)

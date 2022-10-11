@@ -73,7 +73,7 @@ class YugenSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink =
+    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             // Get the link of episode
             val watchLink = animeUrl.replace("anime", "watch")

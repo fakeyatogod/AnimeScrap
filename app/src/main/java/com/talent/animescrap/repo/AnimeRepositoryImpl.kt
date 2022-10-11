@@ -22,7 +22,7 @@ interface AnimeRepository {
     suspend fun searchAnimeFromSite(searchUrl: String): ArrayList<SimpleAnime>
     suspend fun getLatestAnimeFromSite(): ArrayList<SimpleAnime>
     suspend fun getTrendingAnimeFromSite(): ArrayList<SimpleAnime>
-    suspend fun getStreamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink
+    suspend fun getStreamLink(animeUrl: String, animeEpCode: String, extras: List<String>): AnimeStreamLink
 
     // Room Operations
     suspend fun getFavoritesFromRoom(): Flow<List<SimpleAnime>>
@@ -113,12 +113,13 @@ class AnimeRepositoryImpl @Inject constructor(
 
     override suspend fun getStreamLink(
         animeUrl: String,
-        animeEpCode: String
+        animeEpCode: String,
+        extras: List<String>
     ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             Log.i(TAG, "Getting the anime stream Link")
             try {
-                return@withContext animeSource.streamLink(animeUrl, animeEpCode)
+                return@withContext animeSource.streamLink(animeUrl, animeEpCode, extras)
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
                 return@withContext AnimeStreamLink("", "", false)

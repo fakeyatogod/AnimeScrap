@@ -9,6 +9,6 @@ interface AnimeSource {
     suspend fun searchAnime(searchedText: String): ArrayList<SimpleAnime>
     suspend fun latestAnime(): ArrayList<SimpleAnime>
     suspend fun trendingAnime(): ArrayList<SimpleAnime>
-    suspend fun streamLink(animeUrl: String, animeEpCode: String): AnimeStreamLink
+    suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>? = null): AnimeStreamLink
 }
 
