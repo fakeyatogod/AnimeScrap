@@ -53,6 +53,8 @@
 
     <ListView
         android:focusedByDefault="true"
+        android:nextFocusLeft="@id/asc_dsc_image_button"
+        android:nextFocusRight="@id/asc_dsc_image_button"
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
