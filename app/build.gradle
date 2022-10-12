@@ -14,8 +14,8 @@ android {
         applicationId "com.talent.animescrap"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 14
-        versionName "2.2.3"
+        versionCode 15
+        versionName "2.2.4"
         archivesBaseName = "AnimeScrap"
 
         kapt {
