@@ -71,5 +71,8 @@
     <string name="check_update_pref_summary">Check for newer version of the app</string>
     <string name="check_update_pref">Check for updates</string>
     <string name="sort">Sort</string>
+    <string name="video_cache_perf_title">Enable Video Cache</string>
+    <string name="video_cache_perf_summray_disabled">Video cache disabled in player</string>
+    <string name="video_cache_perf_summray_enabled">Video cache enabled in player</string>
 
 </resources>

@@ -52,6 +52,13 @@
             app:summaryOn="@string/pip_enabled"
             app:title="@string/pip_title" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="video_cache"
+            app:summaryOff="@string/video_cache_perf_summray_enabled"
+            app:summaryOn="@string/video_cache_perf_summray_disabled"
+            app:title="@string/video_cache_perf_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Update">

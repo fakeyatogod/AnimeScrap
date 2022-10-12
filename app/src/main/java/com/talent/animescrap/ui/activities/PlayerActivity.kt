@@ -93,6 +93,7 @@ class PlayerActivity : AppCompatActivity() {
     private var extraHeaders: HashMap<String, String>? = null
     private var isHls: Boolean = true
     private var isTV: Boolean = false
+    private var isVideoCacheEnabled: Boolean = true
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
@@ -113,6 +114,12 @@ class PlayerActivity : AppCompatActivity() {
 
         // Back Pressed
         onBackPressedDispatcher.addCallback(this@PlayerActivity, callback)
+
+        // Settings
+        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+
+        // Video Cache
+        isVideoCacheEnabled = settingsPreferenceManager.getBoolean("video_cache", true)
 
         // Prepare PiP
         preparePip()
@@ -224,25 +231,38 @@ class PlayerActivity : AppCompatActivity() {
             .setConnectTimeoutMs(20000)
 
         val databaseProvider = StandaloneDatabaseProvider(this)
-        simpleCache?.release()
-        simpleCache = SimpleCache(
-            File(cacheDir, "exoplayer").also { it.deleteOnExit() }, // Ensures always fresh file
-            LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
-            databaseProvider
-        )
-        val cacheFactory = CacheDataSource.Factory().apply {
-            setCache(simpleCache!!)
-            setUpstreamDataSourceFactory(dataSourceFactory)
-        }
-        mediaItem =
-            MediaItem.fromUri(animeStreamUrl!!)
-        mediaSource = if (isHls) {
-            HlsMediaSource.Factory(cacheFactory)
-                .setAllowChunklessPreparation(true)
-                .createMediaSource(mediaItem)
+        if (isVideoCacheEnabled) {
+            simpleCache?.release()
+            simpleCache = SimpleCache(
+                File(cacheDir, "exoplayer").also { it.deleteOnExit() }, // Ensures always fresh file
+                LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
+                databaseProvider
+            )
+            val cacheFactory = CacheDataSource.Factory().apply {
+                setCache(simpleCache!!)
+                setUpstreamDataSourceFactory(dataSourceFactory)
+            }
+            mediaItem =
+                MediaItem.fromUri(animeStreamUrl!!)
+            mediaSource = if (isHls) {
+                HlsMediaSource.Factory(cacheFactory)
+                    .setAllowChunklessPreparation(true)
+                    .createMediaSource(mediaItem)
+            } else {
+                ProgressiveMediaSource.Factory(cacheFactory)
+                    .createMediaSource(mediaItem)
+            }
         } else {
-            ProgressiveMediaSource.Factory(cacheFactory)
-                .createMediaSource(mediaItem)
+            mediaItem =
+                MediaItem.fromUri(animeStreamUrl!!)
+            mediaSource = if (isHls) {
+                HlsMediaSource.Factory(dataSourceFactory)
+                    .setAllowChunklessPreparation(true)
+                    .createMediaSource(mediaItem)
+            } else {
+                ProgressiveMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(mediaItem)
+            }
         }
 
         if (animeSub != null) {
@@ -317,7 +337,6 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun preparePip() {
-        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
         isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
 
         if (isPipEnabled && !isTV) {
@@ -496,7 +515,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun releasePlayer() {
-        releaseCache()
+        if (isVideoCacheEnabled) releaseCache()
         player.pause()
         player.stop()
         player.release()
