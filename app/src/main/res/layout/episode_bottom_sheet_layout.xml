@@ -18,7 +18,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="5"
-            android:paddingHorizontal="10dp"
+            android:paddingEnd="10dp"
+            android:paddingStart="0dp"
             android:hint="@string/title_search">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -43,12 +44,11 @@
             android:contentDescription="@string/sort"
             android:id="@+id/asc_dsc_image_button"
             android:layout_width="0dp"
-            android:padding="20dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@drawable/background_selector_accent"
             android:checkable="true"
-            android:src="@drawable/ic_baseline_arrow_upward_24" />
+            android:src="@drawable/sort_numeric_normal" />
     </LinearLayout>
 
     <ListView

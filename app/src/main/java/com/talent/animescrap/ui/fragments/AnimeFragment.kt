@@ -288,10 +288,10 @@ class AnimeFragment : Fragment() {
         val editText = bottomSheet.findViewById<EditText>(R.id.text_input_edit_text)
         val spinner = bottomSheet.findViewById<Spinner>(R.id.sub_dub_spinner)
         val ascDscImageBtn = bottomSheet.findViewById<ImageView>(R.id.asc_dsc_image_button)
-        val upIcon =
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_arrow_upward_24)
-        val downIcon =
-            ContextCompat.getDrawable(requireContext(), R.drawable.ic_baseline_arrow_downward_24)
+        val normalOrderIcon =
+            ContextCompat.getDrawable(requireContext(), R.drawable.sort_numeric_normal)
+        val reversedOrderIcon =
+            ContextCompat.getDrawable(requireContext(), R.drawable.sort_numeric_reversed)
 
         // Episodes aye
         epType = animeEpisodesMap.keys.first()
@@ -339,16 +339,14 @@ class AnimeFragment : Fragment() {
         }
 
         // Toggle Asc/Desc
-        var isDown = true
         ascDscImageBtn?.setOnClickListener {
             println(epList)
             epList.reverse()
             println(epList)
             adapterForEpList.notifyDataSetChanged()
             ascDscImageBtn.apply {
-                if (isDown) this.setImageDrawable(downIcon)
-                else this.setImageDrawable(upIcon)
-                isDown = !isDown
+                if (this.drawable == reversedOrderIcon) this.setImageDrawable(normalOrderIcon)
+                else this.setImageDrawable(reversedOrderIcon)
             }
             list?.setSelection(0)
         }
@@ -363,6 +361,7 @@ class AnimeFragment : Fragment() {
                 // back to the position of the current watching ep, after changing type, dub might not have same ep
                 if (epList.contains(epIndex))
                     list?.setSelection(adapterForEpList.getPosition(epIndex))
+                ascDscImageBtn?.setImageDrawable(normalOrderIcon)
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {

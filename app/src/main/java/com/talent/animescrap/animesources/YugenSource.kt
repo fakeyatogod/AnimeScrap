@@ -14,17 +14,27 @@ class YugenSource : AnimeSource {
             val url = "https://yugen.to${contentLink}watch/?sort=episode"
             val doc = getJsoup(url)
             val animeContent = doc.getElementsByClass("p-10-t")
-            val num = doc.getElementsByClass("box p-10 p-15 m-15-b anime-metadetails")
-                .select("div:nth-child(6)").select("span").text()
             val animeCover =
                 doc.getElementsByClass("page-cover-inner").first()!!.getElementsByTag("img")
                     .attr("data-src")
             val animeName = animeContent.first()!!.text()
             val animDesc = animeContent[1].text()
 
-            val epMap = (1..num.toInt()).associate { it.toString() to it.toString() }
+            val subsEpCount = doc.getElementsByClass("box p-10 p-15 m-15-b anime-metadetails")
+                .select("div:nth-child(6)").select("span").text()
+            val epMapSub = (1..subsEpCount.toInt()).associate { it.toString() to it.toString() }
+            val epMap = mutableMapOf("SUB" to epMapSub)
 
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
+            try {
+                val dubsEpCount = doc.getElementsByClass("box p-10 p-15 m-15-b anime-metadetails")
+                    .select("div:nth-child(7)").select("span").text()
+                println(dubsEpCount)
+                val epMapDub = (1..dubsEpCount.toInt()).associate { it.toString() to it.toString() }
+                epMap["DUB"] = epMapDub
+            } catch (_: Exception) {
+            }
+
+            return@withContext AnimeDetails(animeName, animDesc, animeCover, epMap)
         }
 
 
@@ -73,12 +83,22 @@ class YugenSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
+    override suspend fun streamLink(
+        animeUrl: String,
+        animeEpCode: String,
+        extras: List<String>?
+    ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             // Get the link of episode
             val watchLink = animeUrl.replace("anime", "watch")
-            val animeEpUrl = "https://yugen.to$watchLink$animeEpCode"
-            println(animeEpUrl)
+
+            val animeEpUrl =
+                if (extras?.first() == "DUB")
+                    "https://yugen.to${
+                        watchLink.dropLast(1)
+                    }-dub/$animeEpCode"
+                else "https://yugen.to$watchLink$animeEpCode"
+
             var yugenEmbedLink =
                 getJsoup(animeEpUrl).getElementById("main-embed")!!.attr("src")
             if (!yugenEmbedLink.contains("https:")) yugenEmbedLink = "https:$yugenEmbedLink"
