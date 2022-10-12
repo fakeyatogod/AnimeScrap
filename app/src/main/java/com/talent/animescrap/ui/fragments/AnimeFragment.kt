@@ -56,8 +56,8 @@ class AnimeFragment : Fragment() {
     private lateinit var settingsPreferenceManager: SharedPreferences
     private lateinit var bottomSheet: BottomSheetDialog
     private lateinit var epList: MutableList<String>
-    private lateinit var epType : String
-    private lateinit var epIndex : String
+    private lateinit var epType: String
+    private lateinit var epIndex: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -127,10 +127,6 @@ class AnimeFragment : Fragment() {
                 binding.animeNameTxt.text = animeDetails.animeName
                 binding.animeDetailsTxt.text = animeDetails.animeDesc
 
-                binding.lastWatchedTxt.text =
-                    if (lastWatchedPrefString == "Not Started Yet") lastWatchedPrefString
-                    else "Last Watched : $lastWatchedPrefString/${animeDetails.animeEpisodes.size}"
-
                 // load background image.
                 binding.backgroundImage.load(animeDetails.animeCover) {
                     error(R.drawable.ic_broken_image)
@@ -165,6 +161,10 @@ class AnimeFragment : Fragment() {
 
         binding.epCard.setOnClickListener { bottomSheet.show() }
         binding.playCard.setOnClickListener {
+
+            // Update last watched
+            sharedPreferences.edit()
+                .putString(animeMainLink!!, epIndex).apply()
 
             // Navigate to Internal Player
             if (!isExternalPlayerEnabled) {
@@ -270,7 +270,7 @@ class AnimeFragment : Fragment() {
         if (::animeDetails.isInitialized) {
             sharedPreferences.getString(animeMainLink, "Not Started Yet").apply {
                 binding.lastWatchedTxt.text =
-                    if (this == "Not Started Yet") this else "Last Watched : $this/${animeDetails.animeEpisodes.size}"
+                    if (this == "Not Started Yet") this else "Last Watched : $this/${epList.size}"
             }
         }
     }
@@ -296,7 +296,20 @@ class AnimeFragment : Fragment() {
         epType = animeEpisodesMap.keys.first()
         epList = animeEpisodesMap[epType]!!.keys.toMutableList()
         epIndex = epList.first()
+
+        // Setup the views that uses the above
+        // 1. Ep text
         binding.epTextView.text = "$epIndex - $epType"
+        // 2. Last Watched Text
+        if (lastWatchedPrefString == "Not Started Yet") {
+            binding.lastWatchedTxt.text = lastWatchedPrefString
+        } else {
+            binding.lastWatchedTxt.text = "Last Watched : $lastWatchedPrefString/${epList.size}"
+            if (epList.contains(lastWatchedPrefString)) {
+                binding.epTextView.text = "$lastWatchedPrefString - $epType"
+                epIndex = lastWatchedPrefString
+            }
+        }
 
         val adapterForEpList = ArrayAdapter(
             requireContext(), R.layout.support_simple_spinner_dropdown_item,
@@ -332,16 +345,19 @@ class AnimeFragment : Fragment() {
                 else this.setImageDrawable(upIcon)
                 isDown = !isDown
             }
+            list?.setSelection(0)
         }
 
         //spinner type
         spinner?.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                println(p2)
                 epType = animeEpisodesMap.keys.toList()[p2]
                 epList.clear()
                 epList.addAll(animeEpisodesMap[epType]!!.keys.toMutableList())
                 adapterForEpList.notifyDataSetChanged()
+                // back to the position of the current watching ep, after changing type, dub might not have same ep
+                if (epList.contains(epIndex))
+                    list?.setSelection(adapterForEpList.getPosition(epIndex))
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -349,7 +365,7 @@ class AnimeFragment : Fragment() {
 
         }
 
-        val pos = adapterForEpList.getPosition(binding.epTextView.text.toString())
+        val pos = adapterForEpList.getPosition(epIndex)
         list?.setSelection(pos)
         list?.setOnItemClickListener { _, view, _, _ ->
             val episodeString = (view as TextView).text.toString()
