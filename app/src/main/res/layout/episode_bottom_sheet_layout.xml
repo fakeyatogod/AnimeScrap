@@ -38,6 +38,7 @@
             android:padding="10dp" />
 
         <ImageView
+            android:contentDescription="@string/sort"
             android:id="@+id/asc_dsc_image_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

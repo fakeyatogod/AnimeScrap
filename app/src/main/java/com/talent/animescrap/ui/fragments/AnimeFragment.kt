@@ -1,6 +1,5 @@
 package com.talent.animescrap.ui.fragments
 
-import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.SharedPreferences
@@ -22,6 +21,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import coil.load
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
@@ -270,17 +270,18 @@ class AnimeFragment : Fragment() {
         if (::animeDetails.isInitialized) {
             sharedPreferences.getString(animeMainLink, "Not Started Yet").apply {
                 binding.lastWatchedTxt.text =
-                    if (this == "Not Started Yet") this else "Last Watched : $this/${epList.size}"
+                    if (this == "Not Started Yet") resources.getString(R.string.not_started_yet)
+                    else resources.getString(R.string.last_watched_format, "$this/${epList.size}")
             }
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private fun setupEpListBottomSheet(animeEpisodesMap: Map<String, Map<String, String>>) {
 
         bottomSheet = BottomSheetDialog(requireContext())
         bottomSheet.setContentView(R.layout.episode_bottom_sheet_layout)
-        bottomSheet.behavior.peekHeight = 1000
+        bottomSheet.behavior.peekHeight = bottomSheet.behavior.maxHeight
+        bottomSheet.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         bottomSheet.behavior.isDraggable = false
 
         val list = bottomSheet.findViewById<ListView>(R.id.listView)
@@ -299,14 +300,18 @@ class AnimeFragment : Fragment() {
 
         // Setup the views that uses the above
         // 1. Ep text
-        binding.epTextView.text = "$epIndex - $epType"
+        binding.epTextView.text = resources.getString(R.string.episode_text, epIndex, epType)
         // 2. Last Watched Text
         if (lastWatchedPrefString == "Not Started Yet") {
-            binding.lastWatchedTxt.text = lastWatchedPrefString
+            binding.lastWatchedTxt.text = resources.getString(R.string.not_started_yet)
         } else {
-            binding.lastWatchedTxt.text = "Last Watched : $lastWatchedPrefString/${epList.size}"
+            binding.lastWatchedTxt.text = resources.getString(
+                R.string.last_watched_format,
+                "$lastWatchedPrefString/${epList.size}"
+            )
             if (epList.contains(lastWatchedPrefString)) {
-                binding.epTextView.text = "$lastWatchedPrefString - $epType"
+                binding.epTextView.text =
+                    resources.getString(R.string.episode_text, lastWatchedPrefString, epType)
                 epIndex = lastWatchedPrefString
             }
         }
@@ -370,7 +375,7 @@ class AnimeFragment : Fragment() {
         list?.setOnItemClickListener { _, view, _, _ ->
             val episodeString = (view as TextView).text.toString()
             epIndex = episodeString
-            binding.epTextView.text = "$epIndex - $epType"
+            binding.epTextView.text = resources.getString(R.string.episode_text, epIndex, epType)
             bottomSheet.dismiss()
         }
     }
