@@ -39,8 +39,6 @@ import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
-import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy
-import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
@@ -227,7 +225,6 @@ class PlayerActivity : AppCompatActivity() {
 
         val databaseProvider = StandaloneDatabaseProvider(this)
         simpleCache?.release()
-        simpleCache
         simpleCache = SimpleCache(
             File(cacheDir, "exoplayer").also { it.deleteOnExit() }, // Ensures always fresh file
             LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
@@ -242,7 +239,6 @@ class PlayerActivity : AppCompatActivity() {
         mediaSource = if (isHls) {
             HlsMediaSource.Factory(cacheFactory)
                 .setAllowChunklessPreparation(true)
-                .setLoadErrorHandlingPolicy(getMyErrorHandlingPolicy())
                 .createMediaSource(mediaItem)
         } else {
             ProgressiveMediaSource.Factory(cacheFactory)
@@ -497,14 +493,6 @@ class PlayerActivity : AppCompatActivity() {
             bottomSheet.dismiss()
         }
 
-    }
-
-    private fun getMyErrorHandlingPolicy(): DefaultLoadErrorHandlingPolicy {
-        return object : DefaultLoadErrorHandlingPolicy() {
-            override fun getRetryDelayMsFor(loadErrorInfo: LoadErrorHandlingPolicy.LoadErrorInfo): Long {
-                return 10000
-            }
-        }
     }
 
     private fun releasePlayer() {
