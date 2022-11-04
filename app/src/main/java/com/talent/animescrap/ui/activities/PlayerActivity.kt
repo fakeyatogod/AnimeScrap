@@ -98,7 +98,6 @@ class PlayerActivity : AppCompatActivity() {
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
 
-    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
@@ -301,6 +300,19 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun getPlayerListener(): Player.Listener {
         return object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                super.onIsPlayingChanged(isPlaying)
+                if (isPipEnabled && !isTV) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        setPictureInPictureParams(
+                            PictureInPictureParams.Builder()
+                                .setAutoEnterEnabled(isPlaying)
+                                .build()
+                        )
+                    }
+                }
+            }
+
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
                 if (playbackState == Player.STATE_ENDED) {
@@ -332,20 +344,6 @@ class PlayerActivity : AppCompatActivity() {
                     }
 
                 }
-            }
-        }
-    }
-
-    private fun preparePip() {
-        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
-
-        if (isPipEnabled && !isTV) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setPictureInPictureParams(
-                    PictureInPictureParams.Builder()
-                        .setAutoEnterEnabled(true)
-                        .build()
-                )
             }
         }
     }
@@ -535,12 +533,12 @@ class PlayerActivity : AppCompatActivity() {
         override fun handleOnBackPressed() {
             releasePlayer()
             finish()
-            if (!isTV){
-            startActivity(
-                Intent(this@PlayerActivity, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                }
-            )
+            if (!isTV) {
+                startActivity(
+                    Intent(this@PlayerActivity, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                    }
+                )
             }
         }
     }
@@ -588,7 +586,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     override fun onUserLeaveHint() {
-        if (isPipEnabled && !isTV) {
+        if (isPipEnabled && !isTV && (player.isPlaying || player.isLoading)) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     enterPictureInPictureMode(
@@ -596,6 +594,19 @@ class PlayerActivity : AppCompatActivity() {
                             .build()
                     )
                 }
+            }
+        }
+    }
+
+    private fun preparePip() {
+        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
+        if (isPipEnabled && !isTV) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setPictureInPictureParams(
+                    PictureInPictureParams.Builder()
+                        .setAutoEnterEnabled(true)
+                        .build()
+                )
             }
         }
     }
