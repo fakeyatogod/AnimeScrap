@@ -16,7 +16,7 @@ class YugenSource : AnimeSource {
             val animeContent = doc.getElementsByClass("p-10-t")
             val animeCover =
                 doc.getElementsByClass("page-cover-inner").first()!!.getElementsByTag("img")
-                    .attr("data-src")
+                    .attr("src")
             val animeName = animeContent.first()!!.text()
             val animDesc = animeContent[1].text()
 
