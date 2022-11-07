@@ -94,6 +94,7 @@ class PlayerActivity : AppCompatActivity() {
     private var isHls: Boolean = true
     private var isTV: Boolean = false
     private var isVideoCacheEnabled: Boolean = true
+    private var isAutoPlayEnabled: Boolean = true
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
@@ -120,6 +121,8 @@ class PlayerActivity : AppCompatActivity() {
         // Video Cache
         isVideoCacheEnabled = settingsPreferenceManager.getBoolean("video_cache", true)
 
+        // Autoplay pref
+        isAutoPlayEnabled = settingsPreferenceManager.getBoolean("auto_play", true)
         // Prepare PiP
         preparePip()
 
@@ -315,7 +318,7 @@ class PlayerActivity : AppCompatActivity() {
 
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
-                if (playbackState == Player.STATE_ENDED) {
+                if (playbackState == Player.STATE_ENDED && isAutoPlayEnabled) {
                     setNewEpisode()
                 }
             }

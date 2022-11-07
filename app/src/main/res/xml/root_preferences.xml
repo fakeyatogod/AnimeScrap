@@ -59,6 +59,12 @@
             app:summaryOn="@string/video_cache_perf_summray_disabled"
             app:title="@string/video_cache_perf_title" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="auto_play"
+            app:summary="@string/auto_play_summary"
+            app:title="@string/auto_play_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="Update">
