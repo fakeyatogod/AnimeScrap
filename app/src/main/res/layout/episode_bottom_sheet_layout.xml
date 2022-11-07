@@ -46,6 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:padding="4dp"
             android:background="@drawable/background_selector_accent"
             android:checkable="true"
             android:src="@drawable/sort_numeric_normal" />
