@@ -136,12 +136,12 @@ class PlayerActivity : AppCompatActivity() {
             } else {
                 @Suppress("DEPRECATION") intent.getParcelableExtra("animePlayingDetails")
             }
-        animeName = animePlayingDetails?.animeName
-        animeEpisode = animePlayingDetails?.animeEpisodeIndex
-        animeTotalEpisode = animePlayingDetails?.animeTotalEpisode
-        animeUrl = animePlayingDetails?.animeUrl
-        animeEpisodeMap = animePlayingDetails!!.animeEpisodeMap
-        epType = animePlayingDetails!!.epType
+        animeName = animePlayingDetails!!.animeName
+        animeEpisode = animePlayingDetails.animeEpisodeIndex
+        animeTotalEpisode = animePlayingDetails.animeTotalEpisode
+        animeUrl = animePlayingDetails.animeUrl
+        animeEpisodeMap = animePlayingDetails.animeEpisodeMap
+        epType = animePlayingDetails.epType
 
         /// Player Views
         playerView = binding.exoPlayerView
