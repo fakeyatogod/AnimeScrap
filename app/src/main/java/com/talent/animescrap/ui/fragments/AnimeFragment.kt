@@ -298,6 +298,13 @@ class AnimeFragment : Fragment() {
         epList = animeEpisodesMap[epType]!!.keys.toMutableList()
         epIndex = epList.first()
 
+
+        val orderPref = settingsPreferenceManager.getString("episode_order_pref", "normal")
+        if (orderPref == "reversed") {
+            epList.reverse()
+            ascDscImageBtn?.setImageDrawable(reversedOrderIcon)
+        }
+
         // Setup the views that uses the above
         // 1. Ep text
         binding.epTextView.text = resources.getString(R.string.episode_text, epIndex, epType)
@@ -340,15 +347,16 @@ class AnimeFragment : Fragment() {
 
         // Toggle Asc/Desc
         ascDscImageBtn?.setOnClickListener {
-            println(epList)
             epList.reverse()
-            println(epList)
             adapterForEpList.notifyDataSetChanged()
             ascDscImageBtn.apply {
                 if (this.drawable == reversedOrderIcon) this.setImageDrawable(normalOrderIcon)
                 else this.setImageDrawable(reversedOrderIcon)
             }
             list?.setSelection(0)
+            val order =
+                if (ascDscImageBtn.drawable == reversedOrderIcon) "reversed" else "normal"
+            settingsPreferenceManager.edit().putString("episode_order_pref", order).apply()
         }
 
         //spinner type
@@ -357,13 +365,22 @@ class AnimeFragment : Fragment() {
                 epType = animeEpisodesMap.keys.toList()[p2]
                 epList.clear()
                 epList.addAll(animeEpisodesMap[epType]!!.keys.toMutableList())
+
+                // Reversed order if it is preferred
+                if (orderPref == "reversed") {
+                    epList.reverse()
+                    ascDscImageBtn?.setImageDrawable(reversedOrderIcon)
+                } else {
+                    ascDscImageBtn?.setImageDrawable(normalOrderIcon)
+                }
+                // notify changes to adapter
                 adapterForEpList.notifyDataSetChanged()
+
                 // back to the position of the current watching ep, after changing type, dub might not have same ep
                 if (epList.contains(epIndex))
                     list?.setSelection(adapterForEpList.getPosition(epIndex))
-                ascDscImageBtn?.setImageDrawable(normalOrderIcon)
-            }
 
+            }
             override fun onNothingSelected(p0: AdapterView<*>?) {
             }
 
