@@ -127,15 +127,11 @@ class AndroidCookieJar : CookieJar {
             .onEach { manager.setCookie(urlString, "$it=;Max-Age=$maxAge") }
             .count()
     }
-
-    fun removeAll() {
-        manager.removeAllCookies {}
-    }
 }
 
 val cookieManager = AndroidCookieJar()
 
-class CloudflareInterceptor(private val context: Context) : WebViewInterceptor(context) {
+class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
 
     private val executor = ContextCompat.getMainExecutor(context)
 
@@ -171,11 +167,10 @@ class CloudflareInterceptor(private val context: Context) : WebViewInterceptor(c
         // OkHttp doesn't support asynchronous interceptors.
         val latch = CountDownLatch(1)
 
-        var webview: WebView? = null
+        var webview: WebView?
 
         var challengeFound = false
         var cloudflareBypassed = false
-        var isWebViewOutdated = false
 
         val origRequestUrl = originalRequest.url.toString()
         val headers = parseHeaders(originalRequest.headers)
