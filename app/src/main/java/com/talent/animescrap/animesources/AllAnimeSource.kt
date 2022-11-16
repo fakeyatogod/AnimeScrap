@@ -105,7 +105,7 @@ class AllAnimeSource : AnimeSource {
             val type = if ( extras?.first() == "DUB") "dub" else "sub"
             println(type)
             val url =
-                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%2232924fd451b4f8183b46c8c2298ddc2be0a2e4dac0bed7ce3e8988035fde42cb%22%7D%7D"""
+                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%223933a4a68bc80c46e25b7b8b3f563df1416b7b583595e5e5bfc67c01bd791df8%22%7D%7D"""
             val res =
                 getJson(url)!!.asJsonObject["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
             val sortedSources =
