@@ -1,5 +1,9 @@
 package com.talent.animescrap.animesources
 
+import android.content.Context
+import com.google.gson.JsonParser
+import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
+import com.talent.animescrap.animesources.sourceutils.CloudflareInterceptor
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
@@ -7,8 +11,25 @@ import com.talent.animescrap.utils.Utils.getJson
 import com.talent.animescrap.utils.Utils.getJsoup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.*
+import java.util.concurrent.TimeUnit
+import kotlin.math.pow
 
-class AnimePaheSource : AnimeSource {
+class AnimePaheSource(context: Context) : AnimeSource {
+
+    private val client = OkHttpClient.Builder()
+        .cookieJar(AndroidCookieJar())
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .callTimeout(2, TimeUnit.MINUTES)
+        .addInterceptor(CloudflareInterceptor(context))
+        .build()
+
+    private var cookies: String = ""
+    private val kwikParamsRegex = Regex("""\("(\w+)",\d+,"(\w+)",(\d+),(\d+),\d+\)""")
+    private val kwikDUrl = Regex("action=\"([^\"]+)\"")
+    private val kwikDToken = Regex("value=\"([^\"]+)\"")
+
     private val mainUrl = "https://animepahe.com"
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
@@ -114,29 +135,143 @@ class AnimePaheSource : AnimeSource {
                 animeUrl.replaceBefore("AnimePaheSession", "").replace("AnimePaheSession=", "")
 */
             val urlForLinks = "https://animepahe.com/api?m=links&id=$animeEpCode&p=kwik"
+            val r = JsonParser.parseString(client.newCall(Request.Builder().url(urlForLinks).build())
+                .execute().body!!.string())
+            println("r = $r")
+            val data = r.asJsonObject["data"].asJsonArray.last().asJsonObject
+
             val kwikLink =
-                getJson(urlForLinks)!!.asJsonObject["data"].asJsonArray.last().asJsonObject["1080"].asJsonObject["kwik"].asString
+                if(data.has("1080")) data["1080"].asJsonObject["kwik_pahewin"].asString
+                else if(data.has("720")) data["720"].asJsonObject["kwik_pahewin"].asString
+                else if(data.has("480")) data["480"].asJsonObject["kwik_pahewin"].asString
+                else if (data.has("360")) data["360"].asJsonObject["kwik_pahewin"].asString
+                else ""
+
             println(kwikLink)
-            val hlsLink = getHlsStreamUrl(kwikLink)
+            val hlsLink = getStreamUrlFromKwik(kwikLink)
             println(hlsLink)
             return@withContext AnimeStreamLink(
-                hlsLink,
-                "",
-                true,
+                hlsLink, "", false,
                 extraHeaders = hashMapOf("referer" to "https://kwik.cx")
             )
         }
 
-    private fun getHlsStreamUrl(kwikUrl: String): String {
-        val eContent =
-            getJsoup(kwikUrl, mapOfHeaders = mapOf("referer" to mainUrl)).body().toString()
-        println(eContent)
-        val substring = eContent.substringAfterLast("m3u8|uwu|").substringBefore("'")
-        println(substring)
-        val urlParts = substring.split("|").reversed()
-        assert(urlParts.lastIndex == 8)
-        return urlParts[0] + "://" + urlParts[1] + "-" + urlParts[2] + "." + urlParts[3] + "." +
-                urlParts[4] + "." + urlParts[5] + "/" + urlParts[6] + "/" + urlParts[7] + "/" +
-                urlParts[8] + "/uwu.m3u8"
+
+    private fun getStreamUrlFromKwik(paheUrl: String): String {
+
+        val noRedirects = client.newBuilder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .build()
+        val kwikUrl =
+            "https://" + noRedirects.newCall(Request.Builder().url("$paheUrl/i").build()).execute()
+                .header("location")!!.substringAfterLast("https://")
+        println(kwikUrl)
+        val fContent =
+            client.newCall(
+                Request.Builder().url(kwikUrl).header("referer", "https://kwik.cx/").build()
+            ).execute()
+        cookies += (fContent.header("set-cookie")!!)
+        val fContentString = fContent.body!!.string()
+
+        val (fullString, key, v1, v2) = kwikParamsRegex.find(fContentString)!!.destructured
+        val decrypted = decrypt(fullString, key, v1.toInt(), v2.toInt())
+        val uri = kwikDUrl.find(decrypted)!!.destructured.component1()
+        val tok = kwikDToken.find(decrypted)!!.destructured.component1()
+        var content: Response? = null
+
+        println(uri)
+        println(tok)
+
+        var code = 419
+        var tries = 0
+
+        val noRedirectClient = OkHttpClient().newBuilder()
+            .followRedirects(false)
+            .followSslRedirects(false)
+            .cookieJar(client.cookieJar)
+            .build()
+
+        while (code != 302 && tries < 20) {
+
+            content = noRedirectClient.newCall(
+                Request.Builder()
+                    .url(uri)
+                    .headers(
+                    Headers.headersOf(
+                        "referer", fContent.request.url.toString(),
+                        "cookie", fContent.header("set-cookie")!!.replace("path=/;", "")
+                    ))
+                    .post(FormBody.Builder().add("_token", tok).build())
+                    .cacheControl( CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
+                    .build()
+                /*POST(
+                    uri,
+                    ,
+                    FormBody.Builder().add("_token", tok).build()
+                )*/
+            ).execute()
+            code = content.code
+            println(code)
+            ++tries
+        }
+        if (tries > 19) {
+            throw Exception("Failed to extract the stream uri from kwik.")
+        }
+        val location = content?.header("location").toString()
+        content?.close()
+        return location
+    }
+
+    private fun decrypt(fullString: String, key: String, v1: Int, v2: Int): String {
+        var r = ""
+        var i = 0
+
+        while (i < fullString.length) {
+            var s = ""
+
+            while (fullString[i] != key[v2]) {
+                s += fullString[i]
+                ++i
+            }
+            var j = 0
+
+            while (j < key.length) {
+                s = s.replace(key[j].toString(), j.toString())
+                ++j
+            }
+            r += (getString(s, v2).toInt() - v1).toChar()
+            ++i
+        }
+        return r
+    }
+
+    private fun getString(content: String, s1: Int): String {
+        val s2 = 10
+        val characterMap = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/"
+
+        val slice2 = characterMap.slice(0 until s2)
+        var acc: Long = 0
+
+        for ((n, i) in content.reversed().withIndex()) {
+            acc += (
+                    when (("$i").toIntOrNull() != null) {
+                        true -> "$i".toLong()
+                        false -> "0".toLong()
+                    }
+                    ) * s1.toDouble().pow(n.toDouble()).toInt()
+        }
+
+        var k = ""
+
+        while (acc > 0) {
+            k = slice2[(acc % s2).toInt()] + k
+            acc = (acc - (acc % s2)) / s2
+        }
+
+        return when (k != "") {
+            true -> k
+            false -> "0"
+        }
     }
 }

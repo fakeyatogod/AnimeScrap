@@ -1,6 +1,7 @@
 package com.talent.animescrap.repo
 
 import android.app.Application
+import android.content.Context
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.talent.animescrap.R
@@ -59,7 +60,7 @@ class AnimeRepositoryImpl @Inject constructor(
                 KissKhSource()
             }
             "animepahe" -> {
-                AnimePaheSource()
+                AnimePaheSource(application as Context)
             }
             else -> {
                 YugenSource()
