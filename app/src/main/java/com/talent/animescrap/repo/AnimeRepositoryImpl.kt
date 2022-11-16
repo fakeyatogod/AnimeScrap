@@ -58,6 +58,9 @@ class AnimeRepositoryImpl @Inject constructor(
             "kiss_kh" -> {
                 KissKhSource()
             }
+            "animepahe" -> {
+                AnimePaheSource()
+            }
             else -> {
                 YugenSource()
             }
