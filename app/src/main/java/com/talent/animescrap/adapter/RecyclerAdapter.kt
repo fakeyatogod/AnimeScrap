@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.MainCardviewItemBinding
+import com.talent.animescrap.databinding.PortraitCardviewItemBinding
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.ui.fragments.FavoriteFragmentDirections
 import com.talent.animescrap.ui.fragments.LatestFragmentDirections
@@ -18,7 +19,7 @@ import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
 import dagger.hilt.android.internal.managers.ViewComponentManager
 
 class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(AnimeDiffUtil) {
-    inner class ViewHolder(private val binding: MainCardviewItemBinding) :
+    inner class ViewHolder(private val binding: PortraitCardviewItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.setClickListener { view ->
@@ -73,7 +74,7 @@ class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(Ani
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding =
-            MainCardviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            PortraitCardviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 

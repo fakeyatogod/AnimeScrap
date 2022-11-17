@@ -8,10 +8,10 @@ import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils.getJson
-import com.talent.animescrap.utils.Utils.getJsoup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
+import org.jsoup.Jsoup
 import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
@@ -41,7 +41,10 @@ class AnimePaheSource(context: Context) : AnimeSource {
 
             // For Anime Details
             val detailsUrl = "$mainUrl/anime/$session"
-            val doc = getJsoup(detailsUrl)
+            val detailsHtml = client.newCall(Request.Builder().url(detailsUrl).build())
+                .execute().body!!.string()
+            val doc = Jsoup.parse(detailsHtml)
+
             val name = doc.selectFirst("div.title-wrapper > h1 > span")!!.text()
             val cover = doc.selectFirst("div.anime-poster a")!!.attr("href")
             val synonyms = doc.select("div.col-sm-4.anime-info p:contains(Synonyms:)")
@@ -64,14 +67,18 @@ class AnimePaheSource(context: Context) : AnimeSource {
                     epMap[epNumber] = epSession
                 }
                 val lastPage = res["last_page"].asInt
+                println(res["last_page"])
+                println(currentPage)
                 currentPage++
-            } while (currentPage < lastPage)
+                println(res)
+            } while (currentPage <= lastPage)
+
 
             return@withContext AnimeDetails(
                 name,
                 description,
                 cover,
-                mapOf("Default" to epMap)
+                mapOf("Default" to epMap.asIterable().reversed().associate { Pair(it.key, it.value) })
             )
         }
 
@@ -137,7 +144,6 @@ class AnimePaheSource(context: Context) : AnimeSource {
             val urlForLinks = "https://animepahe.com/api?m=links&id=$animeEpCode&p=kwik"
             val r = JsonParser.parseString(client.newCall(Request.Builder().url(urlForLinks).build())
                 .execute().body!!.string())
-            println("r = $r")
             val data = r.asJsonObject["data"].asJsonArray.last().asJsonObject
 
             val kwikLink =
@@ -205,11 +211,6 @@ class AnimePaheSource(context: Context) : AnimeSource {
                     .post(FormBody.Builder().add("_token", tok).build())
                     .cacheControl( CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
                     .build()
-                /*POST(
-                    uri,
-                    ,
-                    FormBody.Builder().add("_token", tok).build()
-                )*/
             ).execute()
             code = content.code
             println(code)
