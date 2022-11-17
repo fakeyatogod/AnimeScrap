@@ -100,7 +100,7 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
     // Hilt dependency injection
-    def hiltVersion = "2.43.1"
+    def hiltVersion = "2.44"
     def hiltAnnotationProcessor = "2.43.1"
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     kapt "com.google.dagger:hilt-android-compiler:$hiltAnnotationProcessor"
