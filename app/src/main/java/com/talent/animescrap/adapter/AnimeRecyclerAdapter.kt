@@ -4,12 +4,14 @@ import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.ViewDataBinding
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.talent.animescrap.R
-import com.talent.animescrap.databinding.MainCardviewItemBinding
+import com.talent.animescrap.databinding.LandscapeCoverCardviewItemBinding
+import com.talent.animescrap.databinding.PortraitCoverCardviewItemBinding
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.ui.fragments.FavoriteFragmentDirections
 import com.talent.animescrap.ui.fragments.LatestFragmentDirections
@@ -17,13 +19,19 @@ import com.talent.animescrap.ui.fragments.SearchFragmentDirections
 import com.talent.animescrap.ui.fragments.TrendingFragmentDirections
 import dagger.hilt.android.internal.managers.ViewComponentManager
 
-class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(AnimeDiffUtil) {
-    inner class ViewHolder(private val binding: MainCardviewItemBinding) :
+class AnimeRecyclerAdapter(private val cardType: String = "portrait card") :
+    ListAdapter<SimpleAnime, AnimeRecyclerAdapter.ViewHolder>(AnimeDiffUtil) {
+
+    inner class ViewHolder(private val binding: ViewDataBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.setClickListener { view ->
-                binding.animeInfo?.let { anime ->
-                    navigate(view, anime)
+            if (binding is LandscapeCoverCardviewItemBinding) {
+                binding.setClickListener { view ->
+                    binding.animeInfo?.let { anime -> navigate(view, anime) }
+                }
+            } else if (binding is PortraitCoverCardviewItemBinding) {
+                binding.setClickListener { view ->
+                    binding.animeInfo?.let { anime -> navigate(view, anime) }
                 }
             }
         }
@@ -66,14 +74,29 @@ class RecyclerAdapter : ListAdapter<SimpleAnime, RecyclerAdapter.ViewHolder>(Ani
         }
 
         fun bind(item: SimpleAnime?) {
-            binding.animeInfo = item
+            if (binding is LandscapeCoverCardviewItemBinding) {
+                binding.animeInfo = item
+            } else if (binding is PortraitCoverCardviewItemBinding) {
+                binding.animeInfo = item
+            }
             binding.executePendingBindings()
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding =
-            MainCardviewItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding: ViewDataBinding = if (cardType == "portrait card"){
+            PortraitCoverCardviewItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        } else{
+            LandscapeCoverCardviewItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        }
         return ViewHolder(binding)
     }
 

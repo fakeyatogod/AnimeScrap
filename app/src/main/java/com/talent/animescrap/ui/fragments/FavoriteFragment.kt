@@ -8,8 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
-import com.talent.animescrap.adapter.RecyclerAdapter
+import com.talent.animescrap.adapter.AnimeRecyclerAdapter
 import com.talent.animescrap.databinding.FragmentFavoriteBinding
 import com.talent.animescrap.ui.viewmodels.FavoriteViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,7 +20,12 @@ class FavoriteFragment : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null
     private val favoriteViewModel: FavoriteViewModel by viewModels()
-    private val rvAdapter = RecyclerAdapter()
+    private val selectedSource by lazy {   PreferenceManager
+        .getDefaultSharedPreferences(requireContext())
+        .getString("source", "yugen")}
+    private val rvAdapter by lazy {
+        AnimeRecyclerAdapter(if(selectedSource == "kiss_kh") "landscape card" else "portrait card")
+    }
 
     // This property is only valid between onCreateView and
     // onDestroyView.
