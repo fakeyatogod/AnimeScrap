@@ -9,8 +9,9 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
-import com.talent.animescrap.adapter.RecyclerAdapter
+import com.talent.animescrap.adapter.AnimeRecyclerAdapter
 import com.talent.animescrap.databinding.FragmentSearchBinding
 import com.talent.animescrap.ui.viewmodels.SearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,7 +23,12 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private val searchViewModel by viewModels<SearchViewModel>()
-    private val rvAdapter = RecyclerAdapter()
+    private val selectedSource by lazy {   PreferenceManager
+        .getDefaultSharedPreferences(requireContext())
+        .getString("source", "yugen")}
+    private val rvAdapter by lazy {
+        AnimeRecyclerAdapter(if(selectedSource == "kiss_kh") "landscape card" else "portrait card")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
