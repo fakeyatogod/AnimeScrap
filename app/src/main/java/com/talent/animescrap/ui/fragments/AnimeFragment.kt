@@ -140,7 +140,9 @@ class AnimeFragment : Fragment() {
 
 
                 animeName = animeDetails.animeName
-                setupEpisodes(animeDetails.animeEpisodes)
+                animeDetails.animeEpisodes.apply {
+                    if (!this[this.keys.first()].isNullOrEmpty()) setupEpisodes(animeDetails.animeEpisodes)
+                }
             } else {
                 binding.errorCard?.visibility = View.VISIBLE
             }
@@ -381,6 +383,7 @@ class AnimeFragment : Fragment() {
                     list?.setSelection(adapterForEpList.getPosition(epIndex))
 
             }
+
             override fun onNothingSelected(p0: AdapterView<*>?) {
             }
 
