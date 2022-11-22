@@ -50,33 +50,29 @@ class KissKhSource : AnimeSource {
 
     override suspend fun latestAnime(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
-            val animeList = arrayListOf<SimpleAnime>()
             val url =
                 "$mainUrl/api/DramaList/List?page=1&type=0&sub=0&country=0&status=0&order=2&pageSize=40"
-            val res = getJson(url)!!.asJsonObject["data"].asJsonArray
-            for (json in res) {
-                val name = json.asJsonObject["title"].asString
-                val image = json.asJsonObject["thumbnail"].asString
-                val id = json.asJsonObject["id"].asString
-                animeList.add(SimpleAnime(name, image, id))
-            }
-            return@withContext animeList
+            return@withContext getAnimeList(url)
         }
 
     override suspend fun trendingAnime(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
-            val animeList = arrayListOf<SimpleAnime>()
             val url =
                 "$mainUrl/api/DramaList/List?page=1&type=0&sub=0&country=0&status=0&order=1&pageSize=40"
-            val res = getJson(url)!!.asJsonObject["data"].asJsonArray
-            for (json in res) {
-                val name = json.asJsonObject["title"].asString
-                val image = json.asJsonObject["thumbnail"].asString
-                val id = json.asJsonObject["id"].asString
-                animeList.add(SimpleAnime(name, image, id))
-            }
-            return@withContext animeList
+            return@withContext getAnimeList(url)
         }
+
+    private fun getAnimeList(url: String): ArrayList<SimpleAnime> {
+        val animeList = arrayListOf<SimpleAnime>()
+        val res = getJson(url)!!.asJsonObject["data"].asJsonArray
+        for (json in res) {
+            val name = json.asJsonObject["title"].asString
+            val image = json.asJsonObject["thumbnail"].asString
+            val id = json.asJsonObject["id"].asString
+            animeList.add(SimpleAnime(name, image, id))
+        }
+        return animeList
+    }
 
     override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
         withContext(Dispatchers.IO) {
@@ -96,8 +92,8 @@ class KissKhSource : AnimeSource {
                         subs = if (subObj["default"].asBoolean) subObj["src"].asString else ""
                     }
                 }
-
-            return@withContext AnimeStreamLink(res["Video"].asString, subs, true)
+            println(res["Video"].asString)
+            return@withContext AnimeStreamLink(res["Video"].asString, subs, true, extraHeaders = hashMapOf("referer" to "https://kisskh.me/"))
         }
 
 }
