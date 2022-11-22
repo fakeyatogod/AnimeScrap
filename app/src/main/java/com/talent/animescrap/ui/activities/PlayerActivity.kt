@@ -305,6 +305,10 @@ class PlayerActivity : AppCompatActivity() {
         return object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
+
+                // Keep screen on only when playing
+                playerView.keepScreenOn = isPlaying
+
                 if (isPipEnabled && !isTV) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                         setPictureInPictureParams(
