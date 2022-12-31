@@ -74,7 +74,11 @@ class KissKhSource : AnimeSource {
         return animeList
     }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
+    override suspend fun streamLink(
+        animeUrl: String,
+        animeEpCode: String,
+        extras: List<String>?
+    ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
 
             println(animeUrl)
@@ -93,7 +97,14 @@ class KissKhSource : AnimeSource {
                     }
                 }
             println(res["Video"].asString)
-            return@withContext AnimeStreamLink(res["Video"].asString, subs, true, extraHeaders = hashMapOf("referer" to "https://kisskh.me/"))
+            return@withContext AnimeStreamLink(
+                if (!res["Video"].asString.contains("https")) "https:${res["Video"].asString}" else res["Video"].asString,
+                subs,
+                true,
+                extraHeaders = hashMapOf(
+                    "referer" to "https://kisskh.me/", "origin" to "https://kisskh.me"
+                )
+            )
         }
 
 }
