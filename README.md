@@ -9,6 +9,11 @@
 </p>
 
 **Anime Scrap** is a simple [Open Source](https://en.m.wikipedia.org/wiki/Free_and_open-source_software) android app to help you watch anime in your phone.
+It offers a variety of servers. So, depending on your needs, you can use any of the servers.
+It also offers an inbuild media player and also if you don't want to use the player provided on the app, you can also play contents on an external player for example like MX Player.
+It is completely add free so that you enjoy your favourite animes without any interuption.
+So, what are you waiting for???
+Download and install now, and enjoy thousands of animes for free!!!
 
 ### 👇 Downloads
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" alt="Get it on GitHub" height="65">](https://github.com/fakeyatogod/AnimeScrap/releases/latest)
