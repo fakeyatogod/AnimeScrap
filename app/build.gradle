@@ -15,7 +15,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 33
         versionCode 16
-        versionName "2.2.7"
+        versionName "2.2.8"
         archivesBaseName = "AnimeScrap"
 
         kapt {
