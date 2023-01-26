@@ -15,7 +15,7 @@ class AllAnimeSource : AnimeSource {
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
             val url =
-                "$mainUrl/allanimeapi?variables=%7B%22_id%22%3A%22${contentLink}%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22afcdaedfd46f36448916b5f7db84d2bdbb72fded428ad8755179a03845c57b96%22%7D%7D"
+                "$mainUrl/allanimeapi?variables=%7B%22_id%22%3A%22${contentLink}%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22f73a8347df0e3e794f8955a18de6e85ac25dfc6b74af8ad613edf87bb446a854%22%7D%7D"
             println(url)
             val res = getJson(url)!!.asJsonObject
 
@@ -104,9 +104,8 @@ class AllAnimeSource : AnimeSource {
 
             val type = if ( extras?.first() == "DUB") "dub" else "sub"
             println(type)
-            val url =
-                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%223933a4a68bc80c46e25b7b8b3f563df1416b7b583595e5e5bfc67c01bd791df8%22%7D%7D"""
-            val res =
+            val url = """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22bfda9b479f7a4810bfeb9e3c8d462c6d09a33f918328b0688eb370e1778f272f%22%7D%7D"""
+                val res =
                 getJson(url)!!.asJsonObject["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
             val sortedSources =
                 res.sortedBy { if (!it.asJsonObject["priority"].isJsonNull) it.asJsonObject["priority"].asDouble else 0.0 }
@@ -120,15 +119,19 @@ class AllAnimeSource : AnimeSource {
                 if (sourceUrl.contains("apivtwo")) {
                     val apiUrl =
                         getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
-
+                    println(apiUrl)
+                    println("$apiUrl${
+                        sourceUrl.replace("clock", "clock.json")
+                    }")
                     val resSource = getJson(
-                        "$apiUrl/${
+                        "$apiUrl${
                             sourceUrl.replace("clock", "clock.json")
                         }"
                     )!!.asJsonObject["links"].asJsonArray
                     println(resSource)
                     println()
                     val firstLink = resSource.first().asJsonObject
+                    println(firstLink)
                     val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
 
                     return@withContext AnimeStreamLink(firstLink["link"].asString, "", isHls)
