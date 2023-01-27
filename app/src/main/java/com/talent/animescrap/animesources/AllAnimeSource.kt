@@ -96,17 +96,23 @@ class AllAnimeSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
+    override suspend fun streamLink(
+        animeUrl: String,
+        animeEpCode: String,
+        extras: List<String>?
+    ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
 
             println(animeUrl)
             println(animeEpCode)
 
-            val type = if ( extras?.first() == "DUB") "dub" else "sub"
+            val type = if (extras?.first() == "DUB") "dub" else "sub"
             println(type)
-            val url = """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22bfda9b479f7a4810bfeb9e3c8d462c6d09a33f918328b0688eb370e1778f272f%22%7D%7D"""
-                val res =
+            val url =
+                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22bfda9b479f7a4810bfeb9e3c8d462c6d09a33f918328b0688eb370e1778f272f%22%7D%7D"""
+            val res =
                 getJson(url)!!.asJsonObject["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
+            println(url)
             val sortedSources =
                 res.sortedBy { if (!it.asJsonObject["priority"].isJsonNull) it.asJsonObject["priority"].asDouble else 0.0 }
                     .reversed()
@@ -115,25 +121,39 @@ class AllAnimeSource : AnimeSource {
             for (sourceUrlHolder in sortedSources) {
                 println(sourceUrlHolder)
                 val sourceUrl = sourceUrlHolder.asJsonObject["sourceUrl"].asString
+                println(sourceUrl)
                 if (isThese(sourceUrl)) continue
                 if (sourceUrl.contains("apivtwo")) {
                     val apiUrl =
                         getJson("$mainUrl/getVersion")!!.asJsonObject["episodeIframeHead"].asString
                     println(apiUrl)
-                    println("$apiUrl${
-                        sourceUrl.replace("clock", "clock.json")
-                    }")
-                    val resSource = getJson(
+                    println(
+                        "$apiUrl${
+                            sourceUrl.replace("clock", "clock.json")
+                        }"
+                    )
+                    val allLinks = getJson(
                         "$apiUrl${
                             sourceUrl.replace("clock", "clock.json")
                         }"
                     )!!.asJsonObject["links"].asJsonArray
-                    println(resSource)
-                    println()
-                    val firstLink = resSource.first().asJsonObject
+                    println(allLinks)
+                    val firstLink = allLinks.first().asJsonObject
                     println(firstLink)
-                    val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
+                    if (firstLink.has("portData") && firstLink["portData"].asJsonObject.has("streams")) {
+                        for (link in firstLink["portData"].asJsonObject["streams"].asJsonArray) {
+                            if (link.toString().contains("dash")) continue
+                            return@withContext AnimeStreamLink(
+                                link.asJsonObject["url"].asString,
+                                "",
+                                link.toString().contains("hls")
+                            )
+                        }
+                    }
+                    println(firstLink)
 
+                    val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
+                    println(firstLink["link"].asString)
                     return@withContext AnimeStreamLink(firstLink["link"].asString, "", isHls)
                 }
 
