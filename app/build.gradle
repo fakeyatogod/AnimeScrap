@@ -61,12 +61,12 @@ android {
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.5.1'
-    implementation 'com.google.android.material:material:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     // ExoPlayer + HLS + UI + MediaSession
-    def exo_version = "2.18.1"
+    def exo_version = "2.18.2"
     implementation "com.google.android.exoplayer:exoplayer:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-hls:$exo_version"
@@ -88,7 +88,7 @@ dependencies {
     implementation 'io.coil-kt:coil:2.1.0' // Photo from network
 
     // Room components
-    def roomVersion = '2.4.3'
+    def roomVersion = '2.5.0'
     implementation "androidx.room:room-ktx:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
@@ -107,7 +107,7 @@ dependencies {
 
     // Test
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
 }
