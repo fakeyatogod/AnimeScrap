@@ -143,6 +143,7 @@ class AllAnimeSource : AnimeSource {
                     if (firstLink.has("portData") && firstLink["portData"].asJsonObject.has("streams")) {
                         for (link in firstLink["portData"].asJsonObject["streams"].asJsonArray) {
                             if (link.toString().contains("dash")) continue
+                            if (!link.asJsonObject["hardsub_lang"].asString.contains("en")) continue
                             return@withContext AnimeStreamLink(
                                 link.asJsonObject["url"].asString,
                                 "",
