@@ -7,6 +7,7 @@
         <item>Enime</item>
         <item>KissKh</item>
         <item>AnimePahe</item>
+        <item>Kawaiifu</item>
     </string-array>
 
     <string-array name="sources_values">
@@ -16,6 +17,7 @@
         <item>enime</item>
         <item>kiss_kh</item>
         <item>animepahe</item>
+        <item>kawaiifu</item>
     </string-array>
 
     <!-- Dark Mode Preference -->

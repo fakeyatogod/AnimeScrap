@@ -62,6 +62,9 @@ class AnimeRepositoryImpl @Inject constructor(
             "animepahe" -> {
                 AnimePaheSource(application as Context)
             }
+            "kawaiifu" -> {
+                KawaiifuSource(application as Context)
+            }
             else -> {
                 YugenSource()
             }

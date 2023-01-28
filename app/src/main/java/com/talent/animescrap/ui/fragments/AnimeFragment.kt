@@ -122,7 +122,7 @@ class AnimeFragment : Fragment() {
 
         animeDetailsViewModel.animeDetails.observe(viewLifecycleOwner) {
             binding.progressbarInPage.visibility = View.GONE
-            if (it != null) {
+            if (it != null && it.animeName != "") {
                 animeDetails = it
                 binding.animeNameTxt.text = animeDetails.animeName
                 binding.animeDetailsTxt.text = animeDetails.animeDesc
