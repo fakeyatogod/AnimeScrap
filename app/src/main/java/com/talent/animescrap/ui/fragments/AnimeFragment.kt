@@ -326,7 +326,7 @@ class AnimeFragment : Fragment() {
         }
 
         val adapterForEpList = ArrayAdapter(
-            requireContext(), R.layout.support_simple_spinner_dropdown_item,
+            requireContext(), android.R.layout.simple_spinner_dropdown_item,
             epList
         ).apply {
             list?.adapter = this

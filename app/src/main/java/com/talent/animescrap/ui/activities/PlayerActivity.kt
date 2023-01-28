@@ -493,7 +493,7 @@ class PlayerActivity : AppCompatActivity() {
 
         val arr = ArrayAdapter(
             this,
-            R.layout.support_simple_spinner_dropdown_item,
+            android.R.layout.simple_spinner_dropdown_item,
             qualities.keys.toList()
         )
 
