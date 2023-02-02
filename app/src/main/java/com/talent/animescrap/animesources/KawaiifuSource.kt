@@ -67,6 +67,7 @@ class KawaiifuSource(context: Context) : AnimeSource {
         val items = res.select(".today-update .item")
         val animeList = arrayListOf<SimpleAnime>()
         for (item in items) {
+            if(item.selectFirst(".cat").toString().contains("Others")) continue
             animeList.add(
                 SimpleAnime(
                     item.selectFirst("img")!!.attr("alt"),
