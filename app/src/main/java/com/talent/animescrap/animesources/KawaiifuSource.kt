@@ -24,9 +24,12 @@ class KawaiifuSource(context: Context) : AnimeSource {
         .build()
 
     override suspend fun animeDetails(contentLink: String): AnimeDetails {
-        val url = "$streamUrl/anime${
+        println(contentLink)
+
+        val url = if (!contentLink.contains("/others/")) "$streamUrl/anime${
             contentLink.replace("https://kawaiifu.com", "").replaceBefore("/", "")
         }".removeSuffix(".html")
+        else contentLink
         println(url)
         val res = Jsoup.parse(get(url))
 
@@ -39,7 +42,10 @@ class KawaiifuSource(context: Context) : AnimeSource {
 //        println(epItems)
         val map = mutableMapOf<String, String>()
         for (epItem in epItems) {
-            map[epItem.text().replace("Ep ", "")] = epItem.selectFirst("a")!!.attr("href")
+            if (epItem.text().contains("WATCH"))
+                map["1"] = epItem.selectFirst("a")!!.attr("href")
+            else
+                map[epItem.text().replace("Ep ", "")] = epItem.selectFirst("a")!!.attr("href")
         }
         return AnimeDetails(title, desc, image, mapOf("Default" to map))
     }
@@ -67,7 +73,7 @@ class KawaiifuSource(context: Context) : AnimeSource {
         val items = res.select(".today-update .item")
         val animeList = arrayListOf<SimpleAnime>()
         for (item in items) {
-            if(item.selectFirst(".cat").toString().contains("Others")) continue
+            if (item.selectFirst(".cat").toString().contains("Others")) continue
             animeList.add(
                 SimpleAnime(
                     item.selectFirst("img")!!.attr("alt"),
