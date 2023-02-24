@@ -10,7 +10,7 @@ import org.jsoup.Jsoup
 
 class AllAnimeSource : AnimeSource {
 
-    private val mainUrl = "https://api.allanime.co"
+    private val mainUrl = "https://api.allanime.to"
 
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
@@ -125,7 +125,7 @@ class AllAnimeSource : AnimeSource {
                 if (isThese(sourceUrl)) continue
                 if (sourceUrl.contains("apivtwo")) {
                     val apiUrl =
-                        getJson("https://allanime.co/getVersion")!!.asJsonObject["episodeIframeHead"].asString
+                        getJson("https://allanime.to/getVersion")!!.asJsonObject["episodeIframeHead"].asString
                     println(apiUrl)
                     println(
                         "$apiUrl${
