@@ -73,10 +73,10 @@ class YugenSource : AnimeSource {
         withContext(Dispatchers.IO) {
             val animeList = arrayListOf<SimpleAnime>()
             val doc = getJsoup(url = "https://yugen.to/trending/")
-            val allInfo = doc.getElementsByClass("anime-meta")
+            val allInfo = doc.getElementsByClass("series-item")
             for (item in allInfo) {
-                val itemImage = item.getElementsByTag("img").attr("data-src")
-                val itemName = item.getElementsByClass("anime-name").attr("title")
+                val itemImage = item.getElementsByTag("img").attr("src")
+                val itemName = item.getElementsByClass("series-title").text()
                 val itemLink = item.attr("href")
                 animeList.add(SimpleAnime(itemName, itemImage, itemLink))
             }
