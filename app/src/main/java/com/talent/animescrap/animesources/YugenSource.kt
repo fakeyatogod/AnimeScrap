@@ -9,9 +9,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class YugenSource : AnimeSource {
+    private val mainUrl = "https://yugenanime.ro"
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
-            val url = "https://yugen.to${contentLink}watch/?sort=episode"
+            val url = "$mainUrl${contentLink}watch/?sort=episode"
             val doc = getJsoup(url)
             val animeContent = doc.getElementsByClass("p-10-t")
             val animeCover =
@@ -40,7 +41,7 @@ class YugenSource : AnimeSource {
 
     override suspend fun searchAnime(searchedText: String) = withContext(Dispatchers.IO) {
         val animeList = arrayListOf<SimpleAnime>()
-        val searchUrl = "https://yugen.to/search/?q=${searchedText}"
+        val searchUrl = "$mainUrl/search/?q=${searchedText}"
 
         val doc = getJsoup(searchUrl)
         val allInfo = doc.getElementsByClass("anime-meta")
@@ -58,7 +59,7 @@ class YugenSource : AnimeSource {
     override suspend fun latestAnime(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
             val animeList = arrayListOf<SimpleAnime>()
-            val doc = getJsoup(url = "https://yugen.to/latest/")
+            val doc = getJsoup(url = "$mainUrl/latest/")
             val allInfo = doc.getElementsByClass("ep-card")
             for (item in allInfo) {
                 val itemImage = item.getElementsByTag("img").attr("data-src")
@@ -72,7 +73,7 @@ class YugenSource : AnimeSource {
     override suspend fun trendingAnime(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
             val animeList = arrayListOf<SimpleAnime>()
-            val doc = getJsoup(url = "https://yugen.to/trending/")
+            val doc = getJsoup(url = "$mainUrl/trending/")
             val allInfo = doc.getElementsByClass("series-item")
             for (item in allInfo) {
                 val itemImage = item.getElementsByTag("img").attr("src")
@@ -94,10 +95,10 @@ class YugenSource : AnimeSource {
 
             val animeEpUrl =
                 if (extras?.first() == "DUB")
-                    "https://yugen.to${
+                    "$mainUrl${
                         watchLink.dropLast(1)
                     }-dub/$animeEpCode"
-                else "https://yugen.to$watchLink$animeEpCode"
+                else "$mainUrl$watchLink$animeEpCode"
 
             var yugenEmbedLink =
                 getJsoup(animeEpUrl).getElementById("main-embed")!!.attr("src")
@@ -112,12 +113,12 @@ class YugenSource : AnimeSource {
                 "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
                 "Host" to "yugen.to",
                 "TE" to "Trailers",
-                "Origin" to "https://yugen.to",
+                "Origin" to "$mainUrl",
                 "X-Requested-With" to "XMLHttpRequest",
                 "Referer" to yugenEmbedLink
             )
 
-            val apiRequest = "https://yugen.to/api/embed/"
+            val apiRequest = "$mainUrl/api/embed/"
             val id = yugenEmbedLink.split("/")
             val dataMap = mapOf("id" to id[id.size - 2], "ac" to "0")
 
