@@ -1,6 +1,7 @@
 package com.talent.animescrap.ui.activities
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.PictureInPictureParams
 import android.app.UiModeManager
 import android.content.Intent
@@ -15,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
@@ -24,6 +26,8 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.navigation.findNavController
+import androidx.navigation.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
@@ -98,6 +102,7 @@ class PlayerActivity : AppCompatActivity() {
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
+    private val args : PlayerActivityArgs by navArgs()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,12 +135,8 @@ class PlayerActivity : AppCompatActivity() {
         sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
 
         // Arguments
-        val animePlayingDetails: AnimePlayingDetails? =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getParcelableExtra("animePlayingDetails", AnimePlayingDetails::class.java)
-            } else {
-                @Suppress("DEPRECATION") intent.getParcelableExtra("animePlayingDetails")
-            }
+        val animePlayingDetails = args.animePlayingDetails
+
         animeName = animePlayingDetails!!.animeName
         animeEpisode = animePlayingDetails.animeEpisodeIndex
         animeTotalEpisode = animePlayingDetails.animeTotalEpisode
@@ -207,7 +208,8 @@ class PlayerActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "No streaming URL found", Toast.LENGTH_SHORT)
                     .show()
-                backPressed()
+                val navController = findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
+                navController.popBackStack()
             }
         }
 
