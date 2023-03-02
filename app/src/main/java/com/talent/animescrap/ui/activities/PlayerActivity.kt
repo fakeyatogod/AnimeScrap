@@ -26,7 +26,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
@@ -208,12 +210,10 @@ class PlayerActivity : AppCompatActivity() {
             } else {
                 Toast.makeText(this, "No streaming URL found", Toast.LENGTH_SHORT)
                     .show()
-                val navController = findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
-                navController.popBackStack()
+                releasePlayer()
+                finish()
             }
         }
-
-
     }
 
     private fun prepareMediaSource() {
