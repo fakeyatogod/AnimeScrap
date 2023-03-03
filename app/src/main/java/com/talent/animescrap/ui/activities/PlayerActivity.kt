@@ -73,6 +73,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var nextEpBtn: ImageView
     private lateinit var centerText: TextView
     private lateinit var videoNameTextView: TextView
+    private lateinit var videoSpeed : TextView
     private lateinit var videoEpTextView: TextView
     private lateinit var mediaSource: MediaSource
     private lateinit var mediaItem: MediaItem
@@ -98,6 +99,7 @@ class PlayerActivity : AppCompatActivity() {
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
+    private var vidSpeed = 1f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,6 +153,7 @@ class PlayerActivity : AppCompatActivity() {
         // Set Video Name
         videoNameTextView = playerView.findViewById(R.id.videoName)
         videoEpTextView = playerView.findViewById(R.id.videoEpisode)
+        videoSpeed = playerView.findViewById(R.id.video_speed)
         videoNameTextView.isSelected = true
         videoNameTextView.text = animeName
         updateEpisodeName()
@@ -404,6 +407,10 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
+        videoSpeed.setOnClickListener {
+            changeVideoSpeed()
+        }
+
         nextEpBtn.setOnClickListener {
             setNewEpisode(1)
         }
@@ -483,6 +490,12 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
+    private fun changeVideoSpeed() {
+        vidSpeed+=0.25f
+        if(vidSpeed>2)vidSpeed = 0.25f
+        videoSpeed.text = "$vidSpeed x"
+        player.playbackParameters = PlaybackParameters(vidSpeed)
+    }
 
     private fun showQuality(qualities: MutableMap<String, Int>, trackGroup: Tracks.Group) {
 
