@@ -43,11 +43,14 @@ jobs:
       with:
         name: Signed app bundle
         path: ${{steps.sign_app.outputs.signedReleaseFile}}
-        
+
+    - name: Set current date as env variable
+      run: echo "date_now=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
     - uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         automatic_release_tag: "latest"
         draft: true
-        title: "Release Draft"
+        title: " Dev Release ${{ env.date_now }}"
         files: ${{steps.sign_app.outputs.signedReleaseFile}}
