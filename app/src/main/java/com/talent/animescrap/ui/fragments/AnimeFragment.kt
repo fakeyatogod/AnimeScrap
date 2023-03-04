@@ -28,7 +28,6 @@ import com.talent.animescrap.databinding.FragmentAnimeBinding
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimePlayingDetails
 import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.ui.activities.PlayerActivity
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -170,19 +169,18 @@ class AnimeFragment : Fragment() {
 
             // Navigate to Internal Player
             if (!isExternalPlayerEnabled) {
-
-                startActivity(Intent(requireContext(), PlayerActivity::class.java).apply {
-                    putExtra(
-                        "animePlayingDetails", AnimePlayingDetails(
-                            animeName = animeName!!,
-                            animeUrl = animeMainLink!!,
-                            animeEpisodeIndex = epIndex,
-                            animeEpisodeMap = animeEpisodesMap[epType] as HashMap<String, String>,
-                            animeTotalEpisode = animeEpisodesMap[epType]!!.size.toString(),
-                            epType = epType
-                        )
+                val action = AnimeFragmentDirections.actionNavigationAnimeToPlayerActivity(
+                    AnimePlayingDetails(
+                        animeName = animeName!!,
+                        animeUrl = animeMainLink!!,
+                        animeEpisodeIndex = epIndex,
+                        animeEpisodeMap = animeEpisodesMap[epType] as HashMap<String, String>,
+                        animeTotalEpisode = animeEpisodesMap[epType]!!.size.toString(),
+                        epType = epType
                     )
-                })
+                )
+
+                findNavController().navigate(action)
 
             } else {
                 binding.progressbarInPage.visibility = View.VISIBLE
@@ -193,10 +191,7 @@ class AnimeFragment : Fragment() {
                     listOf(epType)
                 )
             }
-
         }
-
-
     }
 
     private fun startExternalPlayer(

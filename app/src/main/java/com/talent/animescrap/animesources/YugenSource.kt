@@ -111,9 +111,8 @@ class YugenSource : AnimeSource {
                 "Connection" to "keep-alive",
                 "Upgrade-Insecure-Requests" to "1",
                 "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
-                "Host" to "yugen.to",
                 "TE" to "Trailers",
-                "Origin" to "$mainUrl",
+                "Origin" to mainUrl,
                 "X-Requested-With" to "XMLHttpRequest",
                 "Referer" to yugenEmbedLink
             )

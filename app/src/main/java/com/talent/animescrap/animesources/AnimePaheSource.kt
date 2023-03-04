@@ -1,7 +1,6 @@
 package com.talent.animescrap.animesources
 
 import android.content.Context
-import com.google.gson.JsonParser
 import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
 import com.talent.animescrap.animesources.sourceutils.CloudflareInterceptor
 import com.talent.animescrap.model.AnimeDetails
@@ -135,26 +134,23 @@ class AnimePaheSource(context: Context) : AnimeSource {
         extras: List<String>?
     ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
+            println("anime url = "+animeUrl)
             /*val animeId =
                 animeUrl.replaceAfter("AnimePaheSession", "").replace("AnimePaheSession", "")
-                    .replace("AnimePaheId=", "")
+                    .replace("AnimePaheId=", "")*/
             val animeSession =
                 animeUrl.replaceBefore("AnimePaheSession", "").replace("AnimePaheSession=", "")
-*/
-            val urlForLinks = "https://animepahe.com/api?m=links&id=$animeEpCode&p=kwik"
-            val r = JsonParser.parseString(client.newCall(Request.Builder().url(urlForLinks).build())
-                .execute().body!!.string())
-            val data = r.asJsonObject["data"].asJsonArray.last().asJsonObject
-
-            val kwikLink =
-                if(data.has("1080")) data["1080"].asJsonObject["kwik_pahewin"].asString
-                else if(data.has("720")) data["720"].asJsonObject["kwik_pahewin"].asString
-                else if(data.has("480")) data["480"].asJsonObject["kwik_pahewin"].asString
-                else if (data.has("360")) data["360"].asJsonObject["kwik_pahewin"].asString
-                else ""
-
-            println(kwikLink)
-            val hlsLink = getStreamUrlFromKwik(kwikLink)
+            val urlForLinks = "$mainUrl/api?m=links&id=$animeEpCode&p=kwik"
+            println(urlForLinks)
+            val playUrl = "$mainUrl/play/$animeSession/$animeEpCode"
+            println(playUrl)
+            val d = client.newCall(Request.Builder().url(playUrl).build())
+                .execute().body!!.string()
+            val jDoc = Jsoup.parse(d)
+            val allLinks= jDoc.select("#pickDownload a")
+            val paheLink = allLinks.last()!!.attr("href").toString()
+            println(paheLink)
+            val hlsLink = getStreamUrlFromKwik(paheLink)
             println(hlsLink)
             return@withContext AnimeStreamLink(
                 hlsLink, "", false,
