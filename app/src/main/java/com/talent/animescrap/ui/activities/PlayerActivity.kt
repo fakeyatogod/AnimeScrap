@@ -1,7 +1,6 @@
 package com.talent.animescrap.ui.activities
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.PictureInPictureParams
 import android.app.UiModeManager
 import android.content.Intent
@@ -16,7 +15,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.v4.media.session.MediaSessionCompat
-import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
@@ -26,9 +24,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
@@ -52,7 +47,6 @@ import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityPlayerBinding
-import com.talent.animescrap.model.AnimePlayingDetails
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -79,7 +73,7 @@ class PlayerActivity : AppCompatActivity() {
     private lateinit var nextEpBtn: ImageView
     private lateinit var centerText: TextView
     private lateinit var videoNameTextView: TextView
-    private lateinit var videoSpeed : TextView
+    private lateinit var videoSpeedTextView: TextView
     private lateinit var videoEpTextView: TextView
     private lateinit var mediaSource: MediaSource
     private lateinit var mediaItem: MediaItem
@@ -105,8 +99,8 @@ class PlayerActivity : AppCompatActivity() {
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
-    private var vidSpeed = 1f
-    private val args : PlayerActivityArgs by navArgs()
+    private val args: PlayerActivityArgs by navArgs()
+    private var vidSpeed = 1.00f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -156,7 +150,7 @@ class PlayerActivity : AppCompatActivity() {
         // Set Video Name
         videoNameTextView = playerView.findViewById(R.id.videoName)
         videoEpTextView = playerView.findViewById(R.id.videoEpisode)
-        videoSpeed = playerView.findViewById(R.id.video_speed)
+        videoSpeedTextView = playerView.findViewById(R.id.video_speed)
         videoNameTextView.isSelected = true
         videoNameTextView.text = animeName
         updateEpisodeName()
@@ -409,9 +403,10 @@ class PlayerActivity : AppCompatActivity() {
             }
         }
 
-        videoSpeed.setOnClickListener {
+        videoSpeedTextView.setOnClickListener {
             changeVideoSpeed()
         }
+        videoSpeedTextView.text = resources.getString(R.string.speed, "$vidSpeed")
 
         nextEpBtn.setOnClickListener {
             setNewEpisode(1)
@@ -493,9 +488,9 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun changeVideoSpeed() {
-        vidSpeed+=0.25f
-        if(vidSpeed>2)vidSpeed = 0.25f
-        videoSpeed.text = "$vidSpeed x"
+        vidSpeed += 0.25f
+        if (vidSpeed > 2) vidSpeed = 0.25f
+        videoSpeedTextView.text = resources.getString(R.string.speed, "$vidSpeed")
         player.playbackParameters = PlaybackParameters(vidSpeed)
     }
 

@@ -34,7 +34,7 @@
     <string name="last_watched_format">Last Watched: %1$s</string>
     <string name="episode_text">%1$s - %2$s</string>
     <string name="loading_episode">Loading Episode</string>
-
+    <string name="speed">%1$sx</string>
     <string name="back_to_home">back to home</string>
 
 

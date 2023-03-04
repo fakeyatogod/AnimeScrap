@@ -7,10 +7,10 @@
     android:layout_height="match_parent">
 
     <View
-        android:focusable="false"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/gradient_shape" />
+        android:background="@drawable/gradient_shape"
+        android:focusable="false" />
 
     <RelativeLayout
         android:id="@+id/root"
@@ -18,11 +18,11 @@
         android:layout_height="match_parent">
 
         <TextView
-            android:focusable="false"
             android:id="@+id/centerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:focusable="false"
             android:fontFamily="sans-serif-condensed-medium"
             android:text="@string/app_name"
             android:textAllCaps="true"
@@ -38,8 +38,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="10dp"
-            android:orientation="horizontal"
             android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:weightSum="8">
 
             <ImageView
@@ -48,20 +48,20 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
+                android:background="@drawable/background_selector"
                 android:contentDescription="@string/back_to_home"
+                android:focusable="true"
                 android:minWidth="26dp"
                 android:minHeight="26dp"
-                android:background="@drawable/background_selector"
-                android:src="@drawable/ic_baseline_arrow_back_24"
-                android:focusable="true" />
+                android:src="@drawable/ic_baseline_arrow_back_24" />
 
             <LinearLayout
-                android:focusable="false"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginHorizontal="10dp"
                 android:layout_weight="7"
+                android:focusable="false"
                 android:orientation="vertical">
 
                 <TextView
@@ -92,10 +92,12 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:background="@drawable/subs_toggle_image_selector"
-                android:textOn=""
+                android:text=""
                 android:textOff=""
+                android:textOn=""
                 android:textSize="0sp"
-                android:text=""/>
+                tools:ignore="TouchTargetSizeCheck" />
+
             <Button
                 android:id="@+id/quality_selection_btn"
                 android:layout_width="wrap_content"
@@ -118,12 +120,12 @@
                 android:padding="4dp">
 
                 <TextView
-                    android:focusable="false"
                     android:id="@+id/exo_position"
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
+                    android:focusable="false"
                     android:text="@string/_0_00"
                     android:textColor="@android:color/white" />
 
@@ -137,18 +139,18 @@
                     android:contentDescription="@string/timer_bar"
                     android:padding="4dp"
                     app:bar_height="2dp"
-                    app:scrubber_dragged_size="20dp"
                     app:buffered_color="#BCB9B9"
                     app:played_color="?attr/colorPrimary"
+                    app:scrubber_dragged_size="20dp"
                     app:unplayed_color="#66B5B5B5" />
 
                 <TextView
-                    android:focusable="false"
                     android:id="@+id/exo_duration"
                     android:layout_width="60dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
+                    android:focusable="false"
                     android:text="@string/_0_00"
                     android:textAlignment="textEnd"
                     android:textColor="@android:color/white"
@@ -161,70 +163,76 @@
                 android:layout_height="wrap_content"
                 android:paddingVertical="2dp">
 
+
+                <TextView
+                    android:id="@+id/video_speed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:layout_toStartOf="@+id/primaryControls"
+                    android:gravity="center"
+                    android:minHeight="40dp"
+                    android:padding="6dp"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    tools:text="1.0x" />
+
                 <LinearLayout
+                    android:id="@+id/primaryControls"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
                     android:layout_gravity="center_horizontal"
                     android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/video_speed"
-                        android:text="1x"
-                        android:textColor="@android:color/white"
-                        android:textSize="14sp"
-                        android:layout_gravity="center"/>
 
                     <ImageView
-                        android:background="@drawable/background_selector"
                         android:id="@+id/prev_ep"
                         android:layout_width="30dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
+                        android:background="@drawable/background_selector"
                         android:contentDescription="@string/prev_button_text"
                         android:src="@drawable/ic_baseline_navigate_before_24" />
 
                     <ImageView
-                        android:background="@drawable/background_selector"
                         android:id="@+id/exo_play_pause"
                         style="@style/ExoStyledControls.Button.Center.PlayPause"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/background_selector"
                         android:contentDescription="@string/play_button_text"
                         android:minWidth="64dp"
                         android:minHeight="64dp" />
 
                     <ImageView
-                        android:background="@drawable/background_selector"
                         android:id="@+id/next_ep"
                         android:layout_width="30dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/background_selector"
                         android:contentDescription="@string/next_button_text"
                         android:src="@drawable/ic_baseline_navigate_next_24" />
 
                 </LinearLayout>
 
                 <ImageView
-                    android:background="@drawable/background_selector"
                     android:id="@+id/rotate"
                     android:layout_width="26dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
                     android:layout_marginStart="30dp"
                     android:layout_marginTop="10dp"
+                    android:background="@drawable/background_selector"
                     android:contentDescription="@string/rotate_display"
                     android:src="@drawable/ic_baseline_screen_rotation_24" />
 
                 <ImageView
-                    android:background="@drawable/background_selector"
                     android:id="@+id/btn_fullscreen"
                     android:layout_width="28dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="30dp"
+                    android:background="@drawable/background_selector"
                     android:contentDescription="@string/display_scale"
                     android:src="@drawable/ic_baseline_height_24" />
             </RelativeLayout>
@@ -232,13 +240,14 @@
         </LinearLayout>
 
     </RelativeLayout>
+
     <com.google.android.exoplayer2.ui.SubtitleView
-        android:focusable="false"
         android:id="@+id/exo_subtitles"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="10dp"
+        android:focusable="false" />
 </RelativeLayout>
