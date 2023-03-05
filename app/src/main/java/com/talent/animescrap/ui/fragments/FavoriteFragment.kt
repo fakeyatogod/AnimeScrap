@@ -20,11 +20,13 @@ class FavoriteFragment : Fragment() {
 
     private var _binding: FragmentFavoriteBinding? = null
     private val favoriteViewModel: FavoriteViewModel by viewModels()
-    private val selectedSource by lazy {   PreferenceManager
-        .getDefaultSharedPreferences(requireContext())
-        .getString("source", "yugen")}
+    private val selectedSource by lazy {
+        PreferenceManager
+            .getDefaultSharedPreferences(requireContext())
+            .getString("source", "yugen")
+    }
     private val rvAdapter by lazy {
-        AnimeRecyclerAdapter(if(selectedSource == "kiss_kh") "landscape card" else "portrait card")
+        AnimeRecyclerAdapter(if (selectedSource == "kiss_kh") "landscape card" else "portrait card")
     }
 
     // This property is only valid between onCreateView and

@@ -18,7 +18,7 @@ android {
         minSdk 23
         targetSdk 33
         versionCode 17
-        versionName "2.3.3"
+        versionName "2.3.4"
         archivesBaseName = "AnimeScrap"
 
         kapt {
@@ -64,12 +64,12 @@ android {
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     // ExoPlayer + HLS + UI + MediaSession
-    def exo_version = "2.18.2"
+    def exo_version = "2.18.4"
     implementation "com.google.android.exoplayer:exoplayer:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-hls:$exo_version"

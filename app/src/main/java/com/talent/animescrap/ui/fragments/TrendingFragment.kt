@@ -20,11 +20,13 @@ class TrendingFragment : Fragment() {
 
     private var _binding: FragmentTrendingBinding? = null
     private val trendingViewModel: TrendingViewModel by viewModels()
-    private val selectedSource by lazy {   PreferenceManager
-        .getDefaultSharedPreferences(requireContext())
-        .getString("source", "yugen")}
+    private val selectedSource by lazy {
+        PreferenceManager
+            .getDefaultSharedPreferences(requireContext())
+            .getString("source", "yugen")
+    }
     private val rvAdapter by lazy {
-        AnimeRecyclerAdapter(if(selectedSource == "animepahe" || selectedSource == "kiss_kh") "landscape card" else "portrait card")
+        AnimeRecyclerAdapter(if (selectedSource == "animepahe" || selectedSource == "kiss_kh") "landscape card" else "portrait card")
     }
 
     // This property is only valid between onCreateView and

@@ -23,7 +23,11 @@ interface AnimeRepository {
     suspend fun searchAnimeFromSite(searchUrl: String): ArrayList<SimpleAnime>
     suspend fun getLatestAnimeFromSite(): ArrayList<SimpleAnime>
     suspend fun getTrendingAnimeFromSite(): ArrayList<SimpleAnime>
-    suspend fun getStreamLink(animeUrl: String, animeEpCode: String, extras: List<String>): AnimeStreamLink
+    suspend fun getStreamLink(
+        animeUrl: String,
+        animeEpCode: String,
+        extras: List<String>
+    ): AnimeStreamLink
 
     // Room Operations
     suspend fun getFavoritesFromRoom(): Flow<List<SimpleAnime>>

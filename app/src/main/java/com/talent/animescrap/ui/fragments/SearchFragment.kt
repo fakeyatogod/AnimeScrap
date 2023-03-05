@@ -23,11 +23,13 @@ class SearchFragment : Fragment() {
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
     private val searchViewModel by viewModels<SearchViewModel>()
-    private val selectedSource by lazy {   PreferenceManager
-        .getDefaultSharedPreferences(requireContext())
-        .getString("source", "yugen")}
+    private val selectedSource by lazy {
+        PreferenceManager
+            .getDefaultSharedPreferences(requireContext())
+            .getString("source", "yugen")
+    }
     private val rvAdapter by lazy {
-        AnimeRecyclerAdapter(if(selectedSource == "kiss_kh") "landscape card" else "portrait card")
+        AnimeRecyclerAdapter(if (selectedSource == "kiss_kh") "landscape card" else "portrait card")
     }
 
     override fun onCreateView(

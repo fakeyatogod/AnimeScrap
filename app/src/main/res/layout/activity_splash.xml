@@ -23,6 +23,6 @@
         android:fontFamily="@font/zcool_font"
         android:padding="10dp"
         android:text="@string/app_name"
-        android:textSize="30sp"/>
+        android:textSize="30sp" />
 
 </LinearLayout>

@@ -11,8 +11,6 @@ import java.util.*
 import java.util.concurrent.CountDownLatch
 
 
-
-
 class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
 
     private val executor = ContextCompat.getMainExecutor(context)
@@ -24,7 +22,11 @@ class CloudflareInterceptor(context: Context) : WebViewInterceptor(context) {
     }
 
 
-    override fun intercept(chain: Interceptor.Chain, request: Request, response: Response): Response {
+    override fun intercept(
+        chain: Interceptor.Chain,
+        request: Request,
+        response: Response
+    ): Response {
         try {
             response.close()
             cookieManager.remove(request.url, COOKIE_NAMES, 0)

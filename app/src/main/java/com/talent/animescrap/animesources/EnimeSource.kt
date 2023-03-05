@@ -19,7 +19,10 @@ class EnimeSource : AnimeSource {
             val data = res.asJsonObject
             val animeCover = data["coverImage"].asString
             val animeName = data["title"].asJsonObject["romaji"].asString
-            val animDesc = if (data["description"].isJsonNull) "No Description" else Jsoup.parseBodyFragment(data["description"].asString).text()
+            val animDesc =
+                if (data["description"].isJsonNull) "No Description" else Jsoup.parseBodyFragment(
+                    data["description"].asString
+                ).text()
 
             val eps = data["episodes"].asJsonArray
             val epMapMixed = mutableMapOf<String, String>()
@@ -106,7 +109,11 @@ class EnimeSource : AnimeSource {
             return@withContext animeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
+    override suspend fun streamLink(
+        animeUrl: String,
+        animeEpCode: String,
+        extras: List<String>?
+    ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             val url = "$mainUrl/source/$animeEpCode"
             val res = getJson(url)!!.asJsonObject

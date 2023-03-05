@@ -77,7 +77,8 @@ class AnimePaheSource(context: Context) : AnimeSource {
                 name,
                 description,
                 cover,
-                mapOf("Default" to epMap.asIterable().reversed().associate { Pair(it.key, it.value) })
+                mapOf(
+                    "Default" to epMap.asIterable().reversed().associate { Pair(it.key, it.value) })
             )
         }
 
@@ -134,7 +135,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
         extras: List<String>?
     ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
-            println("anime url = "+animeUrl)
+            println("anime url = " + animeUrl)
             /*val animeId =
                 animeUrl.replaceAfter("AnimePaheSession", "").replace("AnimePaheSession", "")
                     .replace("AnimePaheId=", "")*/
@@ -147,7 +148,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
             val d = client.newCall(Request.Builder().url(playUrl).build())
                 .execute().body!!.string()
             val jDoc = Jsoup.parse(d)
-            val allLinks= jDoc.select("#pickDownload a")
+            val allLinks = jDoc.select("#pickDownload a")
             val paheLink = allLinks.last()!!.attr("href").toString()
             println(paheLink)
             val hlsLink = getStreamUrlFromKwik(paheLink)
@@ -200,12 +201,13 @@ class AnimePaheSource(context: Context) : AnimeSource {
                 Request.Builder()
                     .url(uri)
                     .headers(
-                    Headers.headersOf(
-                        "referer", fContent.request.url.toString(),
-                        "cookie", fContent.header("set-cookie")!!.replace("path=/;", "")
-                    ))
+                        Headers.headersOf(
+                            "referer", fContent.request.url.toString(),
+                            "cookie", fContent.header("set-cookie")!!.replace("path=/;", "")
+                        )
+                    )
                     .post(FormBody.Builder().add("_token", tok).build())
-                    .cacheControl( CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
+                    .cacheControl(CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build())
                     .build()
             ).execute()
             code = content.code

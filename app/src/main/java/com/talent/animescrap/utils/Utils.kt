@@ -7,11 +7,12 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 object Utils {
-    fun getJsoup(url: String,
-                 mapOfHeaders: Map<String, String>? = null
+    fun getJsoup(
+        url: String,
+        mapOfHeaders: Map<String, String>? = null
     ): Document {
         return Jsoup.connect(url).ignoreContentType(true).apply {
-            if(mapOfHeaders != null) {
+            if (mapOfHeaders != null) {
                 headers(mapOfHeaders)
             }
         }.get()

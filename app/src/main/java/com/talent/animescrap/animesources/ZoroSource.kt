@@ -92,7 +92,11 @@ class ZoroSource : AnimeSource {
             return@withContext simpleAnimeList
         }
 
-    override suspend fun streamLink(animeUrl: String, animeEpCode: String, extras: List<String>?): AnimeStreamLink =
+    override suspend fun streamLink(
+        animeUrl: String,
+        animeEpCode: String,
+        extras: List<String>?
+    ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
             val url = "https://zoro.to/ajax/v2/episode/servers?episodeId=$animeEpCode"
             val html = getJson(url)!!.asJsonObject.get("html")!!.asString
@@ -118,7 +122,7 @@ class ZoroSource : AnimeSource {
                     "/embed-6/",
                     ""
                 ).replace("/embed-6/", "").replace("?z=", "")
-            }".replace("?vast=1","")
+            }".replace("?vast=1", "")
             val json = getJson(
                 jsonLink, mapOfHeaders = mapOf(
                     "Referer" to "https://zoro.to/",

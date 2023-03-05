@@ -84,13 +84,13 @@ class AnimeRecyclerAdapter(private val cardType: String = "portrait card") :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding: ViewDataBinding = if (cardType == "portrait card"){
+        val binding: ViewDataBinding = if (cardType == "portrait card") {
             PortraitCoverCardviewItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
-        } else{
+        } else {
             LandscapeCoverCardviewItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
