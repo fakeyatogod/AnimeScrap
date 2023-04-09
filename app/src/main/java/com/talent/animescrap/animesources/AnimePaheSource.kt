@@ -148,7 +148,10 @@ class AnimePaheSource(context: Context) : AnimeSource {
             val d = client.newCall(Request.Builder().url(playUrl).build())
                 .execute().body!!.string()
             val jDoc = Jsoup.parse(d)
-            val allLinks = jDoc.select("#pickDownload a")
+            val allLinks = jDoc.select("#pickDownload a").filter { source ->
+                val isDub = source.getElementsByTag("span").text().contains("eng")
+                return@filter !isDub
+            }
             val paheLink = allLinks.last()!!.attr("href").toString()
             println(paheLink)
             val hlsLink = getStreamUrlFromKwik(paheLink)
