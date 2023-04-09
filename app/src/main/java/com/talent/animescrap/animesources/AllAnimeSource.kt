@@ -14,8 +14,11 @@ class AllAnimeSource : AnimeSource {
 
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
+            val hash = "d6069285a58a25defe4a217b82140c6da891605c20e510d4683ae73190831ab0"
             val url =
-                "$mainUrl/allanimeapi?variables=%7B%22_id%22%3A%22${contentLink}%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22259ae45c19ceff2f855215bb82d377fe7b0ab661f9abcd41538bda935e9cb299%22%7D%7D"
+                "$mainUrl/allanimeapi?variables=%7B%22_id%22%3A%22${contentLink}%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22"+
+                        """sha256Hash%22%3A%22$hash%22%7D%7D"""
+
             println(url)
             val res = getJson(url)!!.asJsonObject
 
@@ -44,6 +47,7 @@ class AllAnimeSource : AnimeSource {
 
     override suspend fun searchAnime(searchedText: String) = withContext(Dispatchers.IO) {
         val animeList = arrayListOf<SimpleAnime>()
+        val hash = "b645a686b1988327795e1203867ed24f27c6338b41e5e3412fc1478a8ab6774e"
 
         val url =
             """$mainUrl/allanimeapi?variables=%7B%22search%22%3A%7B%22allowAdult%22%3Afalse%2C%22allowUnknown%22%3Afalse%2C%22query%22%3A%22${
@@ -51,7 +55,9 @@ class AllAnimeSource : AnimeSource {
                     "+",
                     "%20"
                 )
-            }%22%7D%2C%22limit%22%3A26%2C%22page%22%3A1%2C%22translationType%22%3A%22sub%22%2C%22countryOrigin%22%3A%22ALL%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22c4305f3918591071dfecd081da12243725364f6b7dd92072df09d915e390b1b7%22%7D%7D"""
+            }%22%7D%2C%22limit%22%3A26%2C%22page%22%3A1%2C%22translationType%22%3A%22sub%22%2C%22countryOrigin%22%3A%22ALL%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22"""+
+                    """sha256Hash%22%3A%22$hash%22%7D%7D"""
+
         val res =
             getJson(url)!!.asJsonObject["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
         for (json in res) {
@@ -66,8 +72,11 @@ class AllAnimeSource : AnimeSource {
     override suspend fun latestAnime(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
             val animeList = arrayListOf<SimpleAnime>()
+            val hash = "b645a686b1988327795e1203867ed24f27c6338b41e5e3412fc1478a8ab6774e"
             val url =
-                """$mainUrl/allanimeapi?variables=%7B%22search%22%3A%7B%22allowAdult%22%3Afalse%2C%22allowUnknown%22%3Afalse%2C%22isManga%22%3Afalse%7D%2C%22limit%22%3A26%2C%22page%22%3A1%2C%22translationType%22%3A%22sub%22%2C%22countryOrigin%22%3A%22ALL%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22c4305f3918591071dfecd081da12243725364f6b7dd92072df09d915e390b1b7%22%7D%7D"""
+                """$mainUrl/allanimeapi?variables=%7B%22search%22%3A%7B%22allowAdult%22%3Afalse%2C%22allowUnknown%22%3Afalse%2C%22isManga%22%3Afalse%7D%2C%22limit%22%3A26%2C%22page%22%3A1%2C%22translationType%22%3A%22sub%22%2C%22countryOrigin%22%3A%22ALL%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22"""+
+                        """sha256Hash%22%3A%22$hash%22%7D%7D"""
+            println(url)
             val res =
                 getJson(url)!!.asJsonObject["data"].asJsonObject["shows"].asJsonObject["edges"].asJsonArray
             for (json in res) {
@@ -82,8 +91,10 @@ class AllAnimeSource : AnimeSource {
     override suspend fun trendingAnime(): ArrayList<SimpleAnime> =
         withContext(Dispatchers.IO) {
             val animeList = arrayListOf<SimpleAnime>()
-            val url =
-                """$mainUrl/allanimeapi?variables=%7B%22type%22%3A%22anime%22%2C%22size%22%3A30%2C%22dateRange%22%3A7%2C%22page%22%3A1%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22563c9c7c7fb5218aaf5562ad5d7cabb9ece03a36b4bc94f1384ba70709bd61da%22%7D%7D"""
+            val hash = "31a8dd8a19b12e3923389ae9fc8cf018d620ebb0dc685a611b5404d342ec3950"
+            val url = """$mainUrl/allanimeapi?variables=%7B%22type%22%3A%22anime%22%2C%22size%22%3A30%2C%22dateRange%22%3A7%2C%22page%22%3A1%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22"""+
+                        """sha256Hash%22%3A%22$hash%22%7D%7D"""
+
             val res =
                 getJson(url)!!.asJsonObject["data"].asJsonObject["queryPopular"].asJsonObject["recommendations"].asJsonArray
             for (json in res) {
@@ -108,8 +119,10 @@ class AllAnimeSource : AnimeSource {
 
             val type = if (extras?.first() == "DUB") "dub" else "sub"
             println(type)
+            val hash = "0ac09728ee9d556967c1a60bbcf55a9f58b4112006d09a258356aeafe1c33889"
             val url =
-                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22sha256Hash%22%3A%22919e327075ac9e249d003aa3f804a48bbdf22d7b1d107ffe659accd54283ce48%22%7D%7D"""
+                """$mainUrl/allanimeapi?variables=%7B%22showId%22%3A%22$animeUrl%22%2C%22translationType%22%3A%22$type%22%2C%22episodeString%22%3A%22$animeEpCode%22%7D&extensions=%7B%22persistedQuery%22%3A%7B%22version%22%3A1%2C%22"""+
+                        """sha256Hash%22%3A%22$hash%22%7D%7D"""
             println(url)
             val res =
                 getJson(url)!!.asJsonObject["data"].asJsonObject["episode"].asJsonObject["sourceUrls"].asJsonArray
