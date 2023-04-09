@@ -4,6 +4,7 @@ import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils.getJson
+import com.talent.animescrap.utils.Utils.getJsoup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -115,11 +116,22 @@ class EnimeSource : AnimeSource {
         extras: List<String>?
     ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
+            println(extras)
             val url = "$mainUrl/source/$animeEpCode"
+            println(url)
             val res = getJson(url)!!.asJsonObject
-            val streamLink = res["url"].asString
+            println(res)
+
             val subs = if (res["subtitle"] != null) res["subtitle"].asString else ""
-            return@withContext AnimeStreamLink(streamLink, subs, true, null)
+            val streamLink =
+                if (subs == "") getJsoup("https://cdn.nade.me/generate?url=${res["url"].asString}").text()
+                else res["url"].asString
+            return@withContext AnimeStreamLink(
+                streamLink,
+                subs,
+                true,
+                if (res["referer"] != null) hashMapOf("referer" to res["referer"].asString) else null
+            )
         }
 
 
