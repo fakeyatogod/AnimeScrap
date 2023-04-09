@@ -9,7 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class YugenSource : AnimeSource {
-    private val mainUrl = "https://yugenanime.ro"
+    private val mainUrl = "https://yugen.to"
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
             val url = "$mainUrl${contentLink}watch/?sort=episode"
