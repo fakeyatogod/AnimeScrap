@@ -51,9 +51,9 @@ class AnimeRepositoryImpl @Inject constructor(
             "yugen" -> {
                 YugenSource()
             }
-            "zoro" -> {
-                ZoroSource()
-            }
+//            "zoro" -> {
+//                ZoroSource()
+//            }
             "allanime" -> {
                 AllAnimeSource()
             }

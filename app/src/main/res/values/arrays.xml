@@ -2,7 +2,7 @@
     <!-- Source Preference -->
     <string-array name="sources_entries">
         <item>Yugen</item>
-        <item>Zoro</item>
+<!--        <item>Zoro</item>-->
         <item>AllAnime</item>
         <item>Enime</item>
         <item>KissKh</item>
@@ -12,7 +12,7 @@
 
     <string-array name="sources_values">
         <item>yugen</item>
-        <item>zoro</item>
+<!--        <item>zoro</item>-->
         <item>allanime</item>
         <item>enime</item>
         <item>kiss_kh</item>
