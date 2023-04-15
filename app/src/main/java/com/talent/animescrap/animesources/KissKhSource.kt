@@ -10,7 +10,7 @@ import kotlinx.coroutines.withContext
 
 class KissKhSource : AnimeSource {
 
-    private val mainUrl = "https://kisskh.me"
+    private val mainUrl = "https://kisskh.co"
 
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
