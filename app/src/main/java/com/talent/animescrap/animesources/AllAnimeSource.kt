@@ -165,8 +165,9 @@ class AllAnimeSource : AnimeSource {
                     println("link = $firstLink")
 
                     val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
-                    println(firstLink["link"].asString)
-                    return@withContext AnimeStreamLink(firstLink["link"].asString, "", isHls)
+                    val streamUrl = if(firstLink.has("rawUrls")) firstLink["rawUrls"].asJsonObject["vids"].asJsonArray.first().asJsonObject["url"].asString else firstLink["link"].asString
+                    println()
+                    return@withContext AnimeStreamLink(streamUrl, "", isHls)
                 }
 
                 return@withContext AnimeStreamLink(
