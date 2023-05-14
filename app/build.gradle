@@ -65,11 +65,11 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     // ExoPlayer + HLS + UI + MediaSession
-    def exo_version = "2.18.4"
+    def exo_version = "2.18.6"
     implementation "com.google.android.exoplayer:exoplayer:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-hls:$exo_version"
@@ -88,10 +88,10 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.15.2' // Web scraping tool
     implementation 'com.github.kittinunf.fuel:fuel:2.3.1' // Api Client
     implementation 'com.google.code.gson:gson:2.9.0'  // Json Parser
-    implementation 'io.coil-kt:coil:2.1.0' // Photo from network
+    implementation 'io.coil-kt:coil:2.2.2' // Photo from network
 
     // Room components
-    def roomVersion = '2.5.0'
+    def roomVersion = '2.5.1'
     implementation "androidx.room:room-ktx:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
@@ -103,8 +103,8 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.2.0'
 
     // Hilt dependency injection
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-compiler:2.44"
+    implementation "com.google.dagger:hilt-android:2.44.2"
+    kapt "com.google.dagger:hilt-compiler:2.44.2"
 
     // Test
     testImplementation 'junit:junit:4.13.2'
