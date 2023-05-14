@@ -1,5 +1,6 @@
 package com.talent.animescrap.ui.activities
 
+import android.app.AlertDialog
 import android.app.DownloadManager
 import android.content.res.Configuration
 import android.net.Uri
@@ -23,6 +24,7 @@ import com.google.android.material.navigationrail.NavigationRailView
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityMainBinding
+import com.talent.animescrap.model.UpdateDetails
 import com.talent.animescrap.ui.viewmodels.UpdateViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -92,20 +94,20 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.isVisible = !isLandscape
 
         updateViewModel.isUpdateAvailable.observe(this) { updateDetails ->
-            if (updateDetails.first && !updateMessageIgnored) {
-                showUpdateSnackBar(updateDetails.second)
-                updateMessageIgnored = true
+            if (updateDetails.isUpdateAvailable && !updateMessageIgnored) {
+                showUpdateAlertDialog(updateDetails)
             }
         }
     }
 
-    fun showUpdateSnackBar(updateLink: String) {
-        Snackbar.make(
-            binding.container, getString(R.string.update_available), Snackbar.LENGTH_LONG
-        ).setAction("Update") {
-            val request = DownloadManager.Request(Uri.parse(updateLink))
+    fun showUpdateAlertDialog(updateDetails: UpdateDetails) {
+        val alertBuilder = AlertDialog.Builder(this)
+        alertBuilder.setTitle(getString(R.string.update_available))
+        alertBuilder.setMessage(updateDetails.description)
+        alertBuilder.setPositiveButton("Update") { _, _ ->
+            val request = DownloadManager.Request(Uri.parse(updateDetails.link))
             val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-            val downloadTitle = updateLink.replaceBeforeLast("/", "").replace("/", "")
+            val downloadTitle = updateDetails.link.replaceBeforeLast("/", "").replace("/", "")
             request.apply {
                 setTitle(downloadTitle)
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -117,7 +119,12 @@ class MainActivity : AppCompatActivity() {
                 getString(R.string.downloading_update),
                 Snackbar.LENGTH_SHORT
             ).show()
-        }.show()
+        }
+        alertBuilder.setNegativeButton("Ignore") { _, _ ->
+            updateMessageIgnored = true
+        }
+        val dialog = alertBuilder.create()
+        dialog.show()
     }
 
     fun showNoUpdateSnackBar() {

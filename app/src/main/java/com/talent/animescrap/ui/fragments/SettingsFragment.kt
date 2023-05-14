@@ -90,8 +90,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 }
                 updateViewModel.checkForNewUpdate()
                 updateViewModel.isUpdateAvailable.observe(viewLifecycleOwner) { updateDetails ->
-                    if (updateDetails.first) {
-                        (activity as MainActivity).showUpdateSnackBar(updateDetails.second)
+                    if (updateDetails.isUpdateAvailable) {
+                        (activity as MainActivity).showUpdateAlertDialog(updateDetails)
                     } else {
                         (activity as MainActivity).showNoUpdateSnackBar()
 

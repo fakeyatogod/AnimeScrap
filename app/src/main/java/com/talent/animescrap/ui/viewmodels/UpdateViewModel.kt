@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.BuildConfig
+import com.talent.animescrap.model.UpdateDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -15,10 +16,10 @@ class UpdateViewModel : ViewModel() {
     private val githubAPKLink =
         "https://github.com/fakeyatogod/AnimeScrap/releases/download/TAG/AnimeScrap-vTAG.apk"
 
-    private val _isUpdateAvailable = MutableLiveData<Pair<Boolean, String>>().apply {
+    private val _isUpdateAvailable = MutableLiveData<UpdateDetails>().apply {
         checkForNewUpdate()
     }
-    val isUpdateAvailable: LiveData<Pair<Boolean, String>> = _isUpdateAvailable
+    val isUpdateAvailable: LiveData<UpdateDetails> = _isUpdateAvailable
 
     fun checkForNewUpdate() {
         val currentVersion = BuildConfig.VERSION_NAME
@@ -26,13 +27,20 @@ class UpdateViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 try {
                     val doc = Jsoup.connect(githubReleaseLink).get()
+                    val updateDesc = try {
+                        doc.select(".markdown-body").text()
+                    } catch (_: Exception) {
+                        "No Update Description found"
+                    }
+                    println("Update desc = $updateDesc")
                     val latestVersion =
-                        Regex("[0-9]+\\.[0-9]+\\.[0-9]+").find(doc.toString())?.value
+                        Regex("\\d+\\.\\d+\\.\\d+").find(doc.toString())?.value
                     println("$currentVersion == $latestVersion = ${latestVersion == currentVersion}")
                     _isUpdateAvailable.postValue(
-                        Pair(
+                        UpdateDetails(
                             latestVersion != currentVersion,
-                            githubAPKLink.replace("TAG", latestVersion ?: currentVersion)
+                            githubAPKLink.replace("TAG", latestVersion ?: currentVersion),
+                            updateDesc
                         )
                     )
                 } catch (_: Exception) {
