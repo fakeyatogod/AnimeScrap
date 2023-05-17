@@ -134,7 +134,9 @@ class AllAnimeSource : AnimeSource {
                 println(sourceUrlHolder)
                 val sourceUrl = sourceUrlHolder.asJsonObject["sourceUrl"].asString
                 println(sourceUrl)
-                if (isThese(sourceUrl)) continue
+                val sourceName = sourceUrlHolder.asJsonObject["sourceName"].asString
+                println(sourceName)
+                if (isThese(sourceUrl) || isThese(sourceName)) continue
                 if (sourceUrl.contains("apivtwo")) {
                     val apiUrl = "https://allanimenews.com"
                     println(apiUrl)
@@ -181,7 +183,7 @@ class AllAnimeSource : AnimeSource {
         }
 
     private fun isThese(url: String): Boolean {
-        val unwantedSources = listOf("goload", "streamsb", "ok.ru", "streamlare", "mp4upload")
+        val unwantedSources = listOf("goload", "streamsb", "ok.ru", "streamlare", "mp4upload","Ak")
         unwantedSources.forEach { source ->
             if (url.contains(source)) return true
         }
