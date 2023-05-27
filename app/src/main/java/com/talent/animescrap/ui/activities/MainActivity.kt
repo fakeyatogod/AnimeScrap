@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
                 railViewNavTransition
             )
             when (destination.id) {
-                R.id.navigation_anime -> {
+                R.id.navigation_anime, R.id.navigation_player -> {
                     bottomNavView.isVisible = false
                     railView.isVisible = false
                 }

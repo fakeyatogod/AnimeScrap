@@ -1,9 +1,7 @@
-package com.talent.animescrap.ui.activities
+package com.talent.animescrap.ui.fragments
 
 import android.annotation.SuppressLint
-import android.app.PictureInPictureParams
 import android.app.UiModeManager
-import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -11,20 +9,21 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.v4.media.session.MediaSessionCompat
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
-import androidx.navigation.navArgs
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
@@ -46,7 +45,7 @@ import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
-import com.talent.animescrap.databinding.ActivityPlayerBinding
+import com.talent.animescrap.databinding.FragmentPlayerBinding
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -55,11 +54,10 @@ import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
 
-
 @AndroidEntryPoint
-class PlayerActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivityPlayerBinding
+class PlayerFragment : Fragment() {
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var loadingLayout: LinearLayout
@@ -99,27 +97,29 @@ class PlayerActivity : AppCompatActivity() {
     private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
-    private val args: PlayerActivityArgs by navArgs()
+    private val args: PlayerFragmentArgs by navArgs()
     private var vidSpeed = 1.00f
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityPlayerBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
 
         // Accept All Cookies
         mCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ALL)
         CookieHandler.setDefault(mCookieManager)
 
         // Check TV
-        val uiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+        val uiModeManager = requireActivity().getSystemService(AppCompatActivity.UI_MODE_SERVICE) as UiModeManager
         isTV = uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
 
         // Back Pressed
-        onBackPressedDispatcher.addCallback(this@PlayerActivity, callback)
+//        onBackPressedDispatcher.addCallback(activity, callback)
 
         // Settings
-        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
 
         // Video Cache
         isVideoCacheEnabled = settingsPreferenceManager.getBoolean("video_cache", true)
@@ -127,10 +127,10 @@ class PlayerActivity : AppCompatActivity() {
         // Autoplay pref
         isAutoPlayEnabled = settingsPreferenceManager.getBoolean("auto_play", true)
         // Prepare PiP
-        preparePip()
+//        preparePip()
 
         // Initialize SharedPreferences
-        sharedPreferences = getSharedPreferences("LastWatchedPref", MODE_PRIVATE)
+        sharedPreferences = requireActivity().getSharedPreferences("LastWatchedPref", AppCompatActivity.MODE_PRIVATE)
 
         // Arguments
         val animePlayingDetails = args.animePlayingDetails
@@ -156,7 +156,7 @@ class PlayerActivity : AppCompatActivity() {
         updateEpisodeName()
 
         // Build ExoPlayer
-        player = ExoPlayer.Builder(this)
+        player = ExoPlayer.Builder(requireContext())
             .setSeekForwardIncrementMs(10000)
             .setSeekBackIncrementMs(10000)
             .build()
@@ -170,7 +170,7 @@ class PlayerActivity : AppCompatActivity() {
         playerView.findViewById<DefaultTimeBar>(R.id.exo_progress).setKeyTimeIncrement(10000)
 
         // Build MediaSession
-        mediaSession = MediaSessionCompat(this, "AnimeScrap Media Session")
+        mediaSession = MediaSessionCompat(requireContext(), "AnimeScrap Media Session")
         mediaSessionConnector = MediaSessionConnector(mediaSession).apply {
             setPlayer(player)
         }
@@ -193,7 +193,7 @@ class PlayerActivity : AppCompatActivity() {
             nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
         }
 
-        animeStreamViewModelInPlayer.animeStreamLink.observe(this) { animeStreamLink ->
+        animeStreamViewModelInPlayer.animeStreamLink.observe(viewLifecycleOwner) { animeStreamLink ->
             if (animeStreamLink.link.isNotBlank()) {
                 animeStreamUrl = animeStreamLink.link
                 if (animeStreamLink.subsLink.isNotBlank()) animeSub = animeStreamLink.subsLink
@@ -205,12 +205,14 @@ class PlayerActivity : AppCompatActivity() {
                 playerView.visibility = View.VISIBLE
                 prepareMediaSource()
             } else {
-                Toast.makeText(this, "No streaming URL found", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), "No streaming URL found", Toast.LENGTH_SHORT)
                     .show()
                 releasePlayer()
-                finish()
+//                onDestroy()
             }
         }
+        return binding.root
+
     }
 
     private fun prepareMediaSource() {
@@ -231,11 +233,11 @@ class PlayerActivity : AppCompatActivity() {
             .setReadTimeoutMs(20000)
             .setConnectTimeoutMs(20000)
 
-        val databaseProvider = StandaloneDatabaseProvider(this)
+        val databaseProvider = StandaloneDatabaseProvider(requireContext())
         if (isVideoCacheEnabled) {
             simpleCache?.release()
             simpleCache = SimpleCache(
-                File(cacheDir, "exoplayer").also { it.deleteOnExit() }, // Ensures always fresh file
+                File(requireActivity().cacheDir, "exoplayer").also { it.deleteOnExit() }, // Ensures always fresh file
                 LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
                 databaseProvider
             )
@@ -308,15 +310,15 @@ class PlayerActivity : AppCompatActivity() {
                 // Keep screen on only when playing
                 playerView.keepScreenOn = isPlaying
 
-                if (isPipEnabled && !isTV) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        setPictureInPictureParams(
-                            PictureInPictureParams.Builder()
-                                .setAutoEnterEnabled(isPlaying)
-                                .build()
-                        )
-                    }
-                }
+//                if (isPipEnabled && !isTV) {
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                        setPictureInPictureParams(
+//                            PictureInPictureParams.Builder()
+//                                .setAutoEnterEnabled(isPlaying)
+//                                .build()
+//                        )
+//                    }
+//                }
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -362,7 +364,7 @@ class PlayerActivity : AppCompatActivity() {
         animeEpisode = "${animeEpisode!!.toInt() + increment}"
         println(animeEpisode)
         if (animeEpisode!!.toInt() > animeTotalEpisode!!.toInt() || animeEpisode!!.toInt() < 1)
-            backPressed()
+//            backPressed()
         else {
             animeStreamViewModelInPlayer.setAnimeLink(
                 animeUrl!!,
@@ -418,7 +420,7 @@ class PlayerActivity : AppCompatActivity() {
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
-                backPressed()
+//                backPressed()
             }
         }
         // Fullscreen controls
@@ -441,7 +443,7 @@ class PlayerActivity : AppCompatActivity() {
                     clickCount = 2
                 }
                 2 -> {
-                    if (requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
+                    if (requireActivity().requestedOrientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE) {
                         playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
                     } else {
                         playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
@@ -468,23 +470,6 @@ class PlayerActivity : AppCompatActivity() {
             rotateBtn.isFocusable = false
             rotateBtn.isActivated = false
         }
-        // For Screen Rotation
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-        var flag = true
-        rotateBtn.setOnClickListener {
-            clickCount = 3
-            scaleBtn.setImageResource(R.drawable.ic_baseline_height_24)
-            if (flag) {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
-                flag = false
-            } else {
-                requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
-                flag = true
-
-            }
-        }
     }
 
     private fun changeVideoSpeed() {
@@ -496,13 +481,13 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun showQuality(qualities: MutableMap<String, Int>, trackGroup: Tracks.Group) {
 
-        bottomSheet = BottomSheetDialog(this)
+        bottomSheet = BottomSheetDialog(requireContext())
         bottomSheet.setContentView(R.layout.bottom_sheet_layout)
 
         val list = bottomSheet.findViewById<ListView>(R.id.listView)
 
         val arr = ArrayAdapter(
-            this,
+            requireContext(),
             android.R.layout.simple_spinner_dropdown_item,
             qualities.keys.toList()
         )
@@ -542,28 +527,31 @@ class PlayerActivity : AppCompatActivity() {
         simpleCache = null
     }
 
-    private fun backPressed() {
-        callback.handleOnBackPressed()
-    }
+//    private fun backPressed() {
+//        callback.handleOnBackPressed()
+//    }
 
-    private val callback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            releasePlayer()
-            finish()
-            if (!isTV) {
-                startActivity(
-                    Intent(this@PlayerActivity, MainActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                    }
-                )
-            }
-        }
-    }
+//    private val callback = object : OnBackPressedCallback(true) {
+//        override fun handleOnBackPressed() {
+//            releasePlayer()
+//            finish()
+//            if (!isTV) {
+//                startActivity(
+//                    Intent(this@PlayerActivity, MainActivity::class.java).apply {
+//                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+//                    }
+//                )
+//            }
+//        }
+//    }
 
     override fun onDestroy() {
         super.onDestroy()
         releasePlayer()
-        finish()
+    }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onResume() {
@@ -577,56 +565,56 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun hideSystemUi() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        WindowInsetsControllerCompat(window, playerView).let { controller ->
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
+        WindowInsetsControllerCompat(requireActivity().window, playerView).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 
-    override fun onPictureInPictureModeChanged(
-        isInPictureInPictureMode: Boolean,
-        newConfig: Configuration
-    ) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-        }
-        val totalLayout = playerView.findViewById<RelativeLayout>(R.id.totalLayout)
-        if (isInPictureInPictureMode) {
-            // Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
-            totalLayout.visibility = View.GONE
-        } else {
-            // Restore the full-screen UI.
-            totalLayout.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onUserLeaveHint() {
-        if (isPipEnabled && !isTV && (player.isPlaying || player.isLoading)) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    enterPictureInPictureMode(
-                        PictureInPictureParams.Builder()
-                            .build()
-                    )
-                }
-            }
-        }
-    }
-
-    private fun preparePip() {
-        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
-        if (isPipEnabled && !isTV) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                setPictureInPictureParams(
-                    PictureInPictureParams.Builder()
-                        .setAutoEnterEnabled(true)
-                        .build()
-                )
-            }
-        }
-    }
+//    override fun onPictureInPictureModeChanged(
+//        isInPictureInPictureMode: Boolean,
+//        newConfig: Configuration
+//    ) {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
+//        }
+//        val totalLayout = playerView.findViewById<RelativeLayout>(R.id.totalLayout)
+//        if (isInPictureInPictureMode) {
+//            // Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
+//            totalLayout.visibility = View.GONE
+//        } else {
+//            // Restore the full-screen UI.
+//            totalLayout.visibility = View.VISIBLE
+//        }
+//    }
+//
+//    override fun onUserLeaveHint() {
+//        if (isPipEnabled && !isTV && (player.isPlaying || player.isLoading)) {
+//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    enterPictureInPictureMode(
+//                        PictureInPictureParams.Builder()
+//                            .build()
+//                    )
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun preparePip() {
+//        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
+//        if (isPipEnabled && !isTV) {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+//                setPictureInPictureParams(
+//                    PictureInPictureParams.Builder()
+//                        .setAutoEnterEnabled(true)
+//                        .build()
+//                )
+//            }
+//        }
+//    }
 
     private fun ImageView.setImageViewEnabled(enabled: Boolean) = if (enabled) {
         drawable.clearColorFilter()
