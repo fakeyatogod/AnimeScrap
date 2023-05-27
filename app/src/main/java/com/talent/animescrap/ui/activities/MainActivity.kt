@@ -86,6 +86,7 @@ class MainActivity : AppCompatActivity() {
                     bottomNavView.isVisible = !isLandscape
                 }
             }
+            binding.toolbar.isVisible = destination.id != R.id.navigation_player
         }
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottomNavView.setupWithNavController(navController)

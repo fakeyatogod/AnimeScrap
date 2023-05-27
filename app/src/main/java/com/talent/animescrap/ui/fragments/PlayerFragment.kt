@@ -2,6 +2,7 @@ package com.talent.animescrap.ui.fragments
 
 import android.annotation.SuppressLint
 import android.app.UiModeManager
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
@@ -15,6 +16,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -554,9 +556,16 @@ class PlayerFragment : Fragment() {
         _binding = null
     }
 
-    override fun onResume() {
-        super.onResume()
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
         hideSystemUi()
+    }
+    override fun onDetach() {
+        super.onDetach()
+        requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        WindowInsetsControllerCompat(requireActivity().window, requireActivity().window.decorView)
+            .show(WindowInsetsCompat.Type.systemBars())
     }
 
     override fun onStart() {
@@ -565,8 +574,9 @@ class PlayerFragment : Fragment() {
     }
 
     private fun hideSystemUi() {
+        requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
-        WindowInsetsControllerCompat(requireActivity().window, playerView).let { controller ->
+        WindowInsetsControllerCompat(requireActivity().window, requireActivity().window.decorView).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
