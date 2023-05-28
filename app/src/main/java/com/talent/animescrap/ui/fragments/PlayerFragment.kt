@@ -12,7 +12,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.support.v4.media.session.MediaSessionCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,8 +29,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.MergingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -44,8 +41,6 @@ import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
-import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
@@ -54,7 +49,6 @@ import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import com.talent.animescrap.ui.viewmodels.PlayerViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.CookiePolicy
@@ -81,10 +75,8 @@ class PlayerFragment : Fragment() {
     private lateinit var mediaSource: MediaSource
     private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
-    private lateinit var mediaSession: MediaSessionCompat
-    private lateinit var mediaSessionConnector: MediaSessionConnector
+
     private lateinit var animeEpisodeMap: HashMap<String, String>
-    private lateinit var qualityMapUnsorted: MutableMap<String, Int>
     private lateinit var settingsPreferenceManager: SharedPreferences
     private var animeUrl: String? = null
     private var animeSub: String? = null
@@ -98,7 +90,6 @@ class PlayerFragment : Fragment() {
     private var isTV: Boolean = false
     private var isVideoCacheEnabled: Boolean = true
     private var isAutoPlayEnabled: Boolean = true
-    private var simpleCache: SimpleCache? = null
     private val mCookieManager = CookieManager()
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
     private val args: PlayerFragmentArgs by navArgs()
@@ -177,21 +168,8 @@ class PlayerFragment : Fragment() {
         // Prepare Custom Player View Buttons
         prepareButtons()
 
-        // Build MediaSession
-        mediaSession = MediaSessionCompat(requireContext(), "AnimeScrap Media Session")
-        mediaSessionConnector = MediaSessionConnector(mediaSession).apply {
-            setPlayer(playerView.player)
-        }
-        val url =
-            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-        playerViewModel.setUrl(url)
-        loadingLayout.visibility = View.GONE
-        playerView.visibility = View.VISIBLE
-        return binding.root
-
-
         // Add Listener for quality selection
-//        player.addListener(getPlayerListener())
+        playerViewModel.player.addListener(getPlayerListener())
 
         if (animeUrl != null && animeEpisode != null) {
             loadingLayout.visibility = View.VISIBLE
@@ -201,36 +179,33 @@ class PlayerFragment : Fragment() {
                 animeEpisodeMap[animeEpisode!!] as String,
                 listOf(epType!!)
             )
-//            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
-//            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
+            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
+            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
         }
 
         animeStreamViewModelInPlayer.animeStreamLink.observe(viewLifecycleOwner) { animeStreamLink ->
-            if (!done) {
-                if (animeStreamLink.link.isNotBlank()) {
-                    animeStreamUrl = animeStreamLink.link
-                    if (animeStreamLink.subsLink.isNotBlank()) animeSub = animeStreamLink.subsLink
-                    if (!animeStreamLink.extraHeaders.isNullOrEmpty()) extraHeaders =
-                        animeStreamLink.extraHeaders
-                    isHls = animeStreamLink.isHls
-                    qualityMapUnsorted = mutableMapOf()
-                    loadingLayout.visibility = View.GONE
-                    playerView.visibility = View.VISIBLE
-                    prepareMediaSource()
-                    done = true
-                } else {
-                    Toast.makeText(requireContext(), "No streaming URL found", Toast.LENGTH_SHORT)
-                        .show()
-//                releasePlayer()
-//                onDestroy()
-                }
+            if (animeStreamLink.link.isNotBlank()) {
+                animeStreamUrl = animeStreamLink.link
+                if (animeStreamLink.subsLink.isNotBlank()) animeSub = animeStreamLink.subsLink
+                if (!animeStreamLink.extraHeaders.isNullOrEmpty()) extraHeaders =
+                    animeStreamLink.extraHeaders
+                isHls = animeStreamLink.isHls
+//                qualityMapUnsorted = mutableMapOf()
+                loadingLayout.visibility = View.GONE
+                playerView.visibility = View.VISIBLE
+                prepareMediaSource()
+                done = true
+            } else {
+                Toast.makeText(requireContext(), "No streaming URL found", Toast.LENGTH_SHORT)
+                    .show()
+                backPressed()
             }
         }
         return binding.root
 
     }
 
-    private fun prepareMediaSource() {
+    private fun prepareMediaSource(force: Boolean = false) {
         val headerMap = mutableMapOf(
             "Accept" to "*/*",
             "Connection" to "keep-alive",
@@ -248,19 +223,10 @@ class PlayerFragment : Fragment() {
             .setReadTimeoutMs(20000)
             .setConnectTimeoutMs(20000)
 
-        val databaseProvider = StandaloneDatabaseProvider(requireContext())
         if (isVideoCacheEnabled) {
-            simpleCache?.release()
-            simpleCache = SimpleCache(
-                File(
-                    requireActivity().cacheDir,
-                    "exoplayer"
-                ).also { it.deleteOnExit() }, // Ensures always fresh file
-                LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
-                databaseProvider
-            )
+
             val cacheFactory = CacheDataSource.Factory().apply {
-                setCache(simpleCache!!)
+                setCache(playerViewModel.simpleCache!!)
                 setUpstreamDataSourceFactory(dataSourceFactory)
             }
             mediaItem =
@@ -312,10 +278,10 @@ class PlayerFragment : Fragment() {
                 )
             mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
         } else {
-//            subsToggleButton.isChecked = false
-//            subsToggleButton.visibility = View.GONE
+            subsToggleButton.isChecked = false
+            subsToggleButton.visibility = View.GONE
         }
-        playerViewModel.setMediaSource(mediaSource)
+        if (!force) playerViewModel.setMediaSource(mediaSource)
 
     }
 
@@ -345,31 +311,6 @@ class PlayerFragment : Fragment() {
                 }
             }
 
-            override fun onTracksChanged(tracks: Tracks) {
-                // Update UI using current tracks.
-                for (trackGroup in tracks.groups) {
-                    // Group level information.
-                    if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
-                        for (i in 0 until trackGroup.length) {
-                            val trackFormat = trackGroup.getTrackFormat(i).height
-//                            println(trackGroup.getTrackFormat(i))
-//                            println(trackGroup.isTrackSupported(i))
-//                            println(trackGroup.isTrackSelected(i))
-                            if (trackGroup.isTrackSupported(i) && trackGroup.isTrackSelected(i)) {
-                                qualityMapUnsorted["${trackFormat}p"] = i
-                            }
-                        }
-                        val qualityMapSorted = mutableMapOf<String, Int>()
-                        qualityMapUnsorted.entries.sortedBy { it.key.replace("p", "").toInt() }
-                            .reversed().forEach { qualityMapSorted[it.key] = it.value }
-
-                        qualityBtn.setOnClickListener {
-                            showQuality(qualityMapSorted, trackGroup)
-                        }
-                    }
-
-                }
-            }
         }
     }
 
@@ -394,7 +335,7 @@ class PlayerFragment : Fragment() {
             loadingLayout.visibility = View.VISIBLE
             playerView.visibility = View.GONE
             updateEpisodeName()
-            qualityMapUnsorted = mutableMapOf()
+//            qualityMapUnsorted = mutableMapOf()
             // Set Default Auto Text
             qualityBtn.text = resources.getString(R.string.quality_btn_txt)
             sharedPreferences.edit()
@@ -495,7 +436,7 @@ class PlayerFragment : Fragment() {
         playerViewModel.player.playbackParameters = PlaybackParameters(vidSpeed)
     }
 
-    private fun showQuality(qualities: MutableMap<String, Int>, trackGroup: Tracks.Group) {
+    private fun showQuality() {
 
         bottomSheet = BottomSheetDialog(requireContext())
         bottomSheet.setContentView(R.layout.bottom_sheet_layout)
@@ -505,7 +446,7 @@ class PlayerFragment : Fragment() {
         val arr = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_dropdown_item,
-            qualities.keys.toList()
+            playerViewModel.qualityMapSorted.keys.toList()
         )
 
         list?.adapter = arr
@@ -514,11 +455,11 @@ class PlayerFragment : Fragment() {
 
         list?.setOnItemClickListener { _, view, _, _ ->
             val quality = (view as TextView).text.toString()
-            val trackIndex = qualities.getValue(quality)
+            val trackIndex = playerViewModel.qualityMapSorted.getValue(quality)
             val trackParams = playerViewModel.player.trackSelectionParameters
                 .buildUpon()
                 .setOverrideForType(
-                    TrackSelectionOverride(trackGroup.mediaTrackGroup, trackIndex)
+                    TrackSelectionOverride(playerViewModel.qualityTrackGroup!!.mediaTrackGroup, trackIndex)
                 )
                 .build()
 
@@ -530,15 +471,6 @@ class PlayerFragment : Fragment() {
 
     }
 
-    private fun releasePlayer() {
-        if (isVideoCacheEnabled) releaseCache()
-        playerViewModel.releasePlayer()
-    }
-
-    private fun releaseCache() {
-        simpleCache?.release()
-        simpleCache = null
-    }
 
     private fun backPressed() {
         callback.handleOnBackPressed()
@@ -548,13 +480,6 @@ class PlayerFragment : Fragment() {
         override fun handleOnBackPressed() {
             findNavController().popBackStack()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        releaseCache()
-        mediaSession.release()
-
     }
 
     override fun onDestroyView() {
@@ -573,12 +498,6 @@ class PlayerFragment : Fragment() {
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         WindowInsetsControllerCompat(requireActivity().window, requireActivity().window.decorView)
             .show(WindowInsetsCompat.Type.systemBars())
-    }
-
-    override fun onStart() {
-        super.onStart()
-        releaseCache()
-        mediaSession.isActive = true
     }
 
     private fun hideSystemUi() {
