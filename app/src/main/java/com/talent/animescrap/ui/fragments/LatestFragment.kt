@@ -40,7 +40,6 @@ class LatestFragment : Fragment() {
     ): View {
 
         _binding = FragmentLatestBinding.inflate(inflater, container, false)
-
         binding.progressbarInMain.visibility = View.VISIBLE
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             binding.recyclerView.layoutManager = GridLayoutManager(activity as Context, 4)

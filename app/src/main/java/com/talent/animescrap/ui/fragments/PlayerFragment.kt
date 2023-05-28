@@ -1,6 +1,5 @@
 package com.talent.animescrap.ui.fragments
 
-import android.annotation.SuppressLint
 import android.app.UiModeManager
 import android.content.Context
 import android.content.SharedPreferences
@@ -10,6 +9,7 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.support.v4.media.session.MediaSessionCompat
@@ -18,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -25,6 +26,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
@@ -49,6 +51,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentPlayerBinding
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
+import com.talent.animescrap.ui.viewmodels.PlayerViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
@@ -60,10 +63,10 @@ import java.net.CookiePolicy
 class PlayerFragment : Fragment() {
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
+    private val playerViewModel: PlayerViewModel by viewModels()
 
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var loadingLayout: LinearLayout
-    private lateinit var player: ExoPlayer
     private lateinit var playerView: DoubleTapPlayerView
     private lateinit var qualityBtn: Button
     private lateinit var subsToggleButton: ToggleButton
@@ -83,7 +86,6 @@ class PlayerFragment : Fragment() {
     private lateinit var animeEpisodeMap: HashMap<String, String>
     private lateinit var qualityMapUnsorted: MutableMap<String, Int>
     private lateinit var settingsPreferenceManager: SharedPreferences
-    private var isPipEnabled: Boolean = true
     private var animeUrl: String? = null
     private var animeSub: String? = null
     private var epType: String? = null
@@ -101,6 +103,7 @@ class PlayerFragment : Fragment() {
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
     private val args: PlayerFragmentArgs by navArgs()
     private var vidSpeed = 1.00f
+    private var done = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -114,7 +117,8 @@ class PlayerFragment : Fragment() {
         CookieHandler.setDefault(mCookieManager)
 
         // Check TV
-        val uiModeManager = requireActivity().getSystemService(AppCompatActivity.UI_MODE_SERVICE) as UiModeManager
+        val uiModeManager =
+            requireActivity().getSystemService(AppCompatActivity.UI_MODE_SERVICE) as UiModeManager
         isTV = uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
 
         // Back Pressed
@@ -132,7 +136,10 @@ class PlayerFragment : Fragment() {
 //        preparePip()
 
         // Initialize SharedPreferences
-        sharedPreferences = requireActivity().getSharedPreferences("LastWatchedPref", AppCompatActivity.MODE_PRIVATE)
+        sharedPreferences = requireActivity().getSharedPreferences(
+            "LastWatchedPref",
+            AppCompatActivity.MODE_PRIVATE
+        )
 
         // Arguments
         val animePlayingDetails = args.animePlayingDetails
@@ -157,31 +164,34 @@ class PlayerFragment : Fragment() {
         videoNameTextView.text = animeName
         updateEpisodeName()
 
-        // Build ExoPlayer
-        player = ExoPlayer.Builder(requireContext())
-            .setSeekForwardIncrementMs(10000)
-            .setSeekBackIncrementMs(10000)
-            .build()
+        // Build ExoPlayer - now in Video Module
 
         // Setup Player View
         playerView.keepScreenOn = true
-        playerView.player = player
+        playerView.player = playerViewModel.player
         playerView.subtitleView?.visibility = View.VISIBLE
 
         // 10 sec increment when seeking in TV - d-pad scenarios
         playerView.findViewById<DefaultTimeBar>(R.id.exo_progress).setKeyTimeIncrement(10000)
 
-        // Build MediaSession
-        mediaSession = MediaSessionCompat(requireContext(), "AnimeScrap Media Session")
-        mediaSessionConnector = MediaSessionConnector(mediaSession).apply {
-            setPlayer(player)
-        }
-
         // Prepare Custom Player View Buttons
         prepareButtons()
 
+        // Build MediaSession
+        mediaSession = MediaSessionCompat(requireContext(), "AnimeScrap Media Session")
+        mediaSessionConnector = MediaSessionConnector(mediaSession).apply {
+            setPlayer(playerView.player)
+        }
+        val url =
+            "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        playerViewModel.setUrl(url)
+        loadingLayout.visibility = View.GONE
+        playerView.visibility = View.VISIBLE
+        return binding.root
+
+
         // Add Listener for quality selection
-        player.addListener(getPlayerListener())
+//        player.addListener(getPlayerListener())
 
         if (animeUrl != null && animeEpisode != null) {
             loadingLayout.visibility = View.VISIBLE
@@ -191,26 +201,29 @@ class PlayerFragment : Fragment() {
                 animeEpisodeMap[animeEpisode!!] as String,
                 listOf(epType!!)
             )
-            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
-            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
+//            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
+//            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
         }
 
         animeStreamViewModelInPlayer.animeStreamLink.observe(viewLifecycleOwner) { animeStreamLink ->
-            if (animeStreamLink.link.isNotBlank()) {
-                animeStreamUrl = animeStreamLink.link
-                if (animeStreamLink.subsLink.isNotBlank()) animeSub = animeStreamLink.subsLink
-                if (!animeStreamLink.extraHeaders.isNullOrEmpty()) extraHeaders =
-                    animeStreamLink.extraHeaders
-                isHls = animeStreamLink.isHls
-                qualityMapUnsorted = mutableMapOf()
-                loadingLayout.visibility = View.GONE
-                playerView.visibility = View.VISIBLE
-                prepareMediaSource()
-            } else {
-                Toast.makeText(requireContext(), "No streaming URL found", Toast.LENGTH_SHORT)
-                    .show()
-                releasePlayer()
+            if (!done) {
+                if (animeStreamLink.link.isNotBlank()) {
+                    animeStreamUrl = animeStreamLink.link
+                    if (animeStreamLink.subsLink.isNotBlank()) animeSub = animeStreamLink.subsLink
+                    if (!animeStreamLink.extraHeaders.isNullOrEmpty()) extraHeaders =
+                        animeStreamLink.extraHeaders
+                    isHls = animeStreamLink.isHls
+                    qualityMapUnsorted = mutableMapOf()
+                    loadingLayout.visibility = View.GONE
+                    playerView.visibility = View.VISIBLE
+                    prepareMediaSource()
+                    done = true
+                } else {
+                    Toast.makeText(requireContext(), "No streaming URL found", Toast.LENGTH_SHORT)
+                        .show()
+//                releasePlayer()
 //                onDestroy()
+                }
             }
         }
         return binding.root
@@ -239,7 +252,10 @@ class PlayerFragment : Fragment() {
         if (isVideoCacheEnabled) {
             simpleCache?.release()
             simpleCache = SimpleCache(
-                File(requireActivity().cacheDir, "exoplayer").also { it.deleteOnExit() }, // Ensures always fresh file
+                File(
+                    requireActivity().cacheDir,
+                    "exoplayer"
+                ).also { it.deleteOnExit() }, // Ensures always fresh file
                 LeastRecentlyUsedCacheEvictor(300L * 1024L * 1024L),
                 databaseProvider
             )
@@ -296,12 +312,11 @@ class PlayerFragment : Fragment() {
                 )
             mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
         } else {
-            subsToggleButton.isChecked = false
-            subsToggleButton.visibility = View.GONE
+//            subsToggleButton.isChecked = false
+//            subsToggleButton.visibility = View.GONE
         }
-        player.setMediaSource(mediaSource)
-        player.prepare()
-        player.playWhenReady = true
+        playerViewModel.setMediaSource(mediaSource)
+
     }
 
     private fun getPlayerListener(): Player.Listener {
@@ -366,7 +381,7 @@ class PlayerFragment : Fragment() {
         animeEpisode = "${animeEpisode!!.toInt() + increment}"
         println(animeEpisode)
         if (animeEpisode!!.toInt() > animeTotalEpisode!!.toInt() || animeEpisode!!.toInt() < 1)
-//            backPressed()
+            backPressed()
         else {
             animeStreamViewModelInPlayer.setAnimeLink(
                 animeUrl!!,
@@ -375,7 +390,7 @@ class PlayerFragment : Fragment() {
             )
             prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
             nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
-            player.stop()
+            playerViewModel.player.stop()
             loadingLayout.visibility = View.VISIBLE
             playerView.visibility = View.GONE
             updateEpisodeName()
@@ -387,8 +402,7 @@ class PlayerFragment : Fragment() {
         }
     }
 
-    @SuppressLint("SourceLockedOrientationActivity")
-    fun prepareButtons() {
+    private fun prepareButtons() {
 
         // Custom player views
         scaleBtn = playerView.findViewById(R.id.btn_fullscreen)
@@ -422,7 +436,7 @@ class PlayerFragment : Fragment() {
         // Back Button
         playerView.findViewById<ImageView>(R.id.back).apply {
             setOnClickListener {
-//                backPressed()
+                backPressed()
             }
         }
         // Fullscreen controls
@@ -478,7 +492,7 @@ class PlayerFragment : Fragment() {
         vidSpeed += 0.25f
         if (vidSpeed > 2) vidSpeed = 0.25f
         videoSpeedTextView.text = resources.getString(R.string.speed, "$vidSpeed")
-        player.playbackParameters = PlaybackParameters(vidSpeed)
+        playerViewModel.player.playbackParameters = PlaybackParameters(vidSpeed)
     }
 
     private fun showQuality(qualities: MutableMap<String, Int>, trackGroup: Tracks.Group) {
@@ -501,14 +515,14 @@ class PlayerFragment : Fragment() {
         list?.setOnItemClickListener { _, view, _, _ ->
             val quality = (view as TextView).text.toString()
             val trackIndex = qualities.getValue(quality)
-            val trackParams = player.trackSelectionParameters
+            val trackParams = playerViewModel.player.trackSelectionParameters
                 .buildUpon()
                 .setOverrideForType(
                     TrackSelectionOverride(trackGroup.mediaTrackGroup, trackIndex)
                 )
                 .build()
 
-            player.trackSelectionParameters = trackParams
+            playerViewModel.player.trackSelectionParameters = trackParams
 
             qualityBtn.text = quality
             bottomSheet.dismiss()
@@ -518,10 +532,7 @@ class PlayerFragment : Fragment() {
 
     private fun releasePlayer() {
         if (isVideoCacheEnabled) releaseCache()
-        player.pause()
-        player.stop()
-        player.release()
-        mediaSession.release()
+        playerViewModel.releasePlayer()
     }
 
     private fun releaseCache() {
@@ -529,28 +540,23 @@ class PlayerFragment : Fragment() {
         simpleCache = null
     }
 
-//    private fun backPressed() {
-//        callback.handleOnBackPressed()
-//    }
+    private fun backPressed() {
+        callback.handleOnBackPressed()
+    }
 
-//    private val callback = object : OnBackPressedCallback(true) {
-//        override fun handleOnBackPressed() {
-//            releasePlayer()
-//            finish()
-//            if (!isTV) {
-//                startActivity(
-//                    Intent(this@PlayerActivity, MainActivity::class.java).apply {
-//                        flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-//                    }
-//                )
-//            }
-//        }
-//    }
+    private val callback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            findNavController().popBackStack()
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
-        releasePlayer()
+        releaseCache()
+        mediaSession.release()
+
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -561,6 +567,7 @@ class PlayerFragment : Fragment() {
         super.onAttach(context)
         hideSystemUi()
     }
+
     override fun onDetach() {
         super.onDetach()
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
@@ -570,61 +577,23 @@ class PlayerFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
+        releaseCache()
         mediaSession.isActive = true
     }
 
     private fun hideSystemUi() {
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
         WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
-        WindowInsetsControllerCompat(requireActivity().window, requireActivity().window.decorView).let { controller ->
+        WindowInsetsControllerCompat(
+            requireActivity().window,
+            requireActivity().window.decorView
+        ).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 
-//    override fun onPictureInPictureModeChanged(
-//        isInPictureInPictureMode: Boolean,
-//        newConfig: Configuration
-//    ) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
-//        }
-//        val totalLayout = playerView.findViewById<RelativeLayout>(R.id.totalLayout)
-//        if (isInPictureInPictureMode) {
-//            // Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
-//            totalLayout.visibility = View.GONE
-//        } else {
-//            // Restore the full-screen UI.
-//            totalLayout.visibility = View.VISIBLE
-//        }
-//    }
-//
-//    override fun onUserLeaveHint() {
-//        if (isPipEnabled && !isTV && (player.isPlaying || player.isLoading)) {
-//            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                    enterPictureInPictureMode(
-//                        PictureInPictureParams.Builder()
-//                            .build()
-//                    )
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun preparePip() {
-//        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
-//        if (isPipEnabled && !isTV) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//                setPictureInPictureParams(
-//                    PictureInPictureParams.Builder()
-//                        .setAutoEnterEnabled(true)
-//                        .build()
-//                )
-//            }
-//        }
-//    }
 
     private fun ImageView.setImageViewEnabled(enabled: Boolean) = if (enabled) {
         drawable.clearColorFilter()
@@ -635,4 +604,21 @@ class PlayerFragment : Fragment() {
         isEnabled = false
         isFocusable = false
     }
+
+
+    // PIP
+    override fun onPictureInPictureModeChanged(isInPictureInPictureMode: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            super.onPictureInPictureModeChanged(isInPictureInPictureMode)
+        }
+        val totalLayout = playerView.findViewById<RelativeLayout>(R.id.totalLayout)
+        if (isInPictureInPictureMode) {
+            // Hide the full-screen UI (controls, etc.) while in picture-in-picture mode.
+            totalLayout.visibility = View.GONE
+        } else {
+            // Restore the full-screen UI.
+            totalLayout.visibility = View.VISIBLE
+        }
+    }
+
 }

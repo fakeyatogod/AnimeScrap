@@ -2,8 +2,12 @@ package com.talent.animescrap.ui.activities
 
 import android.app.AlertDialog
 import android.app.DownloadManager
+import android.app.PictureInPictureParams
+import android.app.UiModeManager
+import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.transition.Slide
@@ -12,6 +16,7 @@ import android.view.Gravity
 import android.view.Menu
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
@@ -19,6 +24,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.preference.PreferenceManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigationrail.NavigationRailView
 import com.google.android.material.snackbar.Snackbar
@@ -33,18 +39,27 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var settingsPreferenceManager: SharedPreferences
+    private var isPipEnabled: Boolean = true
+    private var isTV: Boolean = false
+
     private val updateViewModel: UpdateViewModel by viewModels()
     private var updateMessageIgnored = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
+
+        // Check TV
+        val uiModeManager = getSystemService(UI_MODE_SERVICE) as UiModeManager
+        isTV = uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
+        isPipEnabled = settingsPreferenceManager.getBoolean("pip", true)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-
         val bottomNavView: BottomNavigationView = binding.navView
         val railView: NavigationRailView = binding.navRail
 
@@ -87,12 +102,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             binding.toolbar.isVisible = destination.id != R.id.navigation_player
+            isPipEnabled = destination.id == R.id.navigation_player
+            println("Destination is player = ${destination.id == R.id.navigation_player}")
+            preparePip()
         }
         setupActionBarWithNavController(navController, appBarConfiguration)
         bottomNavView.setupWithNavController(navController)
         railView.setupWithNavController(navController)
 
-        binding.toolbar.isVisible = !isLandscape
+        binding.toolbar.isVisible =
+            !isLandscape && navController.currentDestination?.id != R.id.navigation_player
 
         updateViewModel.isUpdateAvailable.observe(this) { updateDetails ->
             if (updateDetails.isUpdateAvailable && !updateMessageIgnored) {
@@ -134,7 +153,6 @@ class MainActivity : AppCompatActivity() {
         ).show()
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.topbar_menu, menu)
         val search = menu.findItem(R.id.navigation_search)
@@ -151,7 +169,7 @@ class MainActivity : AppCompatActivity() {
         }
         navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
-                || destination.id == R.id.navigation_settings
+                || destination.id == R.id.navigation_settings || destination.id == R.id.navigation_player
             ) {
                 search.isVisible = false
                 settings.isVisible = false
@@ -164,5 +182,32 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun preparePip() {
+        if (isPipEnabled && !isTV) {
+            println("PIP enabled")
+            setPictureInPictureParams(
+                PictureInPictureParams.Builder()
+                    .setAutoEnterEnabled(true)
+                    .build()
+            )
+
+        } else {
+            println("PIP disabled")
+            setPictureInPictureParams(
+                PictureInPictureParams.Builder()
+                    .setAutoEnterEnabled(false)
+                    .build()
+            )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (isPipEnabled && Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+            enterPictureInPictureMode(PictureInPictureParams.Builder().build())
     }
 }
