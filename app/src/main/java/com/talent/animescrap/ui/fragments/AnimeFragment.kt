@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
@@ -169,7 +170,9 @@ class AnimeFragment : Fragment() {
 
             // Navigate to Internal Player
             if (!isExternalPlayerEnabled) {
-                val action = AnimeFragmentDirections.actionNavigationAnimeToPlayerActivity(
+                val navController =
+                    requireActivity().findNavController(R.id.nav_host_fragment_activity_main_bottom_nav)
+                val action = AnimeFragmentDirections.actionNavigationAnimeToNavigationPlayer(
                     AnimePlayingDetails(
                         animeName = animeName!!,
                         animeUrl = animeMainLink!!,
@@ -180,7 +183,7 @@ class AnimeFragment : Fragment() {
                     )
                 )
 
-                findNavController().navigate(action)
+                navController.navigate(action)
 
             } else {
                 binding.progressbarInPage.visibility = View.VISIBLE
