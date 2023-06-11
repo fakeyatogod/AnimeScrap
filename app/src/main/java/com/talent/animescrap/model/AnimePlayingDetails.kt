@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 data class AnimePlayingDetails(
     val animeName: String,
     val animeUrl: String,
-    val animeEpisodeIndex: String,
+    var animeEpisodeIndex: String,
     val animeEpisodeMap: HashMap<String, String>,
     val animeTotalEpisode: String,
     val epType: String

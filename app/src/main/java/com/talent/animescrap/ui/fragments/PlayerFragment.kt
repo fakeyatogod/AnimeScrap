@@ -45,6 +45,7 @@ import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentPlayerBinding
+import com.talent.animescrap.model.AnimePlayingDetails
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
 import com.talent.animescrap.ui.viewmodels.PlayerViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
@@ -55,6 +56,8 @@ import java.net.CookiePolicy
 
 @AndroidEntryPoint
 class PlayerFragment : Fragment() {
+    private lateinit var animePlayingDetails: AnimePlayingDetails
+    private var isInit: Boolean = false
     private var _binding: FragmentPlayerBinding? = null
     private val binding get() = _binding!!
     private val playerViewModel: PlayerViewModel by viewModels()
@@ -76,14 +79,9 @@ class PlayerFragment : Fragment() {
     private lateinit var mediaItem: MediaItem
     private lateinit var bottomSheet: BottomSheetDialog
 
-    private lateinit var animeEpisodeMap: HashMap<String, String>
     private lateinit var settingsPreferenceManager: SharedPreferences
-    private var animeUrl: String? = null
+
     private var animeSub: String? = null
-    private var epType: String? = null
-    private var animeEpisode: String? = null
-    private var animeTotalEpisode: String? = null
-    private var animeName: String? = null
     private var animeStreamUrl: String? = null
     private var extraHeaders: HashMap<String, String>? = null
     private var isHls: Boolean = true
@@ -94,7 +92,6 @@ class PlayerFragment : Fragment() {
     private val animeStreamViewModelInPlayer: AnimeStreamViewModel by viewModels()
     private val args: PlayerFragmentArgs by navArgs()
     private var vidSpeed = 1.00f
-    private var done = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -133,15 +130,9 @@ class PlayerFragment : Fragment() {
         )
 
         // Arguments
-        val animePlayingDetails = args.animePlayingDetails
-
-        animeName = animePlayingDetails!!.animeName
-        animeEpisode = animePlayingDetails.animeEpisodeIndex
-        animeTotalEpisode = animePlayingDetails.animeTotalEpisode
-        animeUrl = animePlayingDetails.animeUrl
-        animeEpisodeMap = animePlayingDetails.animeEpisodeMap
-        epType = animePlayingDetails.epType
-
+        animePlayingDetails = savedInstanceState?.getParcelable("animePlayingDetails") ?: args.animePlayingDetails!!
+        isInit = savedInstanceState?.getBoolean("init") ?: false
+        println("inininit = $isInit")
         /// Player Views
         playerView = binding.exoPlayerView
         playerView.doubleTapOverlay = binding.doubleTapOverlay
@@ -152,7 +143,7 @@ class PlayerFragment : Fragment() {
         videoEpTextView = playerView.findViewById(R.id.videoEpisode)
         videoSpeedTextView = playerView.findViewById(R.id.video_speed)
         videoNameTextView.isSelected = true
-        videoNameTextView.text = animeName
+        videoNameTextView.text = animePlayingDetails.animeName
         updateEpisodeName()
 
         // Build ExoPlayer - now in Video Module
@@ -169,18 +160,18 @@ class PlayerFragment : Fragment() {
         prepareButtons()
 
         // Add Listener for quality selection
-        playerViewModel.player.addListener(getPlayerListener())
+//        playerViewModel.player.addListener(getPlayerListener())
 
-        if (animeUrl != null && animeEpisode != null) {
+        if (!isInit) {
             loadingLayout.visibility = View.VISIBLE
             playerView.visibility = View.GONE
             animeStreamViewModelInPlayer.setAnimeLink(
-                animeUrl!!,
-                animeEpisodeMap[animeEpisode!!] as String,
-                listOf(epType!!)
+                animePlayingDetails.animeUrl,
+                animePlayingDetails.animeEpisodeMap[animePlayingDetails.animeEpisodeIndex] as String,
+                listOf(animePlayingDetails.epType)
             )
-            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
-            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
+            prevEpBtn.setImageViewEnabled(animePlayingDetails.animeEpisodeIndex.toInt() >= 2)
+            nextEpBtn.setImageViewEnabled(animePlayingDetails.animeEpisodeIndex.toInt() != animePlayingDetails.animeTotalEpisode.toInt())
         }
 
         animeStreamViewModelInPlayer.animeStreamLink.observe(viewLifecycleOwner) { animeStreamLink ->
@@ -194,13 +185,13 @@ class PlayerFragment : Fragment() {
                 loadingLayout.visibility = View.GONE
                 playerView.visibility = View.VISIBLE
                 prepareMediaSource()
-                done = true
             } else {
                 Toast.makeText(requireContext(), "No streaming URL found", Toast.LENGTH_SHORT)
                     .show()
                 backPressed()
             }
         }
+        isInit = true
         return binding.root
 
     }
@@ -281,7 +272,7 @@ class PlayerFragment : Fragment() {
             subsToggleButton.isChecked = false
             subsToggleButton.visibility = View.GONE
         }
-        if (!force) playerViewModel.setMediaSource(mediaSource)
+        playerViewModel.setMediaSource(mediaSource)
 
     }
 
@@ -315,22 +306,22 @@ class PlayerFragment : Fragment() {
     }
 
     private fun updateEpisodeName() {
-        videoEpTextView.text = resources.getString(R.string.episode, animeEpisode)
+        videoEpTextView.text = resources.getString(R.string.episode, animePlayingDetails.animeEpisodeIndex)
     }
 
     private fun setNewEpisode(increment: Int = 1) {
-        animeEpisode = "${animeEpisode!!.toInt() + increment}"
-        println(animeEpisode)
-        if (animeEpisode!!.toInt() > animeTotalEpisode!!.toInt() || animeEpisode!!.toInt() < 1)
+        animePlayingDetails.animeEpisodeIndex = "${animePlayingDetails.animeEpisodeIndex.toInt() + increment}"
+        println(animePlayingDetails.animeEpisodeIndex)
+        if (animePlayingDetails.animeEpisodeIndex.toInt() > animePlayingDetails.animeTotalEpisode.toInt() || animePlayingDetails.animeEpisodeIndex.toInt() < 1)
             backPressed()
         else {
             animeStreamViewModelInPlayer.setAnimeLink(
-                animeUrl!!,
-                animeEpisodeMap[animeEpisode!!] as String,
-                listOf(epType!!)
+                animePlayingDetails.animeUrl,
+                animePlayingDetails.animeEpisodeMap[animePlayingDetails.animeEpisodeIndex] as String,
+                listOf(animePlayingDetails.epType)
             )
-            prevEpBtn.setImageViewEnabled(animeEpisode!!.toInt() >= 2)
-            nextEpBtn.setImageViewEnabled(animeEpisode!!.toInt() != animeTotalEpisode!!.toInt())
+            prevEpBtn.setImageViewEnabled(animePlayingDetails.animeEpisodeIndex.toInt() >= 2)
+            nextEpBtn.setImageViewEnabled(animePlayingDetails.animeEpisodeIndex.toInt() != animePlayingDetails.animeTotalEpisode.toInt())
             playerViewModel.player.stop()
             loadingLayout.visibility = View.VISIBLE
             playerView.visibility = View.GONE
@@ -339,10 +330,15 @@ class PlayerFragment : Fragment() {
             // Set Default Auto Text
             qualityBtn.text = resources.getString(R.string.quality_btn_txt)
             sharedPreferences.edit()
-                .putString(animeUrl!!, animeEpisode!!).apply()
+                .putString(animePlayingDetails.animeUrl, animePlayingDetails.animeEpisodeIndex).apply()
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean("init",isInit)
+        outState.putParcelable("animePlayingDetails", animePlayingDetails)
+        super.onSaveInstanceState(outState)
+    }
     private fun prepareButtons() {
 
         // Custom player views
@@ -354,6 +350,9 @@ class PlayerFragment : Fragment() {
         nextEpBtn = playerView.findViewById(R.id.next_ep)
         subsToggleButton = playerView.findViewById(R.id.subs_toggle_btn)
 
+        qualityBtn.setOnClickListener {
+            showQuality()
+        }
         subsToggleButton.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 playerView.subtitleView?.visibility = View.VISIBLE

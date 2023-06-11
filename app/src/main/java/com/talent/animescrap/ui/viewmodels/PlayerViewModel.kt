@@ -16,20 +16,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
-    val app : Application,
+    val app: Application,
     private val savedStateHandle: SavedStateHandle,
     val player: ExoPlayer
 ) : ViewModel() {
 
-     var qualityTrackGroup: Tracks.Group? = null
+    var qualityTrackGroup: Tracks.Group? = null
     private var qualityMapUnsorted: MutableMap<String, Int> = mutableMapOf()
-     var qualityMapSorted: MutableMap<String, Int> = mutableMapOf()
-    private var mediaSession: MediaSessionCompat = MediaSessionCompat(app, "AnimeScrap Media Session")
+    var qualityMapSorted: MutableMap<String, Int> = mutableMapOf()
+
+    private var mediaSession: MediaSessionCompat =
+        MediaSessionCompat(app, "AnimeScrap Media Session")
     private var mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
     var simpleCache: SimpleCache? = null
     private val databaseProvider = StandaloneDatabaseProvider(app)
     private val savedUrl = savedStateHandle.getStateFlow("playerUrl", "")
-    private val savedDone = savedStateHandle.getStateFlow("done",false)
+    private val savedDone = savedStateHandle.getStateFlow("done", false)
 
     init {
         player.prepare()
@@ -59,9 +61,6 @@ class PlayerViewModel @Inject constructor(
                     if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
                         for (i in 0 until trackGroup.length) {
                             val trackFormat = trackGroup.getTrackFormat(i).height
-//                            println(trackGroup.getTrackFormat(i))
-//                            println(trackGroup.isTrackSupported(i))
-//                            println(trackGroup.isTrackSelected(i))
                             if (trackGroup.isTrackSupported(i) && trackGroup.isTrackSelected(i)) {
                                 qualityMapUnsorted["${trackFormat}p"] = i
                             }
@@ -91,8 +90,8 @@ class PlayerViewModel @Inject constructor(
         simpleCache = null
     }
 
-        fun setMediaSource(mediaSource: MediaSource) {
-        if (!savedDone.value) {
+    fun setMediaSource(mediaSource: MediaSource, force: Boolean = false) {
+        if (!savedDone.value || force) {
             player.setMediaSource(mediaSource)
             savedStateHandle["done"] = true
         }
