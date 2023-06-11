@@ -136,7 +136,7 @@ class AllAnimeSource : AnimeSource {
                 println(sourceUrl)
                 val sourceName = sourceUrlHolder.asJsonObject["sourceName"].asString
                 println(sourceName)
-                if (isThese(sourceUrl) || isThese(sourceName)) continue
+                if (isThese(sourceUrl) || isThese(sourceName) || !sourceUrl.contains("http")) continue
                 if (sourceUrl.contains("apivtwo")) {
                     val apiUrl = "https://allanimenews.com"
                     println(apiUrl)
