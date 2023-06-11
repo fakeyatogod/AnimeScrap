@@ -142,6 +142,7 @@ class PlayerFragment : Fragment() {
 
         // Prepare Custom Player View Buttons
         prepareButtons()
+        qualityBtn.text = quality
         playerViewModel.showSubsBtn.observe(viewLifecycleOwner){ showSubsBtn ->
             subsToggleButton.isChecked = showSubsBtn
             subsToggleButton.isVisible = showSubsBtn
