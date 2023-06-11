@@ -1,7 +1,7 @@
 package com.talent.animescrap.ui.viewmodels
 
 import android.app.Application
-import android.graphics.Color
+import android.media.session.PlaybackState
 import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.lifecycle.*
@@ -14,7 +14,6 @@ import com.google.android.exoplayer2.source.MergingMediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.SingleSampleMediaSource
 import com.google.android.exoplayer2.source.hls.HlsMediaSource
-import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.upstream.DataSource
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
@@ -37,31 +36,18 @@ class PlayerViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     val player: ExoPlayer
 ) : ViewModel() {
+
     private val settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(app)
 
     // Video Cache
     private val isVideoCacheEnabled = settingsPreferenceManager.getBoolean("video_cache", true)
 
-    private val _animeStreamLink: MutableLiveData<AnimeStreamLink> = MutableLiveData()
-    val animeStreamLink: LiveData<AnimeStreamLink> = _animeStreamLink
-    fun setAnimeLink(animeUrl: String, animeEpCode: String, extras: List<String>, getNextEp: Boolean = false) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                println("STREAM GET LINK")
-                animeRepository.getStreamLink(animeUrl, animeEpCode, extras).apply {
-                    _animeStreamLink.postValue(this@apply)
-                    withContext(Dispatchers.Main) {
-                        if(!savedDone.value || getNextEp) {
-                            println("Prrpate")
-                            prepareMediaSource()
-                            savedStateHandle["done"] = true
-                        }
-                    }
-                }
-            }
-        }
+    val isLoading = MutableLiveData(true)
+    val keepScreenOn = MutableLiveData(false)
+    val showSubsBtn = MutableLiveData(false)
 
-    }
+    private val _animeStreamLink: MutableLiveData<AnimeStreamLink> = MutableLiveData()
+    private val animeStreamLink: LiveData<AnimeStreamLink> = _animeStreamLink
 
     var qualityTrackGroup: Tracks.Group? = null
     private var qualityMapUnsorted: MutableMap<String, Int> = mutableMapOf()
@@ -71,7 +57,7 @@ class PlayerViewModel @Inject constructor(
         MediaSessionCompat(app, "AnimeScrap Media Session")
     private var mediaSessionConnector: MediaSessionConnector = MediaSessionConnector(mediaSession)
 
-    var simpleCache: SimpleCache? = null
+    private var simpleCache: SimpleCache? = null
     private val databaseProvider = StandaloneDatabaseProvider(app)
 
     private val savedDone = savedStateHandle.getStateFlow("done", false)
@@ -81,7 +67,7 @@ class PlayerViewModel @Inject constructor(
         player.playWhenReady = true
         mediaSessionConnector.setPlayer(player)
         mediaSession.isActive = true
-        player.addListener(getQualitiesListener())
+        player.addListener(getCustomPlayerListener())
 
         // Cache
         simpleCache?.release()
@@ -95,8 +81,39 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
-    private fun getQualitiesListener(): Player.Listener {
+    fun setAnimeLink(animeUrl: String, animeEpCode: String, extras: List<String>, getNextEp: Boolean = false) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                println("STREAM GET LINK")
+                animeRepository.getStreamLink(animeUrl, animeEpCode, extras).apply {
+                    _animeStreamLink.postValue(this@apply)
+                    withContext(Dispatchers.Main) {
+                        if(!savedDone.value || getNextEp) {
+                            println("prepare Media Source")
+                            prepareMediaSource()
+                            savedStateHandle["done"] = true
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    private fun getCustomPlayerListener(): Player.Listener {
         return object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if(playbackState == PlaybackState.STATE_NONE || playbackState == PlaybackState.STATE_CONNECTING || playbackState == PlaybackState.STATE_STOPPED)
+                    isLoading.postValue(true)
+                else
+                    isLoading.postValue(false)
+                super.onPlaybackStateChanged(playbackState)
+            }
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                super.onIsPlayingChanged(isPlaying)
+                keepScreenOn.postValue(isPlaying)
+            }
             override fun onTracksChanged(tracks: Tracks) {
                 // Update UI using current tracks.
                 for (trackGroup in tracks.groups) {
@@ -129,6 +146,9 @@ class PlayerViewModel @Inject constructor(
         println("Set media Source")
         player.stop()
         player.prepare()
+        qualityMapSorted = mutableMapOf()
+        qualityMapUnsorted = mutableMapOf()
+        qualityTrackGroup = null
         player.setMediaSource(mediaSource)
     }
 
@@ -194,17 +214,7 @@ class PlayerViewModel @Inject constructor(
         }
 
         if (animeStreamLink.value!!.subsLink.isNotBlank()) {
-//            subsToggleButton.isChecked = true
-//            subsToggleButton.visibility = View.VISIBLE
-            val subStyle = CaptionStyleCompat(
-                Color.WHITE,
-                Color.TRANSPARENT,
-                Color.TRANSPARENT,
-                CaptionStyleCompat.EDGE_TYPE_OUTLINE,
-                Color.BLACK,
-                null
-            )
-//            playerView.subtitleView?.setStyle(subStyle)
+            showSubsBtn.postValue(true)
             val subtitleMediaSource = SingleSampleMediaSource.Factory(dataSourceFactory)
                 .createMediaSource(
                     MediaItem.SubtitleConfiguration.Builder(Uri.parse(animeStreamLink.value!!.subsLink))
@@ -220,8 +230,7 @@ class PlayerViewModel @Inject constructor(
                 )
             mediaSource = MergingMediaSource(mediaSource, subtitleMediaSource)
         } else {
-//            subsToggleButton.isChecked = false
-//            subsToggleButton.visibility = View.GONE
+            showSubsBtn.postValue(false)
         }
         setMediaSource(mediaSource)
     }

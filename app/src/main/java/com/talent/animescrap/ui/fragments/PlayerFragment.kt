@@ -28,9 +28,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.PlaybackParameters
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.trackselection.TrackSelectionOverride
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
@@ -45,7 +45,7 @@ import java.net.CookiePolicy
 
 @AndroidEntryPoint
 class PlayerFragment : Fragment() {
-    private var isMediaSet: Boolean = false
+    private var quality: String = "Auto"
     private lateinit var animePlayingDetails: AnimePlayingDetails
     private var isInit: Boolean = false
     private var _binding: FragmentPlayerBinding? = null
@@ -92,8 +92,6 @@ class PlayerFragment : Fragment() {
             requireActivity().getSystemService(AppCompatActivity.UI_MODE_SERVICE) as UiModeManager
         isTV = uiModeManager.currentModeType == Configuration.UI_MODE_TYPE_TELEVISION
 
-        // Back Pressed
-//        onBackPressedDispatcher.addCallback(activity, callback)
 
         // Settings
         settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -115,9 +113,10 @@ class PlayerFragment : Fragment() {
         // Arguments
         animePlayingDetails = savedInstanceState?.getParcelable("animePlayingDetails") ?: args.animePlayingDetails!!
         isInit = savedInstanceState?.getBoolean("init") ?: false
-        isMediaSet = savedInstanceState?.getBoolean("isMediaSet") ?: false
         vidSpeed = savedInstanceState?.getFloat("vidSpeed") ?: 1.00f
+        quality = savedInstanceState?.getString("quality") ?: "Auto"
         println("Init = $isInit")
+
         /// Player Views
         playerView = binding.exoPlayerView
         playerView.doubleTapOverlay = binding.doubleTapOverlay
@@ -143,17 +142,34 @@ class PlayerFragment : Fragment() {
 
         // Prepare Custom Player View Buttons
         prepareButtons()
+        playerViewModel.showSubsBtn.observe(viewLifecycleOwner){ showSubsBtn ->
+            subsToggleButton.isChecked = showSubsBtn
+            subsToggleButton.isVisible = showSubsBtn
+        }
 
-        // Add Listener for quality selection
-//        playerViewModel.player.addListener(getPlayerListener())
-        loadingLayout.visibility = View.GONE
-        playerView.visibility = View.VISIBLE
+        val subStyle = CaptionStyleCompat(
+            Color.WHITE,
+            Color.TRANSPARENT,
+            Color.TRANSPARENT,
+            CaptionStyleCompat.EDGE_TYPE_OUTLINE,
+            Color.BLACK,
+            null
+        )
+        playerView.subtitleView?.setStyle(subStyle)
+
+        playerViewModel.isLoading.observe(viewLifecycleOwner){isLoading ->
+            loadingLayout.isVisible = isLoading
+            playerView.isVisible = !isLoading
+        }
+        playerViewModel.keepScreenOn.observe(viewLifecycleOwner){keepScreenOn ->
+            playerView.keepScreenOn = keepScreenOn
+        }
+
         if (!isInit) {
             playerViewModel.setAnimeLink(
                 animePlayingDetails.animeUrl,
                 animePlayingDetails.animeEpisodeMap[animePlayingDetails.animeEpisodeIndex] as String,
-                listOf(animePlayingDetails.epType),
-                true
+                listOf(animePlayingDetails.epType)
             )
             prevEpBtn.setImageViewEnabled(animePlayingDetails.animeEpisodeIndex.toInt() >= 2)
             nextEpBtn.setImageViewEnabled(animePlayingDetails.animeEpisodeIndex.toInt() != animePlayingDetails.animeTotalEpisode.toInt())
@@ -162,35 +178,6 @@ class PlayerFragment : Fragment() {
         return binding.root
 
     }
-    private fun getPlayerListener(): Player.Listener {
-        return object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                super.onIsPlayingChanged(isPlaying)
-
-                // Keep screen on only when playing
-                playerView.keepScreenOn = isPlaying
-
-//                if (isPipEnabled && !isTV) {
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-//                        setPictureInPictureParams(
-//                            PictureInPictureParams.Builder()
-//                                .setAutoEnterEnabled(isPlaying)
-//                                .build()
-//                        )
-//                    }
-//                }
-            }
-
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                super.onPlaybackStateChanged(playbackState)
-                if (playbackState == Player.STATE_ENDED && isAutoPlayEnabled) {
-                    setNewEpisode()
-                }
-            }
-
-        }
-    }
-
     private fun updateEpisodeName() {
         videoEpTextView.text = resources.getString(R.string.episode, animePlayingDetails.animeEpisodeIndex)
     }
@@ -223,7 +210,7 @@ class PlayerFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putBoolean("init",isInit)
-        outState.putBoolean("isMediaSet",isMediaSet)
+        outState.putString("quality",quality)
         outState.putParcelable("animePlayingDetails", animePlayingDetails)
         outState.putFloat("vidSpeed", vidSpeed)
         super.onSaveInstanceState(outState)
@@ -342,7 +329,7 @@ class PlayerFragment : Fragment() {
         bottomSheet.show()
 
         list?.setOnItemClickListener { _, view, _, _ ->
-            val quality = (view as TextView).text.toString()
+            quality = (view as TextView).text.toString()
             val trackIndex = playerViewModel.qualityMapSorted.getValue(quality)
             val trackParams = playerViewModel.player.trackSelectionParameters
                 .buildUpon()
