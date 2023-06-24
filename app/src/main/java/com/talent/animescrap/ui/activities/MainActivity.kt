@@ -186,7 +186,8 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.S)
     private fun preparePip() {
-        if (isPipEnabled && !isTV) {
+        if(isTV) return
+        if (isPipEnabled) {
             println("PIP enabled")
             setPictureInPictureParams(
                 PictureInPictureParams.Builder()
