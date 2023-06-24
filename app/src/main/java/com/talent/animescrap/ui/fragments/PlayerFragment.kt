@@ -1,5 +1,6 @@
 package com.talent.animescrap.ui.fragments
 
+import android.annotation.SuppressLint
 import android.app.UiModeManager
 import android.content.Context
 import android.content.SharedPreferences
@@ -116,6 +117,8 @@ class PlayerFragment : Fragment() {
         isInit = savedInstanceState?.getBoolean("init") ?: false
         vidSpeed = savedInstanceState?.getFloat("vidSpeed") ?: 1.00f
         quality = savedInstanceState?.getString("quality") ?: "Auto"
+        requireActivity().requestedOrientation = savedInstanceState?.getInt("rotation")
+            ?: ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         println("Init = $isInit")
 
         /// Player Views
@@ -219,9 +222,11 @@ class PlayerFragment : Fragment() {
         outState.putString("quality", quality)
         outState.putParcelable("animePlayingDetails", animePlayingDetails)
         outState.putFloat("vidSpeed", vidSpeed)
+        outState.putInt("rotation", requireActivity().requestedOrientation)
         super.onSaveInstanceState(outState)
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     private fun prepareButtons() {
 
         // Custom player views
@@ -309,6 +314,24 @@ class PlayerFragment : Fragment() {
             rotateBtn.isFocusable = false
             rotateBtn.isActivated = false
         }
+
+        // For Screen Rotation
+        var flag = true
+        rotateBtn.setOnClickListener {
+            clickCount = 0
+            scaleBtn.setImageResource(R.drawable.ic_baseline_height_24)
+            if (flag) {
+                requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_WIDTH
+                flag = false
+            } else {
+                requireActivity().requestedOrientation =
+                    ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                playerView.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIXED_HEIGHT
+                flag = true
+
+            }
+        }
     }
 
     private fun changeVideoSpeed() {
@@ -381,6 +404,7 @@ class PlayerFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         showSystemUi()
+        requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
     }
 
     private fun showSystemUi() {
