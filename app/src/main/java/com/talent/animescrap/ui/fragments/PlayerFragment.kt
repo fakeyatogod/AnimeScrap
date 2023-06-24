@@ -111,7 +111,8 @@ class PlayerFragment : Fragment() {
         )
 
         // Arguments
-        animePlayingDetails = savedInstanceState?.getParcelable("animePlayingDetails") ?: args.animePlayingDetails!!
+        animePlayingDetails =
+            savedInstanceState?.getParcelable("animePlayingDetails") ?: args.animePlayingDetails!!
         isInit = savedInstanceState?.getBoolean("init") ?: false
         vidSpeed = savedInstanceState?.getFloat("vidSpeed") ?: 1.00f
         quality = savedInstanceState?.getString("quality") ?: "Auto"
@@ -143,7 +144,7 @@ class PlayerFragment : Fragment() {
         // Prepare Custom Player View Buttons
         prepareButtons()
         qualityBtn.text = quality
-        playerViewModel.showSubsBtn.observe(viewLifecycleOwner){ showSubsBtn ->
+        playerViewModel.showSubsBtn.observe(viewLifecycleOwner) { showSubsBtn ->
             subsToggleButton.isChecked = showSubsBtn
             subsToggleButton.isVisible = showSubsBtn
         }
@@ -158,11 +159,11 @@ class PlayerFragment : Fragment() {
         )
         playerView.subtitleView?.setStyle(subStyle)
 
-        playerViewModel.isLoading.observe(viewLifecycleOwner){isLoading ->
+        playerViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
             loadingLayout.isVisible = isLoading
             playerView.isVisible = !isLoading
         }
-        playerViewModel.keepScreenOn.observe(viewLifecycleOwner){keepScreenOn ->
+        playerViewModel.keepScreenOn.observe(viewLifecycleOwner) { keepScreenOn ->
             playerView.keepScreenOn = keepScreenOn
         }
 
@@ -179,12 +180,15 @@ class PlayerFragment : Fragment() {
         return binding.root
 
     }
+
     private fun updateEpisodeName() {
-        videoEpTextView.text = resources.getString(R.string.episode, animePlayingDetails.animeEpisodeIndex)
+        videoEpTextView.text =
+            resources.getString(R.string.episode, animePlayingDetails.animeEpisodeIndex)
     }
 
     private fun setNewEpisode(increment: Int = 1) {
-        animePlayingDetails.animeEpisodeIndex = "${animePlayingDetails.animeEpisodeIndex.toInt() + increment}"
+        animePlayingDetails.animeEpisodeIndex =
+            "${animePlayingDetails.animeEpisodeIndex.toInt() + increment}"
         println(animePlayingDetails.animeEpisodeIndex)
         if (animePlayingDetails.animeEpisodeIndex.toInt() > animePlayingDetails.animeTotalEpisode.toInt() || animePlayingDetails.animeEpisodeIndex.toInt() < 1)
             backPressed()
@@ -205,17 +209,19 @@ class PlayerFragment : Fragment() {
             // Set Default Auto Text
             qualityBtn.text = resources.getString(R.string.quality_btn_txt)
             sharedPreferences.edit()
-                .putString(animePlayingDetails.animeUrl, animePlayingDetails.animeEpisodeIndex).apply()
+                .putString(animePlayingDetails.animeUrl, animePlayingDetails.animeEpisodeIndex)
+                .apply()
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean("init",isInit)
-        outState.putString("quality",quality)
+        outState.putBoolean("init", isInit)
+        outState.putString("quality", quality)
         outState.putParcelable("animePlayingDetails", animePlayingDetails)
         outState.putFloat("vidSpeed", vidSpeed)
         super.onSaveInstanceState(outState)
     }
+
     private fun prepareButtons() {
 
         // Custom player views
@@ -335,7 +341,10 @@ class PlayerFragment : Fragment() {
             val trackParams = playerViewModel.player.trackSelectionParameters
                 .buildUpon()
                 .setOverrideForType(
-                    TrackSelectionOverride(playerViewModel.qualityTrackGroup!!.mediaTrackGroup, trackIndex)
+                    TrackSelectionOverride(
+                        playerViewModel.qualityTrackGroup!!.mediaTrackGroup,
+                        trackIndex
+                    )
                 )
                 .build()
 
@@ -371,7 +380,12 @@ class PlayerFragment : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
+        showSystemUi()
+    }
+
+    private fun showSystemUi() {
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
         WindowInsetsControllerCompat(requireActivity().window, requireActivity().window.decorView)
             .show(WindowInsetsCompat.Type.systemBars())
     }
