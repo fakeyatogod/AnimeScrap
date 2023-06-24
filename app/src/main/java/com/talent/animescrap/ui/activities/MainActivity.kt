@@ -184,9 +184,8 @@ class MainActivity : AppCompatActivity() {
                 || super.onSupportNavigateUp()
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     private fun preparePip() {
-        if(isTV) return
+        if (isTV || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
         if (isPipEnabled) {
             println("PIP enabled")
             setPictureInPictureParams(
@@ -208,7 +207,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        if (isPipEnabled && Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+        if (isPipEnabled && !isTV && Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
             enterPictureInPictureMode(PictureInPictureParams.Builder().build())
     }
 }
