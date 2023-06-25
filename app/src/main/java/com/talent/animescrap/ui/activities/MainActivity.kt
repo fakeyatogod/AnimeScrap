@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             binding.toolbar.isVisible = destination.id != R.id.navigation_player
+            binding.toolbar.isVisible = !isLandscape
             isPipEnabled = destination.id == R.id.navigation_player
             println("Destination is player = ${destination.id == R.id.navigation_player}")
             preparePip()
