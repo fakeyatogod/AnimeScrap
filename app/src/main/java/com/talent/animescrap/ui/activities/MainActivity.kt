@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        updateMessageIgnored = savedInstanceState?.getBoolean("updateMessageIgnored") ?: false
         val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -210,5 +211,10 @@ class MainActivity : AppCompatActivity() {
         super.onUserLeaveHint()
         if (isPipEnabled && !isTV && Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
             enterPictureInPictureMode(PictureInPictureParams.Builder().build())
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean("updateMessageIgnored", updateMessageIgnored)
     }
 }
