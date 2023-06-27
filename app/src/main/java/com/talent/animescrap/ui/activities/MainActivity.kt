@@ -10,11 +10,14 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment.DIRECTORY_DOWNLOADS
+import android.os.Handler
+import android.os.Looper
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.view.Gravity
 import android.view.Menu
 import android.view.ViewGroup
+import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -135,7 +138,49 @@ class MainActivity : AppCompatActivity() {
                 setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, downloadTitle)
             }
-            downloadManager.enqueue(request)
+            println(DIRECTORY_DOWNLOADS+Uri.parse(updateDetails.link).lastPathSegment)
+            val downloadId = downloadManager.enqueue(request)
+
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Downloading")
+
+            val progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal)
+            progressBar.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            builder.setView(progressBar)
+
+            val dialog = builder.create()
+            dialog.show()
+
+            val query = DownloadManager.Query().setFilterById(downloadId)
+            val cursor = downloadManager.query(query)
+
+            cursor.moveToFirst()
+            val columnIndex = cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES)
+            val totalSize = cursor.getLong(columnIndex)
+
+            val bytesDownloadedIndex = cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR)
+
+            val handler = Handler(Looper.getMainLooper())
+
+            val runnable = object : Runnable {
+                override fun run() {
+                    cursor.moveToFirst()
+                    val bytesDownloaded = cursor.getLong(bytesDownloadedIndex)
+                    val progress = (bytesDownloaded * 100L / totalSize).toInt()
+                    progressBar.progress = progress
+
+                    if (progress < 100) {
+                        handler.postDelayed(this, 100)
+                    } else {
+                        dialog.dismiss()
+                    }
+                }
+            }
+
+            handler.postDelayed(runnable, 100)
             Snackbar.make(
                 binding.container,
                 getString(R.string.downloading_update),
