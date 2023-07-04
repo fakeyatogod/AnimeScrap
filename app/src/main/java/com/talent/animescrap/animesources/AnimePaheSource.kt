@@ -29,7 +29,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
     private val kwikDUrl = Regex("action=\"([^\"]+)\"")
     private val kwikDToken = Regex("value=\"([^\"]+)\"")
 
-    private val mainUrl = "https://animepahe.com"
+    private val mainUrl = "https://animepahe.ru"
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
             /*  val id =
