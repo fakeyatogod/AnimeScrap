@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        updateMessageIgnored = savedInstanceState?.getBoolean("updateMessageIgnored") ?: false
         val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
         settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(this)
 
@@ -119,6 +118,9 @@ class MainActivity : AppCompatActivity() {
             !isLandscape && navController.currentDestination?.id != R.id.navigation_player
 
         updateViewModel.isUpdateAvailable.observe(this) { updateDetails ->
+            updateMessageIgnored =
+                settingsPreferenceManager.getString("updateIgnoredLink", "") == updateDetails.link
+
             if (updateDetails.isUpdateAvailable && !updateMessageIgnored) {
                 showUpdateAlertDialog(updateDetails)
             }
@@ -187,8 +189,9 @@ class MainActivity : AppCompatActivity() {
                 Snackbar.LENGTH_SHORT
             ).show()
         }
-        alertBuilder.setNegativeButton("Ignore") { _, _ ->
-            updateMessageIgnored = true
+        alertBuilder.setNegativeButton("Ignore this version") { _, _ ->
+            settingsPreferenceManager.edit().putString("updateIgnoredLink", updateDetails.link)
+                .apply()
         }
         val dialog = alertBuilder.create()
         dialog.show()
@@ -256,10 +259,5 @@ class MainActivity : AppCompatActivity() {
         super.onUserLeaveHint()
         if (isPipEnabled && !isTV && Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
             enterPictureInPictureMode(PictureInPictureParams.Builder().build())
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBoolean("updateMessageIgnored", updateMessageIgnored)
     }
 }
