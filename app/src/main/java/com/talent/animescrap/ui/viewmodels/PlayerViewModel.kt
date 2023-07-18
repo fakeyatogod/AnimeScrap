@@ -41,10 +41,12 @@ class PlayerViewModel @Inject constructor(
 
     // Video Cache
     private val isVideoCacheEnabled = settingsPreferenceManager.getBoolean("video_cache", true)
+    private val isAutoPlayEnabled = settingsPreferenceManager.getBoolean("auto_play", true)
 
     val isLoading = MutableLiveData(true)
     val keepScreenOn = MutableLiveData(false)
     val showSubsBtn = MutableLiveData(false)
+    val playNextEp = MutableLiveData(false)
 
     private val _animeStreamLink: MutableLiveData<AnimeStreamLink> = MutableLiveData()
     private val animeStreamLink: LiveData<AnimeStreamLink> = _animeStreamLink
@@ -103,6 +105,7 @@ class PlayerViewModel @Inject constructor(
 
     private fun getCustomPlayerListener(): Player.Listener {
         return object : Player.Listener {
+
             override fun onPlaybackStateChanged(playbackState: Int) {
                 if(playbackState == PlaybackState.STATE_NONE || playbackState == PlaybackState.STATE_CONNECTING || playbackState == PlaybackState.STATE_STOPPED)
                     isLoading.postValue(true)
@@ -113,6 +116,11 @@ class PlayerViewModel @Inject constructor(
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 keepScreenOn.postValue(isPlaying)
+                val progress = (player.currentPosition.toFloat()*100)/player.duration.toFloat()
+                println(progress)
+                if(progress> 100 && isAutoPlayEnabled) {
+                    playNextEp.postValue(true)
+                }
             }
             override fun onTracksChanged(tracks: Tracks) {
                 // Update UI using current tracks.

@@ -169,6 +169,9 @@ class PlayerFragment : Fragment() {
         playerViewModel.keepScreenOn.observe(viewLifecycleOwner) { keepScreenOn ->
             playerView.keepScreenOn = keepScreenOn
         }
+        playerViewModel.playNextEp.observe(viewLifecycleOwner) { playNextEp ->
+            if(playNextEp) setNewEpisode()
+        }
 
         if (!isInit) {
             playerViewModel.setAnimeLink(
