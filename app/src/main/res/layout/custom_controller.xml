@@ -176,6 +176,7 @@
                     android:textAlignment="center"
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
+                    android:background="@drawable/background_selector"
                     tools:text="1.0x" />
 
                 <LinearLayout
