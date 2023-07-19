@@ -117,7 +117,6 @@ class PlayerViewModel @Inject constructor(
                 super.onIsPlayingChanged(isPlaying)
                 keepScreenOn.postValue(isPlaying)
                 val progress = (player.currentPosition.toFloat()*100)/player.duration.toFloat()
-                println(progress)
                 if(progress> 100 && isAutoPlayEnabled) {
                     playNextEp.postValue(true)
                 }

@@ -61,7 +61,6 @@
 
     <string name="anime_details_error_message">Something went wrong, unable to connect to the server. Please check your network connection</string>
     <string name="no_favorites_text">Your Favorites will show here</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="player">Player</string>
     <string name="dark_mode_pref_title">Dark Mode</string>
@@ -76,5 +75,6 @@
     <string name="video_cache_perf_summray_enabled">Video cache enabled in player</string>
     <string name="auto_play_summary">Autoplay next episode when the current episode ends</string>
     <string name="auto_play_title">Autoplay next episode</string>
+    <string name="press_back_again_in_player">Press Back Again to Exit Player</string>
 
 </resources>

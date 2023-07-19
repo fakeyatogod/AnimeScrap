@@ -9,9 +9,7 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import android.os.Build
-import android.os.Bundle
-import android.os.CountDownTimer
+import android.os.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +32,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.ui.CaptionStyleCompat
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentPlayerBinding
 import com.talent.animescrap.model.AnimePlayingDetails
@@ -67,6 +66,7 @@ class PlayerFragment : Fragment() {
     private lateinit var videoSpeedTextView: TextView
     private lateinit var videoEpTextView: TextView
     private lateinit var bottomSheet: BottomSheetDialog
+    private var doubleBackToExitPressedOnce: Boolean = false
 
     private lateinit var settingsPreferenceManager: SharedPreferences
 
@@ -170,7 +170,7 @@ class PlayerFragment : Fragment() {
             playerView.keepScreenOn = keepScreenOn
         }
         playerViewModel.playNextEp.observe(viewLifecycleOwner) { playNextEp ->
-            if(playNextEp) setNewEpisode()
+            if (playNextEp) setNewEpisode()
         }
 
         if (!isInit) {
@@ -384,12 +384,24 @@ class PlayerFragment : Fragment() {
 
 
     private fun backPressed() {
-        callback.handleOnBackPressed()
+        backCallback.handleOnBackPressed()
     }
 
-    private val callback = object : OnBackPressedCallback(true) {
+    private val backCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            findNavController().popBackStack()
+            if (doubleBackToExitPressedOnce) {
+                findNavController().popBackStack()
+            }
+            doubleBackToExitPressedOnce = true
+            Handler(Looper.getMainLooper()).postDelayed(
+                { doubleBackToExitPressedOnce = false },
+                2000
+            )
+            Snackbar.make(
+                binding.exoPlayerView,
+                getString(R.string.press_back_again_in_player),
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -402,6 +414,7 @@ class PlayerFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         hideSystemUi()
+        requireActivity().onBackPressedDispatcher.addCallback(this,backCallback)
     }
 
     override fun onDetach() {
