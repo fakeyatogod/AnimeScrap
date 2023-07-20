@@ -391,6 +391,7 @@ class PlayerFragment : Fragment() {
         override fun handleOnBackPressed() {
             if (doubleBackToExitPressedOnce) {
                 findNavController().popBackStack()
+                return
             }
             doubleBackToExitPressedOnce = true
             Handler(Looper.getMainLooper()).postDelayed(
