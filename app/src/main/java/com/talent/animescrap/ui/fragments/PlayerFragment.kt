@@ -67,6 +67,7 @@ class PlayerFragment : Fragment() {
     private lateinit var videoEpTextView: TextView
     private lateinit var bottomSheet: BottomSheetDialog
     private var doubleBackToExitPressedOnce: Boolean = false
+    private lateinit var backPressSnackbar: Snackbar
 
     private lateinit var settingsPreferenceManager: SharedPreferences
 
@@ -144,6 +145,11 @@ class PlayerFragment : Fragment() {
         // 10 sec increment when seeking in TV - d-pad scenarios
         playerView.findViewById<DefaultTimeBar>(R.id.exo_progress).setKeyTimeIncrement(10000)
 
+        backPressSnackbar = Snackbar.make(
+            binding.exoPlayerView,
+            getString(R.string.press_back_again_in_player),
+            Snackbar.LENGTH_SHORT
+        )
         // Prepare Custom Player View Buttons
         prepareButtons()
         qualityBtn.text = quality
@@ -391,6 +397,7 @@ class PlayerFragment : Fragment() {
         override fun handleOnBackPressed() {
             if (doubleBackToExitPressedOnce) {
                 findNavController().popBackStack()
+                backPressSnackbar.dismiss()
                 return
             }
             doubleBackToExitPressedOnce = true
@@ -398,11 +405,7 @@ class PlayerFragment : Fragment() {
                 { doubleBackToExitPressedOnce = false },
                 2000
             )
-            Snackbar.make(
-                binding.exoPlayerView,
-                getString(R.string.press_back_again_in_player),
-                Snackbar.LENGTH_SHORT
-            ).show()
+            backPressSnackbar.show()
         }
     }
 
