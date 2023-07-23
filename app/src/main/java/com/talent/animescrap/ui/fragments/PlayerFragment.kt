@@ -178,6 +178,9 @@ class PlayerFragment : Fragment() {
         playerViewModel.playNextEp.observe(viewLifecycleOwner) { playNextEp ->
             if (playNextEp) setNewEpisode()
         }
+        playerViewModel.isError.observe(viewLifecycleOwner) { isError ->
+            if (isError) findNavController().popBackStack()
+        }
 
         if (!isInit) {
             playerViewModel.setAnimeLink(
@@ -203,7 +206,7 @@ class PlayerFragment : Fragment() {
             "${animePlayingDetails.animeEpisodeIndex.toInt() + increment}"
         println(animePlayingDetails.animeEpisodeIndex)
         if (animePlayingDetails.animeEpisodeIndex.toInt() > animePlayingDetails.animeTotalEpisode.toInt() || animePlayingDetails.animeEpisodeIndex.toInt() < 1)
-            backPressed()
+            findNavController().popBackStack()
         else {
             playerViewModel.setAnimeLink(
                 animePlayingDetails.animeUrl,

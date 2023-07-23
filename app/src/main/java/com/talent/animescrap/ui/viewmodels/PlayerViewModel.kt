@@ -4,6 +4,7 @@ import android.app.Application
 import android.media.session.PlaybackState
 import android.net.Uri
 import android.support.v4.media.session.MediaSessionCompat
+import android.widget.Toast
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import com.google.android.exoplayer2.*
@@ -47,6 +48,7 @@ class PlayerViewModel @Inject constructor(
     val keepScreenOn = MutableLiveData(false)
     val showSubsBtn = MutableLiveData(false)
     val playNextEp = MutableLiveData(false)
+    val isError = MutableLiveData(false)
 
     private val _animeStreamLink: MutableLiveData<AnimeStreamLink> = MutableLiveData()
     private val animeStreamLink: LiveData<AnimeStreamLink> = _animeStreamLink
@@ -112,6 +114,12 @@ class PlayerViewModel @Inject constructor(
                 else
                     isLoading.postValue(false)
                 super.onPlaybackStateChanged(playbackState)
+            }
+
+            override fun onPlayerError(error: PlaybackException) {
+                super.onPlayerError(error)
+                isError.postValue(true)
+                Toast.makeText(app,error.localizedMessage,Toast.LENGTH_SHORT).show()
             }
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
