@@ -85,14 +85,19 @@ class PlayerViewModel @Inject constructor(
         )
     }
 
-    fun setAnimeLink(animeUrl: String, animeEpCode: String, extras: List<String>, getNextEp: Boolean = false) {
+    fun setAnimeLink(
+        animeUrl: String,
+        animeEpCode: String,
+        extras: List<String>,
+        getNextEp: Boolean = false
+    ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 println("STREAM GET LINK")
                 animeRepository.getStreamLink(animeUrl, animeEpCode, extras).apply {
                     _animeStreamLink.postValue(this@apply)
                     withContext(Dispatchers.Main) {
-                        if(!savedDone.value || getNextEp) {
+                        if (!savedDone.value || getNextEp) {
                             println("prepare Media Source")
                             prepareMediaSource()
                             savedStateHandle["done"] = true
@@ -109,7 +114,7 @@ class PlayerViewModel @Inject constructor(
         return object : Player.Listener {
 
             override fun onPlaybackStateChanged(playbackState: Int) {
-                if(playbackState == PlaybackState.STATE_NONE || playbackState == PlaybackState.STATE_CONNECTING || playbackState == PlaybackState.STATE_STOPPED)
+                if (playbackState == PlaybackState.STATE_NONE || playbackState == PlaybackState.STATE_CONNECTING || playbackState == PlaybackState.STATE_STOPPED)
                     isLoading.postValue(true)
                 else
                     isLoading.postValue(false)
@@ -119,16 +124,19 @@ class PlayerViewModel @Inject constructor(
             override fun onPlayerError(error: PlaybackException) {
                 super.onPlayerError(error)
                 isError.postValue(true)
-                Toast.makeText(app,error.localizedMessage,Toast.LENGTH_SHORT).show()
+                Toast.makeText(app, error.localizedMessage, Toast.LENGTH_SHORT).show()
             }
+
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 keepScreenOn.postValue(isPlaying)
-                val progress = (player.currentPosition.toFloat()*100)/player.duration.toFloat()
-                if(progress> 100 && isAutoPlayEnabled) {
+                if (!isPlaying) return
+                val progress = player.duration - player.currentPosition
+                if (progress <= 0 && isAutoPlayEnabled) {
                     playNextEp.postValue(true)
                 }
             }
+
             override fun onTracksChanged(tracks: Tracks) {
                 // Update UI using current tracks.
                 for (trackGroup in tracks.groups) {
