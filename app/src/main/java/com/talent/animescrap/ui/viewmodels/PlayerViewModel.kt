@@ -130,11 +130,9 @@ class PlayerViewModel @Inject constructor(
             override fun onIsPlayingChanged(isPlaying: Boolean) {
                 super.onIsPlayingChanged(isPlaying)
                 keepScreenOn.postValue(isPlaying)
-                if (!isPlaying) return
                 val progress = player.duration - player.currentPosition
-                if (progress <= 0 && isAutoPlayEnabled) {
+                if (progress <= 0 && isAutoPlayEnabled && !isPlaying)
                     playNextEp.postValue(true)
-                }
             }
 
             override fun onTracksChanged(tracks: Tracks) {
