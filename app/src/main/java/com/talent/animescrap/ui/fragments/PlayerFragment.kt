@@ -439,6 +439,9 @@ class PlayerFragment : Fragment() {
         WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
         WindowInsetsControllerCompat(requireActivity().window, requireActivity().window.decorView)
             .show(WindowInsetsCompat.Type.systemBars())
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2)
+            requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
     }
 
     private fun hideSystemUi() {
@@ -452,6 +455,9 @@ class PlayerFragment : Fragment() {
             controller.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S_V2)
+            requireActivity().window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
+
     }
 
 
