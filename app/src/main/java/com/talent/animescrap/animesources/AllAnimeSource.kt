@@ -7,6 +7,7 @@ import com.talent.animescrap.utils.Utils.getJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
+import java.nio.charset.StandardCharsets
 
 class AllAnimeSource : AnimeSource {
 
@@ -130,75 +131,77 @@ class AllAnimeSource : AnimeSource {
                     .reversed()
             println(sortedSources)
             println("sorted")
+            val sortedList = arrayListOf<String>()
             for (sourceUrlHolder in sortedSources) {
-                println(sourceUrlHolder)
                 var sourceUrl = sourceUrlHolder.asJsonObject["sourceUrl"].asString
-                println(sourceUrl)
-                val sourceName = sourceUrlHolder.asJsonObject["sourceName"].asString
                 if(!sourceUrl.startsWith("http")) sourceUrl = sourceUrl.decodeHash()
-                if (isThese(sourceUrl) || isThese(sourceName) || !sourceUrl.contains("http")) continue
-                if (sourceUrl.contains("apivtwo")) {
-                    val apiUrl = "https://allanimenews.com"
-                    println(apiUrl)
-                    println(
-                        "$apiUrl${
-                            sourceUrl.replace("clock", "clock.json")
-                        }"
-                    )
-                    val allLinks = getJson(
-                        "$apiUrl${
-                            sourceUrl.replace("clock", "clock.json")
-                        }"
-                    )!!.asJsonObject["links"].asJsonArray
-                    println(allLinks)
-                    val firstLink = allLinks.first().asJsonObject
-                    println(firstLink)
-                    if (firstLink.has("portData") && firstLink["portData"].asJsonObject.has("streams")) {
-                        for (link in firstLink["portData"].asJsonObject["streams"].asJsonArray) {
-                            if (link.toString().contains("dash")) continue
-                            if (!link.asJsonObject["hardsub_lang"].asString.contains("en")) continue
-                            return@withContext AnimeStreamLink(
-                                link.asJsonObject["url"].asString,
-                                "",
-                                link.toString().contains("hls")
-                            )
-                        }
-                    }
-                    println("link = $firstLink")
-
-                    val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
-                    val streamUrl = if(firstLink.has("rawUrls")) firstLink["rawUrls"].asJsonObject["vids"].asJsonArray.first().asJsonObject["url"].asString else firstLink["link"].asString
-                    println()
-                    return@withContext AnimeStreamLink(streamUrl, "", isHls)
-                }
-
-                return@withContext AnimeStreamLink(
-                    sourceUrl,
-                    "",
-                    res.first().toString().contains("hls")
+                val sourceName = sourceUrlHolder.asJsonObject["sourceName"].asString
+                if(isThese(sourceName) || isThese(sourceUrl)) continue
+                sortedList.add(sourceUrl)
+            }
+            println("======= sortedList =====")
+            sortedList.forEachIndexed { index, item ->
+                println("${index + 1}) $item")
+            }
+            println("======= =====")
+            val sourceUrl = sortedList.first()
+            if (sourceUrl.contains("apivtwo")) {
+                val apiUrl = "https://allanimenews.com"
+                println(apiUrl)
+                println(
+                    "$apiUrl${
+                        sourceUrl.replace("clock", "clock.json")
+                    }"
                 )
+                val allLinks = getJson(
+                    "$apiUrl${
+                        sourceUrl.replace("clock", "clock.json")
+                    }"
+                )!!.asJsonObject["links"].asJsonArray
+                println(allLinks)
+                val firstLink = allLinks.first().asJsonObject
+                println(firstLink)
+                if (firstLink.has("portData") && firstLink["portData"].asJsonObject.has("streams")) {
+                    for (link in firstLink["portData"].asJsonObject["streams"].asJsonArray) {
+                        if (link.toString().contains("dash")) continue
+                        if (!link.asJsonObject["hardsub_lang"].asString.contains("en")) continue
+                        return@withContext AnimeStreamLink(
+                            link.asJsonObject["url"].asString,
+                            "",
+                            link.toString().contains("hls")
+                        )
+                    }
+                }
+                println("link = $firstLink")
+
+                val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
+                val streamUrl = if(firstLink.has("rawUrls")) firstLink["rawUrls"].asJsonObject["vids"].asJsonArray.first().asJsonObject["url"].asString else firstLink["link"].asString
+                println()
+                return@withContext AnimeStreamLink(streamUrl, "", isHls)
             }
 
-            return@withContext AnimeStreamLink("", "", false)
-        }
+            return@withContext AnimeStreamLink(
+                sourceUrl,
+                "",
+                res.first().toString().contains("hls")
+            )
+           }
 
-    private fun String.hexDecode(): String {
-        return substringAfterLast('#')
-            .chunked(2)
-            .map { it.toInt(16).toByte() }
-            .toByteArray()
-            .toString(Charsets.UTF_8)
+    private fun decrypt(target: String): String {
+        val byteArray = target.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
+        for (i in byteArray.indices) {
+            byteArray[i] = (byteArray[i].toInt() xor 56).toByte()
+        }
+        return String(byteArray, StandardCharsets.UTF_8)
     }
 
     private fun String.decodeHash(): String {
-        var str = hexDecode()
-        str = str.map {
-            (it.code xor 48).toChar()
-        }.joinToString("")
-        return str
+        if(startsWith('-')) return decrypt(this.substringAfterLast('-'))
+        if(startsWith('#')) return decrypt(this.substringAfterLast('#'))
+        return this
     }
     private fun isThese(url: String): Boolean {
-        val unwantedSources = listOf("goload", "streamsb", "ok.ru", "streamlare", "mp4upload")
+        val unwantedSources = listOf("goload", "playtaku", "streamsb", "ok.ru", "streamlare", "mp4upload")
         unwantedSources.forEach { source ->
             if (url.contains(source)) return true
         }

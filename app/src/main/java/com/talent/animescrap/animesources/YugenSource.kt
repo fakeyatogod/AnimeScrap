@@ -41,7 +41,7 @@ class YugenSource : AnimeSource {
 
     override suspend fun searchAnime(searchedText: String) = withContext(Dispatchers.IO) {
         val animeList = arrayListOf<SimpleAnime>()
-        val searchUrl = "$mainUrl/search/?q=${searchedText}"
+        val searchUrl = "$mainUrl/discover/?q=${searchedText}"
 
         val doc = getJsoup(searchUrl)
         val allInfo = doc.getElementsByClass("anime-meta")
