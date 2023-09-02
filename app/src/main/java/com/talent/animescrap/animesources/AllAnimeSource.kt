@@ -201,7 +201,7 @@ class AllAnimeSource : AnimeSource {
         return this
     }
     private fun isThese(url: String): Boolean {
-        val unwantedSources = listOf("goload", "playtaku", "streamsb", "ok.ru", "streamlare", "mp4upload")
+        val unwantedSources = listOf("goload", "filemoon", "streamwish", "playtaku", "streamsb", "ok.ru", "streamlare", "mp4upload", "Ak")
         unwantedSources.forEach { source ->
             if (url.contains(source)) return true
         }
