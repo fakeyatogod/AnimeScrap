@@ -29,6 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="180dp"
                     android:adjustViewBounds="true"
+                    android:background="@color/shimmerColor"
                     android:scaleType="centerCrop"
                     tools:ignore="ContentDescription" />
 
@@ -55,7 +56,7 @@
                             android:id="@+id/coverAnime"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@color/white"
+                            android:background="@color/shimmerColor"
                             android:contentDescription="@string/cover_of_anime"
                             android:scaleType="centerCrop"
                             android:transitionName="pageImageT" />

@@ -22,6 +22,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
 import coil.load
+import com.facebook.shimmer.Shimmer
+import com.facebook.shimmer.ShimmerDrawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
@@ -58,6 +60,14 @@ class AnimeFragment : Fragment() {
     private lateinit var epList: MutableList<String>
     private lateinit var epType: String
     private lateinit var epIndex: String
+    private val shimmer =
+        Shimmer.AlphaHighlightBuilder()// The attributes for a ShimmerDrawable is set by this builder
+            .setDuration(1200) // how long the shimmering animation takes to do one full sweep
+            .setBaseAlpha(0.6f) //the alpha of the underlying children
+            .setHighlightAlpha(0.9f) // the shimmer alpha amount
+            .setDirection(Shimmer.Direction.LEFT_TO_RIGHT)
+            .setAutoStart(true)
+            .build()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -129,10 +139,16 @@ class AnimeFragment : Fragment() {
 
                 // load background image.
                 binding.backgroundImage.load(animeDetails.animeCover) {
+                    placeholder(ShimmerDrawable().apply {
+                        setShimmer(shimmer)
+                    })
                     error(R.drawable.ic_broken_image)
                 }
                 // load cover image.
                 binding.coverAnime.load(animeDetails.animeCover) {
+                    placeholder(ShimmerDrawable().apply {
+                        setShimmer(shimmer)
+                    })
                     error(R.drawable.ic_broken_image)
                 }
                 binding.errorCard?.visibility = View.GONE
