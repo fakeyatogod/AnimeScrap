@@ -25,6 +25,7 @@ fun ImageView.setImage(url: String?) {
         .build()
     if (!url.isNullOrEmpty())
         load(url, imageLoader) {
+            crossfade(true)
             placeholder(ShimmerDrawable().apply {
                 setShimmer(shimmer)
             })

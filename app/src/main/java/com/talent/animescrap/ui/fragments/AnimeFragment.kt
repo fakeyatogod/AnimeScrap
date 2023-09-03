@@ -143,6 +143,7 @@ class AnimeFragment : Fragment() {
 
                 // load background image.
                 binding.backgroundImage.load(animeDetails.animeCover, imageLoader) {
+                    crossfade(true)
                     placeholder(ShimmerDrawable().apply {
                         setShimmer(shimmer)
                     })
@@ -150,6 +151,7 @@ class AnimeFragment : Fragment() {
                 }
                 // load cover image.
                 binding.coverAnime.load(animeDetails.animeCover, imageLoader) {
+                    crossfade(true)
                     placeholder(ShimmerDrawable().apply {
                         setShimmer(shimmer)
                     })
