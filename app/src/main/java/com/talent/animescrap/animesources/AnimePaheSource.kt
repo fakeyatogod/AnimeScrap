@@ -1,12 +1,12 @@
 package com.talent.animescrap.animesources
 
 import android.content.Context
-import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
 import com.talent.animescrap.animesources.sourceutils.CloudflareInterceptor
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils.getJson
+import com.talent.animescrap.utils.Utils.httpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
@@ -16,13 +16,11 @@ import kotlin.math.pow
 
 class AnimePaheSource(context: Context) : AnimeSource {
 
-    private val client = OkHttpClient.Builder()
-        .cookieJar(AndroidCookieJar())
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .callTimeout(2, TimeUnit.MINUTES)
-        .addInterceptor(CloudflareInterceptor(context))
-        .build()
+
+    init {
+        httpClient = httpClient.newBuilder().addInterceptor(CloudflareInterceptor(context))
+            .build()
+    }
 
     private var cookies: String = ""
     private val kwikParamsRegex = Regex("""\("(\w+)",\d+,"(\w+)",(\d+),(\d+),\d+\)""")
@@ -40,7 +38,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
 
             // For Anime Details
             val detailsUrl = "$mainUrl/anime/$session"
-            val detailsHtml = client.newCall(Request.Builder().url(detailsUrl).build())
+            val detailsHtml = httpClient.newCall(Request.Builder().url(detailsUrl).build())
                 .execute().body!!.string()
             val doc = Jsoup.parse(detailsHtml)
 
@@ -135,7 +133,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
         extras: List<String>?
     ): AnimeStreamLink =
         withContext(Dispatchers.IO) {
-            println("anime url = " + animeUrl)
+            println("anime url = $animeUrl")
             /*val animeId =
                 animeUrl.replaceAfter("AnimePaheSession", "").replace("AnimePaheSession", "")
                     .replace("AnimePaheId=", "")*/
@@ -145,7 +143,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
             println(urlForLinks)
             val playUrl = "$mainUrl/play/$animeSession/$animeEpCode"
             println(playUrl)
-            val d = client.newCall(Request.Builder().url(playUrl).build())
+            val d = httpClient.newCall(Request.Builder().url(playUrl).build())
                 .execute().body!!.string()
             val jDoc = Jsoup.parse(d)
             val allLinks = jDoc.select("#pickDownload a").filter { source ->
@@ -165,7 +163,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
 
     private fun getStreamUrlFromKwik(paheUrl: String): String {
 
-        val noRedirects = client.newBuilder()
+        val noRedirects = httpClient.newBuilder()
             .followRedirects(false)
             .followSslRedirects(false)
             .build()
@@ -174,7 +172,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
                 .header("location")!!.substringAfterLast("https://")
         println(kwikUrl)
         val fContent =
-            client.newCall(
+            httpClient.newCall(
                 Request.Builder().url(kwikUrl).header("referer", "https://kwik.cx/").build()
             ).execute()
         cookies += (fContent.header("set-cookie")!!)
@@ -195,7 +193,7 @@ class AnimePaheSource(context: Context) : AnimeSource {
         val noRedirectClient = OkHttpClient().newBuilder()
             .followRedirects(false)
             .followSslRedirects(false)
-            .cookieJar(client.cookieJar)
+            .cookieJar(httpClient.cookieJar)
             .build()
 
         while (code != 302 && tries < 20) {

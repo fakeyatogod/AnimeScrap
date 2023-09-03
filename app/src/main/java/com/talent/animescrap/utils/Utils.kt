@@ -3,10 +3,21 @@ package com.talent.animescrap.utils
 import com.github.kittinunf.fuel.Fuel
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
+import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
+import okhttp3.OkHttpClient
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import java.util.concurrent.TimeUnit
 
 object Utils {
+
+    var httpClient = OkHttpClient.Builder()
+        .cookieJar(AndroidCookieJar())
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .callTimeout(2, TimeUnit.MINUTES)
+        .build()
+
     fun getJsoup(
         url: String,
         mapOfHeaders: Map<String, String>? = null

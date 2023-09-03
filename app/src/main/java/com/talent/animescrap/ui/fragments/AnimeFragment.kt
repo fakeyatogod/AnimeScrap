@@ -21,6 +21,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.preference.PreferenceManager
+import coil.ImageLoader
 import coil.load
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
@@ -33,6 +34,7 @@ import com.talent.animescrap.model.AnimePlayingDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
+import com.talent.animescrap.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -74,7 +76,9 @@ class AnimeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentAnimeBinding.inflate(inflater, container, false)
-
+        val imageLoader = ImageLoader.Builder(requireContext())
+            .okHttpClient { Utils.httpClient }
+            .build()
         settingsPreferenceManager = PreferenceManager.getDefaultSharedPreferences(requireContext())
         selectedSource = settingsPreferenceManager.getString("source", "yugen")!!
         isExternalPlayerEnabled = settingsPreferenceManager.getBoolean("external_player", false)
@@ -138,14 +142,14 @@ class AnimeFragment : Fragment() {
                 binding.animeDetailsTxt.text = animeDetails.animeDesc
 
                 // load background image.
-                binding.backgroundImage.load(animeDetails.animeCover) {
+                binding.backgroundImage.load(animeDetails.animeCover, imageLoader) {
                     placeholder(ShimmerDrawable().apply {
                         setShimmer(shimmer)
                     })
                     error(R.drawable.ic_broken_image)
                 }
                 // load cover image.
-                binding.coverAnime.load(animeDetails.animeCover) {
+                binding.coverAnime.load(animeDetails.animeCover, imageLoader) {
                     placeholder(ShimmerDrawable().apply {
                         setShimmer(shimmer)
                     })

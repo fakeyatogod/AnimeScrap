@@ -1,13 +1,13 @@
 package com.talent.animescrap.viewbindings
 
-import android.view.View
 import android.widget.ImageView
-import android.widget.ProgressBar
 import androidx.databinding.BindingAdapter
+import coil.ImageLoader
 import coil.load
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
 import com.talent.animescrap.R
+import com.talent.animescrap.utils.Utils
 
 private val shimmer =
     Shimmer.AlphaHighlightBuilder()// The attributes for a ShimmerDrawable is set by this builder
@@ -20,8 +20,11 @@ private val shimmer =
 /* A function that is called when the `image` attribute is used in the layout. */
 @BindingAdapter("image")
 fun ImageView.setImage(url: String?) {
+    val imageLoader = ImageLoader.Builder(context)
+        .okHttpClient { Utils.httpClient }
+        .build()
     if (!url.isNullOrEmpty())
-        load(url) {
+        load(url, imageLoader) {
             placeholder(ShimmerDrawable().apply {
                 setShimmer(shimmer)
             })

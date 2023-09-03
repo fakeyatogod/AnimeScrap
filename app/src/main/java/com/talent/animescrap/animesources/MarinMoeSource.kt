@@ -2,36 +2,30 @@ package com.talent.animescrap.animesources
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
-import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
 import com.talent.animescrap.animesources.sourceutils.DdosGuardInterceptor
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
-import okhttp3.OkHttpClient
+import com.talent.animescrap.utils.Utils.httpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup
-import java.util.concurrent.TimeUnit
 
 class MarinMoeSource : AnimeSource {
     private val mainUrl = "https://marin.moe"
 
-    private val httpClient = OkHttpClient.Builder()
-        .cookieJar(AndroidCookieJar())
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .callTimeout(2, TimeUnit.MINUTES)
-        .build()
 
-    private val client = httpClient.newBuilder().addInterceptor(DdosGuardInterceptor(httpClient))
-        .build()
+    init {
+        httpClient = httpClient.newBuilder().addInterceptor(DdosGuardInterceptor(httpClient))
+            .build()
+    }
 
     override suspend fun searchAnime(searchedText: String): ArrayList<SimpleAnime> {
         return getAnimeList("$mainUrl/anime?sort=rel-d&search=$searchedText")
     }
 
     override suspend fun latestAnime(): ArrayList<SimpleAnime> {
-        return getAnimeList("$mainUrl/anime?sort=rel-d&page=1")
+        return getEpisodeList("$mainUrl/episode?sort=rel-d&page=1")
     }
 
     override suspend fun trendingAnime(): ArrayList<SimpleAnime> {
@@ -49,6 +43,26 @@ class MarinMoeSource : AnimeSource {
                     SimpleAnime(
                         anime["title"].asString,
                         anime["cover"].asString,
+                        "/anime/${anime["slug"].asString}"
+                    )
+                )
+
+            }
+        return animeList
+
+    }
+
+    private fun getEpisodeList(url: String): ArrayList<SimpleAnime> {
+        val res = get(url)
+        val resJson = parseJson(res)
+        val animeList = arrayListOf<SimpleAnime>()
+        resJson.asJsonObject["props"].asJsonObject["episode_list"].asJsonObject["data"].asJsonArray
+            .forEach { e ->
+                val anime = e.asJsonObject["anime"].asJsonObject
+                animeList.add(
+                    SimpleAnime(
+                        anime["title"].asString,
+                        e.asJsonObject["cover"].asString,
                         "/anime/${anime["slug"].asString}"
                     )
                 )
@@ -94,7 +108,7 @@ class MarinMoeSource : AnimeSource {
         println(videoLink)
         println(videoSubs)
 
-        val ddosCookies = client.cookieJar.loadForRequest(res.request.url).filter {
+        val ddosCookies = httpClient.cookieJar.loadForRequest(res.request.url).filter {
             it.name !in arrayOf("__ddgid_", "__ddgmark_")
         }.joinToString(";") { "${it.name}=${it.value}" }
 
@@ -123,13 +137,13 @@ class MarinMoeSource : AnimeSource {
 
     private fun get(url: String): String {
         val requestBuilder = Request.Builder().url(url)
-        return client.newCall(requestBuilder.build())
+        return httpClient.newCall(requestBuilder.build())
             .execute().body!!.string()
     }
 
     private fun getResponse(url: String): Response {
         val requestBuilder = Request.Builder().url(url)
-        return client.newCall(requestBuilder.build())
+        return httpClient.newCall(requestBuilder.build())
             .execute()
     }
 }
