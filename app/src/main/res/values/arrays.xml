@@ -9,6 +9,7 @@
         <item>AnimePahe</item>
         <item>Kawaiifu</item>
         <item>MarinMoe</item>
+        <item>AsianHDPlay</item>
     </string-array>
 
     <string-array name="sources_values">
@@ -20,6 +21,7 @@
         <item>animepahe</item>
         <item>kawaiifu</item>
         <item>marin_moe</item>
+        <item>asian_hd_play</item>
     </string-array>
 
     <!-- Dark Mode Preference -->
