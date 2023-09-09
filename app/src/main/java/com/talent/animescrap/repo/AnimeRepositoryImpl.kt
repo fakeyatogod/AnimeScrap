@@ -72,8 +72,8 @@ class AnimeRepositoryImpl @Inject constructor(
             "marin_moe" -> {
                 MarinMoeSource()
             }
-            "asian_hd_play" -> {
-                AsianHDPlaySource()
+            "asian_load" -> {
+                AsianLoad()
             }
             else -> {
                 YugenSource()

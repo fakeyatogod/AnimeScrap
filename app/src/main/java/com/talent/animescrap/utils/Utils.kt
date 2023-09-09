@@ -4,7 +4,9 @@ import com.github.kittinunf.fuel.Fuel
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
+import okhttp3.Headers
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import java.util.concurrent.TimeUnit
@@ -17,6 +19,19 @@ object Utils {
         .readTimeout(30, TimeUnit.SECONDS)
         .callTimeout(2, TimeUnit.MINUTES)
         .build()
+
+    fun get(url: String,
+            mapOfHeaders: Map<String, String>? = null
+    ): String {
+        val requestBuilder = Request.Builder().url(url)
+        if (!mapOfHeaders.isNullOrEmpty()) {
+            mapOfHeaders.forEach{
+                requestBuilder.addHeader(it.key, it.value)
+            }
+        }
+        return httpClient.newCall(requestBuilder.build())
+            .execute().body!!.string()
+    }
 
     fun getJsoup(
         url: String,

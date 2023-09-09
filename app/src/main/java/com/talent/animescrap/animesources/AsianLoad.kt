@@ -1,24 +1,28 @@
 package com.talent.animescrap.animesources
 
+import android.net.Uri
+import android.util.Base64
+import com.google.gson.JsonParser
 import com.talent.animescrap.model.AnimeDetails
 import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.getJsoup
+import com.talent.animescrap.utils.Utils.get
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jsoup.Jsoup
+import javax.crypto.Cipher
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
-class AsianHDPlaySource : AnimeSource {
-    private val mainUrl = "https://asianhdplay.pro"
+class AsianLoad : AnimeSource {
+    private val mainUrl = "https://asianload.cc"
     override suspend fun animeDetails(contentLink: String): AnimeDetails {
         val url = "$mainUrl${contentLink}"
-        val doc = getJsoup(url)
+        val doc = Jsoup.parse(get(url))
         val animeCover = doc.selectFirst(".video-block")!!.getElementsByTag("img").attr("src")
         val animeName = doc.selectFirst(".video-details .date")!!.text()
         val animDesc = doc.selectFirst(".video-details .post-entry")!!.text()
 
-        println(animeCover)
-        println(animeName)
-        println(animDesc)
         val eps = doc.selectFirst(".listing")!!.select("li")
         val subMap = mutableMapOf<String, String>()
         var totalEp = eps.size
@@ -28,9 +32,7 @@ class AsianHDPlaySource : AnimeSource {
             subMap[totalEp.toString()] = link
             totalEp--
         }
-        println(eps)
 
-//            val epMapSub = (1..subsEpCount.toInt()).associate { it.toString() to it.toString() }
         val epMap = mutableMapOf("DEFAULT" to subMap)
 
         return AnimeDetails(animeName, animDesc, animeCover, epMap)
@@ -44,7 +46,7 @@ class AsianHDPlaySource : AnimeSource {
 
     private fun getItems(url: String): ArrayList<SimpleAnime> {
         val animeList = arrayListOf<SimpleAnime>()
-        val doc = getJsoup(url)
+        val doc = Jsoup.parse(get(url))
         val allInfo = doc.getElementsByClass("video-block")
         for (item in allInfo) {
             val itemImage = item.getElementsByTag("img").attr("src")
@@ -72,17 +74,44 @@ class AsianHDPlaySource : AnimeSource {
         withContext(Dispatchers.IO) {
             // Get the link of episode
             val animeEpUrl = "$mainUrl$animeEpCode"
+            val doc = Jsoup.parse(get(animeEpUrl))
 
-            var embedLink =
-                getJsoup(animeEpUrl).selectFirst(".play-video")!!.getElementsByTag("iframe")
+            val embedLink = "https:"+doc.selectFirst(".play-video")!!.getElementsByTag("iframe")
                     .attr("src")
-            embedLink = embedLink.replaceBefore("streaming.php", "$mainUrl/download")
-                .replace("streaming.php", "")
             println(embedLink)
-            val link = getJsoup(embedLink).selectFirst(".mirror_link")!!.select("dowload").last()!!
-                .getElementsByTag("a").attr("href")
+            val id = Uri.parse(embedLink).getQueryParameter("id")!!
+            val embedDoc = Jsoup.parse(get(embedLink))
+            val scriptValue = embedDoc.select("script[data-name='crypto']").attr("data-value")
+            val key = "93422192433952489752342908585752"
+            val iv = "9262859232435825"
+            val encryptedKey = encryptAES(id, key, iv)
+            val decryptedToken = decryptAES(scriptValue, key, iv)
+
+            val url = "https://${Uri.parse(embedLink).host}/encrypt-ajax.php?id=$encryptedKey&alias=$decryptedToken"
+            println(url)
+            val data = JsonParser.parseString(get(url)).asJsonObject["data"].asString
+            println(data)
+            val link = JsonParser.parseString(decryptAES(data, key, iv)).asJsonObject["source"].asJsonArray.first().asJsonObject["file"].asString
             println(link)
             return@withContext AnimeStreamLink(link, "", true)
 
         }
+
+    private fun encryptAES(data: String, key: String, iv: String): String {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        val secretKey = SecretKeySpec(key.toByteArray(), "AES")
+        val ivSpec = IvParameterSpec(iv.toByteArray())
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec)
+        val encryptedBytes = cipher.doFinal(data.toByteArray())
+        return Base64.encodeToString(encryptedBytes, Base64.DEFAULT)
+    }
+
+    private fun decryptAES(encryptedData: String, key: String, iv: String): String {
+        val cipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+        val secretKey = SecretKeySpec(key.toByteArray(), "AES")
+        val ivSpec = IvParameterSpec(iv.toByteArray())
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec)
+        val decryptedBytes = cipher.doFinal(Base64.decode(encryptedData, Base64.DEFAULT))
+        return String(decryptedBytes)
+    }
 }
