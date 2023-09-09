@@ -17,6 +17,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.ui.activities.MainActivity
 import com.talent.animescrap.ui.viewmodels.UpdateViewModel
+import com.talent.animescrap.utils.Utils
+import com.talent.animescrap.utils.Utils.httpClient
 import dagger.hilt.android.AndroidEntryPoint
 import kotlin.system.exitProcess
 
@@ -46,6 +48,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         val sourcePref = findPreference<ListPreference>("source")
         sourcePref?.setOnPreferenceChangeListener { _, newValue ->
+            httpClient = httpClient.newBuilder().build()
             startActivity(Intent.makeRestartActivityTask(activity?.intent?.component))
             Toast.makeText(
                 requireContext(),

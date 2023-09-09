@@ -50,7 +50,7 @@ class AsianLoad : AnimeSource {
         val allInfo = doc.getElementsByClass("video-block")
         for (item in allInfo) {
             val itemImage = item.getElementsByTag("img").attr("src")
-            val itemName = item.getElementsByClass("name").text()
+            val itemName = item.getElementsByClass("name").text().substringBefore("Episode ")
             val itemLink = item.getElementsByTag("a").attr("href")
             animeList.add(SimpleAnime(itemName, itemImage, itemLink))
         }
