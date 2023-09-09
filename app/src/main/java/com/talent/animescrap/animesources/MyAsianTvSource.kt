@@ -6,24 +6,24 @@ import com.talent.animescrap.model.AnimeStreamLink
 import com.talent.animescrap.model.SimpleAnime
 import com.talent.animescrap.utils.Utils.get
 import org.jsoup.Jsoup
+import org.jsoup.select.Elements
 
-class AsianLoad : AnimeSource {
-    private val mainUrl = "https://asianload.cc"
+class MyAsianTvSource : AnimeSource {
+    private val mainUrl = "https://myasiantv.cx"
     override suspend fun animeDetails(contentLink: String): AnimeDetails {
         val url = "$mainUrl${contentLink}"
         val doc = Jsoup.parse(get(url))
-        val animeCover = doc.selectFirst(".video-block")!!.getElementsByTag("img").attr("src")
-        val animeName = doc.selectFirst(".video-details .date")!!.text()
-        val animDesc = doc.selectFirst(".video-details .post-entry")!!.text()
+        val animeCover = doc.selectFirst(".poster")!!.getElementsByTag("img").attr("src")
+        val animeName = doc.selectFirst(".movie h1")!!.text()
+        val animDesc = doc.selectFirst(".info")!!.text()
 
-        val eps = doc.selectFirst(".listing")!!.select("li")
+        val lastEpUrl = doc.selectFirst(".list-episode a")!!.attr("href")
+        val lastEp = lastEpUrl.substringAfterLast("episode-").toInt()
+        val epPrefix = lastEpUrl.replaceAfterLast("episode-", "")
         val subMap = mutableMapOf<String, String>()
-        var totalEp = eps.size
-        eps.forEach { epLi ->
-            val link = epLi.getElementsByTag("a").attr("href")
-//            val name = epLi.select(".name").text().replace(animeName,"")
-            subMap[totalEp.toString()] = link
-            totalEp--
+
+        for (ep in 1..lastEp) {
+            subMap["$ep"] = epPrefix + ep
         }
 
         val epMap = mutableMapOf("DEFAULT" to subMap)
@@ -33,17 +33,18 @@ class AsianLoad : AnimeSource {
 
 
     override suspend fun searchAnime(searchedText: String): ArrayList<SimpleAnime> {
-        val searchUrl = "$mainUrl/search.html?keyword=${searchedText}"
-        return getItems(searchUrl)
+        val searchUrl = "$mainUrl/search.html?key=${searchedText}"
+        println(searchUrl)
+        val allInfo = Jsoup.parse(get(searchUrl)).select(".items > li")
+        println(allInfo)
+        return getItems(allInfo)
     }
 
-    private fun getItems(url: String): ArrayList<SimpleAnime> {
+    private fun getItems(allInfo: Elements): ArrayList<SimpleAnime> {
         val animeList = arrayListOf<SimpleAnime>()
-        val doc = Jsoup.parse(get(url))
-        val allInfo = doc.getElementsByClass("video-block")
         for (item in allInfo) {
             val itemImage = item.getElementsByTag("img").attr("src")
-            val itemName = item.getElementsByClass("name").text().substringBefore("Episode ")
+            val itemName = item.getElementsByTag("img").attr("alt")
             val itemLink = item.getElementsByTag("a").attr("href")
             animeList.add(SimpleAnime(itemName, itemImage, itemLink))
         }
@@ -51,11 +52,16 @@ class AsianLoad : AnimeSource {
     }
 
     override suspend fun latestAnime(): ArrayList<SimpleAnime> {
-        return getItems(mainUrl)
+        return getItems(
+            Jsoup.parse(get("$mainUrl/show/goblin")).select("#sidebarlist-2 div > a")
+        )
     }
 
     override suspend fun trendingAnime(): ArrayList<SimpleAnime> {
-        return getItems("$mainUrl/popular")
+        return getItems(
+            Jsoup.parse(get("$mainUrl/anclytic.html?id=3"))
+                .getElementsByTag("div")
+        )
 
     }
 
@@ -66,15 +72,16 @@ class AsianLoad : AnimeSource {
     ): AnimeStreamLink {
         // Get the link of episode
         val animeEpUrl = "$mainUrl$animeEpCode"
+        println(animeEpUrl)
         val doc = Jsoup.parse(get(animeEpUrl))
-
-        val embedLink = "https:" + doc.selectFirst(".play-video")!!.getElementsByTag("iframe")
-            .attr("src")
+        val embedLink =
+            "https:" + doc.getElementsByAttribute("data-video").first()!!.attr("data-video")
         println(embedLink)
         val link = AsianExtractor().getAsianStreamLink(embedLink)
         println(link)
         return AnimeStreamLink(link, "", true)
 
     }
+
 
 }

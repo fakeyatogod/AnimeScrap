@@ -75,6 +75,9 @@ class AnimeRepositoryImpl @Inject constructor(
             "asian_load" -> {
                 AsianLoad()
             }
+            "my_asian_tv" -> {
+                MyAsianTvSource()
+            }
             else -> {
                 YugenSource()
             }

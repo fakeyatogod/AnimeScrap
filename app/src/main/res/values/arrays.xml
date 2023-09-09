@@ -10,6 +10,7 @@
         <item>Kawaiifu</item>
         <item>MarinMoe</item>
         <item>AsianLoad</item>
+        <item>MyAsianTv</item>
     </string-array>
 
     <string-array name="sources_values">
@@ -22,6 +23,7 @@
         <item>kawaiifu</item>
         <item>marin_moe</item>
         <item>asian_load</item>
+        <item>my_asian_tv</item>
     </string-array>
 
     <!-- Dark Mode Preference -->
