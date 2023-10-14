@@ -144,9 +144,9 @@ class AllAnimeSource : AnimeSource {
                 println("${index + 1}) $item")
             }
             println("======= =====")
-            val sourceUrl = sortedList.first()
+            val sourceUrl = sortedList[1]
             if (sourceUrl.contains("apivtwo")) {
-                val apiUrl = "https://allanimenews.com"
+                val apiUrl = "https://embed.ssbcontent.site"
                 println(apiUrl)
                 println(
                     "$apiUrl${
@@ -201,7 +201,7 @@ class AllAnimeSource : AnimeSource {
         return this
     }
     private fun isThese(url: String): Boolean {
-        val unwantedSources = listOf("goload", "filemoon", "streamwish", "playtaku", "streamsb", "ok.ru", "streamlare", "mp4upload", "Ak")
+        val unwantedSources = listOf("goload", "filemoon", "streamwish", "goone.pro", "playtaku", "streamsb", "ok.ru", "streamlare", "mp4upload", "Ak")
         unwantedSources.forEach { source ->
             if (url.contains(source)) return true
         }
