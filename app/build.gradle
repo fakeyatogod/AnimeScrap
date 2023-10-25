@@ -116,3 +116,18 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'org.company'
+            artifactId = 'sample'
+            version = "0.9-SNAPSHOT"
+            from components.java
+
+            pom {
+                description = 'AnimeScrap Classes Lib'
+            }
+        }
+    }
+}
