@@ -11,12 +11,12 @@ plugins {
 android {
 
     namespace 'com.talent.animescrap'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.talent.animescrap"
         minSdk 23
-        targetSdk 33
+        targetSdk 34
         versionCode 18
         versionName "2.4.5"
         archivesBaseName = "AnimeScrap"
@@ -63,27 +63,27 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation project(path: ':AnimeScrapCommon')
 
     // ExoPlayer + HLS + UI + MediaSession
-    def exo_version = "2.18.7"
+    def exo_version = "2.19.1"
     implementation "com.google.android.exoplayer:exoplayer:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-ui:$exo_version"
     implementation "com.google.android.exoplayer:exoplayer-hls:$exo_version"
     implementation "com.google.android.exoplayer:extension-mediasession:$exo_version"
 
     // MVVM
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.2'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
 
     // Navigation - Jetpack
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.4'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.4'
 
     // Network
     implementation 'org.jsoup:jsoup:1.15.2' // Web scraping tool
@@ -92,7 +92,7 @@ dependencies {
     implementation 'io.coil-kt:coil:2.2.2' // Photo from network
 
     // Room components
-    def roomVersion = '2.5.1'
+    def roomVersion = '2.6.0'
     implementation "androidx.room:room-ktx:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     androidTestImplementation "androidx.room:room-testing:$roomVersion"
@@ -101,7 +101,7 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     // Preference / Settings
-    implementation 'androidx.preference:preference-ktx:1.2.0'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
 
     // Hilt dependency injection
     implementation "com.google.dagger:hilt-android:2.44.2"
