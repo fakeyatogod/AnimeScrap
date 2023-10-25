@@ -173,12 +173,10 @@ class MainActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
-                || destination.id == R.id.navigation_settings || destination.id == R.id.navigation_player
-            ) {
-                search.isVisible = false
-                settings.isVisible = false
-            }
+           val notThis = destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
+                   || destination.id == R.id.navigation_settings || destination.id == R.id.navigation_player
+                search.isVisible = !notThis
+                settings.isVisible = !notThis
         }
         return super.onCreateOptionsMenu(menu)
     }
