@@ -1,4 +1,4 @@
-package com.talent.AnimeScrapCommon
+package com.talent.animescrap_common
 
 import org.junit.Test
 

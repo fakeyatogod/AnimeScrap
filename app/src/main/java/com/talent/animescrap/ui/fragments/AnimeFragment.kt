@@ -29,12 +29,12 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentAnimeBinding
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimePlayingDetails
-import com.talent.animescrap.model.AnimeStreamLink
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimePlayingDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap.ui.viewmodels.AnimeDetailsViewModel
 import com.talent.animescrap.ui.viewmodels.AnimeStreamViewModel
-import com.talent.animescrap.utils.Utils
+import com.talent.animescrap_common.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 
 

@@ -1,4 +1,4 @@
-package com.talent.animescrap.animesources.sourceutils
+package com.talent.animescrap_common.sourceutils
 
 import android.webkit.CookieManager
 import okhttp3.Cookie

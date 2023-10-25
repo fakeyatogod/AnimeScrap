@@ -1,4 +1,4 @@
-package com.talent.animescrap.animesources.sourceutils
+package com.talent.animescrap_common.sourceutils
 
 import android.annotation.SuppressLint
 import android.content.Context

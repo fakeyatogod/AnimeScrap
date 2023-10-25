@@ -2,11 +2,11 @@ package com.talent.animescrap.animesources
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
-import com.talent.animescrap.animesources.sourceutils.DdosGuardInterceptor
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.httpClient
+import com.talent.animescrap_common.sourceutils.DdosGuardInterceptor
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.utils.Utils.httpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup
@@ -86,7 +86,12 @@ class MarinMoeSource : AnimeSource {
             resJson.asJsonObject["props"].asJsonObject["episode_list"].asJsonObject["meta"].asJsonObject["total"].asInt
         val subEpMap = (1..totalEps).associate { it.toString() to it.toString() }
 
-        return AnimeDetails(name, desc, cover, mapOf("SUB" to subEpMap))
+        return AnimeDetails(
+            name,
+            desc,
+            cover,
+            mapOf("SUB" to subEpMap)
+        )
     }
 
     override suspend fun streamLink(

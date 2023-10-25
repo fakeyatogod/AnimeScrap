@@ -6,9 +6,9 @@ import android.util.Log
 import androidx.preference.PreferenceManager
 import com.talent.animescrap.R
 import com.talent.animescrap.animesources.*
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
 import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinkDao
 import kotlinx.coroutines.Dispatchers
@@ -146,7 +146,13 @@ class AnimeRepositoryImpl @Inject constructor(
 
     override suspend fun getFavoritesFromRoom() = withContext(Dispatchers.IO) {
         return@withContext linkDao.getLinks(selectedSource).map { animeList ->
-            animeList.map { SimpleAnime(it.nameString, it.picLinkString, it.linkString) }
+            animeList.map {
+                SimpleAnime(
+                    it.nameString,
+                    it.picLinkString,
+                    it.linkString
+                )
+            }
         }
     }
 

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.LandscapeCoverCardviewItemBinding
 import com.talent.animescrap.databinding.PortraitCoverCardviewItemBinding
-import com.talent.animescrap.model.SimpleAnime
+import com.talent.animescrap_common.model.SimpleAnime
 import com.talent.animescrap.ui.fragments.FavoriteFragmentDirections
 import com.talent.animescrap.ui.fragments.LatestFragmentDirections
 import com.talent.animescrap.ui.fragments.SearchFragmentDirections

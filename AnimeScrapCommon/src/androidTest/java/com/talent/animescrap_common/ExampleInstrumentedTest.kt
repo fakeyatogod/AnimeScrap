@@ -1,4 +1,4 @@
-package com.talent.AnimeScrapCommon
+package com.talent.animescrap_common
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

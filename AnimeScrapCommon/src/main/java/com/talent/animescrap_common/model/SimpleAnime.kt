@@ -1,4 +1,4 @@
-package com.talent.animescrap.model
+package com.talent.animescrap_common.model
 
 data class SimpleAnime(
     val animeName: String,

@@ -1,8 +1,8 @@
 package com.talent.animescrap.animesources
 
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
 
 interface AnimeSource {
     suspend fun animeDetails(contentLink: String): AnimeDetails

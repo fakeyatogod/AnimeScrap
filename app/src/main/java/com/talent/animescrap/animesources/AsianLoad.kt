@@ -1,10 +1,10 @@
 package com.talent.animescrap.animesources
 
 import com.talent.animescrap.animesources.sourceCommonExtractors.AsianExtractor
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.get
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.utils.Utils.get
 import org.jsoup.Jsoup
 
 class AsianLoad : AnimeSource {
@@ -28,7 +28,12 @@ class AsianLoad : AnimeSource {
 
         val epMap = mutableMapOf("DEFAULT" to subMap)
 
-        return AnimeDetails(animeName, animDesc, animeCover, epMap)
+        return AnimeDetails(
+            animeName,
+            animDesc,
+            animeCover,
+            epMap
+        )
     }
 
 
@@ -45,7 +50,13 @@ class AsianLoad : AnimeSource {
             val itemImage = item.getElementsByTag("img").attr("src")
             val itemName = item.getElementsByClass("name").text().substringBefore("Episode ")
             val itemLink = item.getElementsByTag("a").attr("href")
-            animeList.add(SimpleAnime(itemName, itemImage, itemLink))
+            animeList.add(
+                SimpleAnime(
+                    itemName,
+                    itemImage,
+                    itemLink
+                )
+            )
         }
         return animeList
     }

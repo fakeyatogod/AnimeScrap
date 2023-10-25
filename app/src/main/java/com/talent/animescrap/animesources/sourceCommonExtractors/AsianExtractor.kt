@@ -3,7 +3,7 @@ package com.talent.animescrap.animesources.sourceCommonExtractors
 import android.net.Uri
 import android.util.Base64
 import com.google.gson.JsonParser
-import com.talent.animescrap.utils.Utils
+import com.talent.animescrap_common.utils.Utils
 import org.jsoup.Jsoup
 import javax.crypto.Cipher
 import javax.crypto.spec.IvParameterSpec

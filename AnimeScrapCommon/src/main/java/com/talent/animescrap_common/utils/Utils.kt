@@ -1,10 +1,9 @@
-package com.talent.animescrap.utils
+package com.talent.animescrap_common.utils
 
-import com.github.kittinunf.fuel.Fuel
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
-import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
-import okhttp3.Headers
+import com.talent.animescrap_common.sourceutils.AndroidCookieJar
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -33,30 +32,43 @@ object Utils {
             .execute().body!!.string()
     }
 
+    fun post(url: String, mapOfHeaders: Map<String, String>? = null, payload: Map<String, String>? = null): String {
+        val requestBuilder = Request.Builder().url(url)
+
+        if (!mapOfHeaders.isNullOrEmpty()) {
+            mapOfHeaders.forEach {
+                requestBuilder.addHeader(it.key, it.value)
+            }
+        }
+
+        val requestBody = payload?.let {
+            FormBody.Builder().apply {
+                it.forEach { (key, value) ->
+                    add(key, value)
+                }
+            }.build()
+        }
+
+        if (requestBody != null) {
+            requestBuilder.post(requestBody)
+        }
+
+        val response = httpClient.newCall(requestBuilder.build()).execute()
+        return response.body?.string() ?: ""
+    }
+
     fun getJsoup(
         url: String,
         mapOfHeaders: Map<String, String>? = null
     ): Document {
-        return Jsoup.connect(url).ignoreContentType(true).apply {
-            if (mapOfHeaders != null) {
-                headers(mapOfHeaders)
-            }
-        }.get()
+        return Jsoup.parse(get(url, mapOfHeaders))
     }
 
     fun getJson(
         url: String,
         mapOfHeaders: Map<String, String>? = null
     ): JsonElement? {
-        val fuel = Fuel.get(url)
-        if (mapOfHeaders != null)
-            fuel.header(mapOfHeaders)
-        val res = fuel.response().third
-        val (bytes, _) = res
-        if (bytes != null) {
-            return JsonParser.parseString(String(bytes))
-        }
-        return null
+        return JsonParser.parseString(get(url, mapOfHeaders))
     }
 
     fun postJson(
@@ -64,13 +76,7 @@ object Utils {
         mapOfHeaders: Map<String, String>? = null,
         payload: Map<String, String>? = null
     ): JsonElement? {
-        val fuel = if (payload == null) Fuel.post(url) else Fuel.post(url, payload.toList())
-        if (mapOfHeaders != null) fuel.header(mapOfHeaders)
-        val res = fuel.response().third
-        val (bytes, _) = res
-        if (bytes != null) {
-            return JsonParser.parseString(String(bytes))
-        }
-        return null
+        val res = post(url, mapOfHeaders, payload)
+        return JsonParser.parseString(res)
     }
 }

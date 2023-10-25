@@ -2,11 +2,11 @@ package com.talent.animescrap.animesources
 
 import android.util.Base64
 import com.google.gson.JsonParser
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.getJson
-import com.talent.animescrap.utils.Utils.getJsoup
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.utils.Utils.getJson
+import com.talent.animescrap_common.utils.Utils.getJsoup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
@@ -41,7 +41,12 @@ class ZoroSource : AnimeSource {
             val animeName = doc.selectFirst(".anisc-detail > .film-name")?.text().toString()
             val animDesc = doc.selectFirst(".film-description.m-hide > .text")?.text().toString()
 
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("ZORO" to epMap))
+            return@withContext AnimeDetails(
+                animeName,
+                animDesc,
+                animeCover,
+                mapOf("ZORO" to epMap)
+            )
         }
 
 
@@ -55,7 +60,13 @@ class ZoroSource : AnimeSource {
             val animeImageURL = item.getElementsByTag("img").attr("data-src")
             val animeName = item.getElementsByClass("dynamic-name").text()
             val animeLink = item.getElementsByClass("dynamic-name").attr("href")
-            simpleAnimeList.add(SimpleAnime(animeName, animeImageURL, animeLink))
+            simpleAnimeList.add(
+                SimpleAnime(
+                    animeName,
+                    animeImageURL,
+                    animeLink
+                )
+            )
         }
         return@withContext simpleAnimeList
     }
@@ -71,7 +82,13 @@ class ZoroSource : AnimeSource {
                 val animeImageURL = item.getElementsByTag("img").attr("data-src")
                 val animeName = item.getElementsByClass("dynamic-name").text()
                 val animeLink = item.getElementsByClass("dynamic-name").attr("href")
-                simpleAnimeList.add(SimpleAnime(animeName, animeImageURL, animeLink))
+                simpleAnimeList.add(
+                    SimpleAnime(
+                        animeName,
+                        animeImageURL,
+                        animeLink
+                    )
+                )
             }
             return@withContext simpleAnimeList
         }
@@ -87,7 +104,13 @@ class ZoroSource : AnimeSource {
                 val animeImageURL = item.getElementsByTag("img").attr("data-src")
                 val animeName = item.getElementsByClass("dynamic-name").text()
                 val animeLink = item.getElementsByClass("dynamic-name").attr("href")
-                simpleAnimeList.add(SimpleAnime(animeName, animeImageURL, animeLink))
+                simpleAnimeList.add(
+                    SimpleAnime(
+                        animeName,
+                        animeImageURL,
+                        animeLink
+                    )
+                )
             }
             return@withContext simpleAnimeList
         }

@@ -30,7 +30,7 @@ import com.google.android.material.navigationrail.NavigationRailView
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityMainBinding
-import com.talent.animescrap.model.UpdateDetails
+import com.talent.animescrap_common.model.UpdateDetails
 import com.talent.animescrap.ui.viewmodels.UpdateViewModel
 import dagger.hilt.android.AndroidEntryPoint
 

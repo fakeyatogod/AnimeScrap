@@ -1,11 +1,11 @@
 package com.talent.animescrap.animesources
 
 import android.content.Context
-import com.talent.animescrap.animesources.sourceutils.AndroidCookieJar
-import com.talent.animescrap.animesources.sourceutils.CloudflareInterceptor
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
+import com.talent.animescrap_common.sourceutils.AndroidCookieJar
+import com.talent.animescrap_common.sourceutils.CloudflareInterceptor
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
@@ -47,7 +47,12 @@ class KawaiifuSource(context: Context) : AnimeSource {
             else
                 map[epItem.text().replace("Ep ", "")] = epItem.selectFirst("a")!!.attr("href")
         }
-        return AnimeDetails(title, desc, image, mapOf("Default" to map))
+        return AnimeDetails(
+            title,
+            desc,
+            image,
+            mapOf("Default" to map)
+        )
     }
 
     override suspend fun searchAnime(searchedText: String): ArrayList<SimpleAnime> {

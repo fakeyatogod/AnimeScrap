@@ -1,9 +1,9 @@
 package com.talent.animescrap.animesources
 
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.getJson
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.utils.Utils.getJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
@@ -42,7 +42,12 @@ class AllAnimeSource : AnimeSource {
                 allEps["DUB"] = dubEpMap
             } catch (_: Exception) {
             }
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, allEps)
+            return@withContext AnimeDetails(
+                animeName,
+                animDesc,
+                animeCover,
+                allEps
+            )
         }
 
 
@@ -144,7 +149,7 @@ class AllAnimeSource : AnimeSource {
                 println("${index + 1}) $item")
             }
             println("======= =====")
-            val sourceUrl = sortedList[1]
+            val sourceUrl = sortedList.first()
             if (sourceUrl.contains("apivtwo")) {
                 val apiUrl = "https://embed.ssbcontent.site"
                 println(apiUrl)
@@ -177,7 +182,11 @@ class AllAnimeSource : AnimeSource {
                 val isHls = firstLink.has("hls") && firstLink["hls"].asBoolean
                 val streamUrl = if(firstLink.has("rawUrls")) firstLink["rawUrls"].asJsonObject["vids"].asJsonArray.first().asJsonObject["url"].asString else firstLink["link"].asString
                 println()
-                return@withContext AnimeStreamLink(streamUrl, "", isHls)
+                return@withContext AnimeStreamLink(
+                    streamUrl,
+                    "",
+                    isHls
+                )
             }
 
             return@withContext AnimeStreamLink(

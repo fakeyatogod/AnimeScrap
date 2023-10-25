@@ -1,9 +1,9 @@
 package com.talent.animescrap.animesources
 
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.getJson
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.utils.Utils.getJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -30,7 +30,12 @@ class KissKhSource : AnimeSource {
                     ep.asJsonObject["id"].asString
 
             }
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, mapOf("SUB" to epMap))
+            return@withContext AnimeDetails(
+                animeName,
+                animDesc,
+                animeCover,
+                mapOf("SUB" to epMap)
+            )
         }
 
 

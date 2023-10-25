@@ -1,12 +1,12 @@
 package com.talent.animescrap.animesources
 
 import android.content.Context
-import com.talent.animescrap.animesources.sourceutils.CloudflareInterceptor
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.getJson
-import com.talent.animescrap.utils.Utils.httpClient
+import com.talent.animescrap_common.sourceutils.CloudflareInterceptor
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.utils.Utils.getJson
+import com.talent.animescrap_common.utils.Utils.httpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.*
@@ -122,7 +122,13 @@ class AnimePaheSource(context: Context) : AnimeSource {
             val image = animeCard["snapshot"].asString
             val id = animeCard["anime_id"].asString
             val session = animeCard["anime_session"].asString
-            animeList.add(SimpleAnime(name, image, "AnimePaheId=${id}AnimePaheSession=${session}"))
+            animeList.add(
+                SimpleAnime(
+                    name,
+                    image,
+                    "AnimePaheId=${id}AnimePaheSession=${session}"
+                )
+            )
         }
         return animeList
     }

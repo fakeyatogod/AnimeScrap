@@ -1,10 +1,10 @@
 package com.talent.animescrap.animesources
 
-import com.talent.animescrap.model.AnimeDetails
-import com.talent.animescrap.model.AnimeStreamLink
-import com.talent.animescrap.model.SimpleAnime
-import com.talent.animescrap.utils.Utils.getJsoup
-import com.talent.animescrap.utils.Utils.postJson
+import com.talent.animescrap_common.model.AnimeDetails
+import com.talent.animescrap_common.model.AnimeStreamLink
+import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.utils.Utils.getJsoup
+import com.talent.animescrap_common.utils.Utils.postJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -35,7 +35,12 @@ class YugenSource : AnimeSource {
             } catch (_: Exception) {
             }
 
-            return@withContext AnimeDetails(animeName, animDesc, animeCover, epMap)
+            return@withContext AnimeDetails(
+                animeName,
+                animDesc,
+                animeCover,
+                epMap
+            )
         }
 
 
@@ -49,7 +54,8 @@ class YugenSource : AnimeSource {
             val itemImage = item.getElementsByTag("img").attr("data-src")
             val itemName = item.getElementsByClass("anime-name").text()
             val itemLink = item.attr("href")
-            val picObject = SimpleAnime(itemName, itemImage, itemLink)
+            val picObject =
+                SimpleAnime(itemName, itemImage, itemLink)
             animeList.add(picObject)
         }
 
@@ -65,7 +71,13 @@ class YugenSource : AnimeSource {
                 val itemImage = item.getElementsByTag("img").attr("data-src")
                 val itemName = item.getElementsByClass("ep-origin-name").text()
                 val itemLink = item.getElementsByClass("ep-details").attr("href")
-                animeList.add(SimpleAnime(itemName, itemImage, itemLink))
+                animeList.add(
+                    SimpleAnime(
+                        itemName,
+                        itemImage,
+                        itemLink
+                    )
+                )
             }
             return@withContext animeList
         }
@@ -79,7 +91,13 @@ class YugenSource : AnimeSource {
                 val itemImage = item.getElementsByTag("img").attr("src")
                 val itemName = item.getElementsByClass("series-title").text()
                 val itemLink = item.attr("href")
-                animeList.add(SimpleAnime(itemName, itemImage, itemLink))
+                animeList.add(
+                    SimpleAnime(
+                        itemName,
+                        itemImage,
+                        itemLink
+                    )
+                )
             }
             return@withContext animeList
         }
@@ -105,16 +123,8 @@ class YugenSource : AnimeSource {
             if (!yugenEmbedLink.contains("https:")) yugenEmbedLink = "https:$yugenEmbedLink"
 
             val mapOfHeaders = mutableMapOf(
-                "Accept" to "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Encoding" to "gzip, deflate",
-                "Accept-Language" to "en-US,en;q=0.5",
-                "Connection" to "keep-alive",
-                "Upgrade-Insecure-Requests" to "1",
-                "User-Agent" to "Mozilla/5.0 (X11; Linux x86_64; rv:89.0) Gecko/20100101 Firefox/89.0",
-                "TE" to "Trailers",
-                "Origin" to mainUrl,
                 "X-Requested-With" to "XMLHttpRequest",
-                "Referer" to yugenEmbedLink
+                "content-type" to "application/x-www-form-urlencoded; charset=UTF-8"
             )
 
             val apiRequest = "$mainUrl/api/embed/"
