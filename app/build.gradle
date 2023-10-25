@@ -117,17 +117,37 @@ dependencies {
 
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'org.company'
-            artifactId = 'sample'
-            version = "0.9-SNAPSHOT"
-            from components.java
+//publishing {
+//    publications {
+//        maven(MavenPublication) {
+//            groupId = 'org.company'
+//            artifactId = 'sample'
+//            version = "0.9-SNAPSHOT"
+//            from components.java
+//
+//            pom {
+//                description = 'AnimeScrap Classes Lib'
+//            }
+//        }
+//    }
+//}
 
-            pom {
-                description = 'AnimeScrap Classes Lib'
+afterEvaluate {
+    // To avoid publishing of the applications inside the project ..
+    if (!plugins.hasPlugin("android")) {
+        publishing {
+            publications {
+                mavenAar(MavenPublication) {
+                    artifactId "$project.name"
+                    version version
+                    from components.release
+                }
             }
         }
+    }
+}
+task comps {
+    afterEvaluate {
+        println("Components: " + components*.name)
     }
 }
