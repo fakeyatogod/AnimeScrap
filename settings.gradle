@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "Anime Scrap"
 include ':app'
 include ':AnimeScrapCommon'
+include ':animeSources'

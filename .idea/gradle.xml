@@ -12,6 +12,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/AnimeScrapCommon" />
+            <option value="$PROJECT_DIR$/animeSources" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
