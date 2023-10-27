@@ -1,4 +1,4 @@
-package com.talent.animescrap.animesources
+package com.talent.animescrapsources.animesources
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
@@ -7,6 +7,7 @@ import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
 import com.talent.animescrap_common.utils.Utils.httpClient
+import com.talent.animescrapsources.animesources.AnimeSource
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup

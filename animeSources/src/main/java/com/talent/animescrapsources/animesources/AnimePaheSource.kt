@@ -1,4 +1,4 @@
-package com.talent.animescrap.animesources
+package com.talent.animescrapsources.animesources
 
 import android.content.Context
 import com.talent.animescrap_common.sourceutils.CloudflareInterceptor

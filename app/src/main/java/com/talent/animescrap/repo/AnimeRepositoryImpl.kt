@@ -5,26 +5,27 @@ import android.content.Context
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.talent.animescrap.R
-import com.talent.animescrap.animesources.AllAnimeSource
-import com.talent.animescrap.animesources.AnimePaheSource
-import com.talent.animescrap.animesources.AnimeSource
-import com.talent.animescrap.animesources.AsianLoad
-import com.talent.animescrap.animesources.EnimeSource
-import com.talent.animescrap.animesources.KawaiifuSource
-import com.talent.animescrap.animesources.KissKhSource
-import com.talent.animescrap.animesources.MarinMoeSource
-import com.talent.animescrap.animesources.MyAsianTvSource
-import com.talent.animescrap.animesources.YugenSource
 import com.talent.animescrap.room.FavRoomModel
 import com.talent.animescrap.room.LinkDao
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrapsources.animesources.AllAnimeSource
+import com.talent.animescrapsources.animesources.AnimePaheSource
+import com.talent.animescrapsources.animesources.AnimeSource
+import com.talent.animescrapsources.animesources.AsianLoad
+import com.talent.animescrapsources.animesources.EnimeSource
+import com.talent.animescrapsources.animesources.KawaiifuSource
+import com.talent.animescrapsources.animesources.KissKhSource
+import com.talent.animescrapsources.animesources.MarinMoeSource
+import com.talent.animescrapsources.animesources.MyAsianTvSource
+import com.talent.animescrapsources.animesources.YugenSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+
 
 interface AnimeRepository {
     // API operations

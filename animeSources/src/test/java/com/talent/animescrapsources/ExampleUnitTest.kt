@@ -1,4 +1,4 @@
-package com.talent.animescrap_animesources
+package com.talent.animescrapsources
 
 import org.junit.Test
 

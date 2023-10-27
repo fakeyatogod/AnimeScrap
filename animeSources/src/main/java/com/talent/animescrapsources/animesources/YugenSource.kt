@@ -1,10 +1,11 @@
-package com.talent.animescrap.animesources
+package com.talent.animescrapsources.animesources
 
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
 import com.talent.animescrap_common.utils.Utils.getJsoup
 import com.talent.animescrap_common.utils.Utils.postJson
+import com.talent.animescrapsources.animesources.AnimeSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

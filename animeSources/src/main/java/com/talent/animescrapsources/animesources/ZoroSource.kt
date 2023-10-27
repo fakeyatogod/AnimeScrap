@@ -1,4 +1,4 @@
-package com.talent.animescrap.animesources
+package com.talent.animescrapsources.animesources
 
 import android.util.Base64
 import com.google.gson.JsonParser

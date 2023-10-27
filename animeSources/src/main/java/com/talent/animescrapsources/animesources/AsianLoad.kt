@@ -1,6 +1,6 @@
-package com.talent.animescrap.animesources
+package com.talent.animescrapsources.animesources
 
-import com.talent.animescrap.animesources.sourceCommonExtractors.AsianExtractor
+import com.talent.animescrapsources.animesources.sourceCommonExtractors.AsianExtractor
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime

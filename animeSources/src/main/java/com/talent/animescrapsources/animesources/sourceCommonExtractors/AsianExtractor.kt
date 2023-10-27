@@ -1,4 +1,4 @@
-package com.talent.animescrap.animesources.sourceCommonExtractors
+package com.talent.animescrapsources.animesources.sourceCommonExtractors
 
 import android.net.Uri
 import android.util.Base64

@@ -1,4 +1,4 @@
-package com.talent.animescrap.animesources
+package com.talent.animescrapsources.animesources
 
 import android.content.Context
 import com.talent.animescrap_common.sourceutils.AndroidCookieJar
@@ -6,6 +6,7 @@ import com.talent.animescrap_common.sourceutils.CloudflareInterceptor
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrapsources.animesources.AnimeSource
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
