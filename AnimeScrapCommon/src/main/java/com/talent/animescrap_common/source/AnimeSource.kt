@@ -1,4 +1,4 @@
-package com.talent.animescrapsources.animesources
+package com.talent.animescrap_common.source
 
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink

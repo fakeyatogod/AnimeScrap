@@ -7,7 +7,7 @@ import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
 import com.talent.animescrap_common.utils.Utils.httpClient
-import com.talent.animescrapsources.animesources.AnimeSource
+import com.talent.animescrap_common.source.AnimeSource
 import okhttp3.Request
 import okhttp3.Response
 import org.jsoup.Jsoup

@@ -5,6 +5,7 @@ import com.talent.animescrap_common.sourceutils.CloudflareInterceptor
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.source.AnimeSource
 import com.talent.animescrap_common.utils.Utils.getJson
 import com.talent.animescrap_common.utils.Utils.httpClient
 import kotlinx.coroutines.Dispatchers

@@ -4,6 +4,7 @@ import com.talent.animescrapsources.animesources.sourceCommonExtractors.AsianExt
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
+import com.talent.animescrap_common.source.AnimeSource
 import com.talent.animescrap_common.utils.Utils.get
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements

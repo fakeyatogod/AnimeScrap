@@ -10,16 +10,8 @@ import com.talent.animescrap.room.LinkDao
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
-import com.talent.animescrapsources.animesources.AllAnimeSource
-import com.talent.animescrapsources.animesources.AnimePaheSource
-import com.talent.animescrapsources.animesources.AnimeSource
-import com.talent.animescrapsources.animesources.AsianLoad
-import com.talent.animescrapsources.animesources.EnimeSource
-import com.talent.animescrapsources.animesources.KawaiifuSource
-import com.talent.animescrapsources.animesources.KissKhSource
-import com.talent.animescrapsources.animesources.MarinMoeSource
-import com.talent.animescrapsources.animesources.MyAsianTvSource
-import com.talent.animescrapsources.animesources.YugenSource
+import com.talent.animescrapsources.SourceSelector
+import com.talent.animescrap_common.source.AnimeSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -56,42 +48,7 @@ class AnimeRepositoryImpl @Inject constructor(
         .getDefaultSharedPreferences(application)
         .getString("source", "yugen")
 
-    private val animeSource: AnimeSource =
-        when (selectedSource) {
-            "yugen" -> {
-                YugenSource()
-            }
-//            "zoro" -> {
-//                ZoroSource()
-//            }
-            "allanime" -> {
-                AllAnimeSource()
-            }
-            "enime" -> {
-                EnimeSource()
-            }
-            "kiss_kh" -> {
-                KissKhSource()
-            }
-            "animepahe" -> {
-                AnimePaheSource(application as Context)
-            }
-            "kawaiifu" -> {
-                KawaiifuSource(application as Context)
-            }
-            "marin_moe" -> {
-                MarinMoeSource()
-            }
-            "asian_load" -> {
-                AsianLoad()
-            }
-            "my_asian_tv" -> {
-                MyAsianTvSource()
-            }
-            else -> {
-                YugenSource()
-            }
-        }
+    private val animeSource : AnimeSource = SourceSelector(application as Context).getSelectedSource(selectedSource ?: "yugen")
 
     override suspend fun getAnimeDetailsFromSite(contentLink: String) =
         withContext(Dispatchers.IO) {

@@ -6,7 +6,7 @@ import com.talent.animescrap_common.sourceutils.CloudflareInterceptor
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
-import com.talent.animescrapsources.animesources.AnimeSource
+import com.talent.animescrap_common.source.AnimeSource
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.Jsoup
