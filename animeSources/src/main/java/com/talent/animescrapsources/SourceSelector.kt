@@ -5,7 +5,7 @@ import com.talent.animescrap_common.source.AnimeSource
 import com.talent.animescrapsources.animesources.*
 
 class SourceSelector(context: Context) {
-    private val sourceMap: Map<String, AnimeSource> = hashMapOf(
+    val sourceMap: Map<String, AnimeSource> = mapOf(
         "yugen" to YugenSource(),
         "allanime" to AllAnimeSource(),
         "enime" to EnimeSource(),

@@ -7,19 +7,24 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate.*
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
+import androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.ListPreference
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SwitchPreferenceCompat
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.ui.activities.MainActivity
 import com.talent.animescrap.ui.viewmodels.UpdateViewModel
-import com.talent.animescrap_common.utils.Utils
 import com.talent.animescrap_common.utils.Utils.httpClient
+import com.talent.animescrapsources.SourceSelector
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Locale
 import kotlin.system.exitProcess
 
 @AndroidEntryPoint
@@ -27,6 +32,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
+        val sourceCategory = preferenceScreen.findPreference<PreferenceCategory>("source_pref_category")
+
+        val sourcePreference = ListPreference(requireContext())
+        sourcePreference.key = "source"
+        sourcePreference.title = getString(R.string.source_list_pref_title)
+        val sourceList = SourceSelector(requireContext()).sourceMap.keys
+        sourcePreference.entryValues = sourceList.toTypedArray()
+        sourcePreference.entries = sourceList.map {
+            it.replaceFirstChar { str -> if (str.isLowerCase()) str.titlecase(Locale.ROOT) else str.toString() }
+                .replace("_", " ")
+        }.toTypedArray()
+        sourcePreference.setDefaultValue("yugen")
+        sourcePreference.summaryProvider = Preference.SummaryProvider<ListPreference> { preference ->
+            val newValue = preference.value
+            "Source set to ${newValue?.uppercase()?.replace("_", " ")}"
+        }
+//        preferenceScreen.addPreference(sourceCategory)
+        sourceCategory?.addPreference(sourcePreference)
+
+
         val dynamicColorsPref = findPreference<SwitchPreferenceCompat>("dynamic_colors")
         dynamicColorsPref?.setOnPreferenceChangeListener { _, newValue ->
             view?.let {
