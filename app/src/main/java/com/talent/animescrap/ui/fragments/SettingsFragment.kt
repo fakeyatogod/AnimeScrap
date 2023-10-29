@@ -41,15 +41,12 @@ class SettingsFragment : PreferenceFragmentCompat() {
         val sourceList = SourceSelector(requireContext()).sourceMap.keys
         sourcePreference.entryValues = sourceList.toTypedArray()
         sourcePreference.entries = sourceList.map {
-            it.replaceFirstChar { str -> if (str.isLowerCase()) str.titlecase(Locale.ROOT) else str.toString() }
-                .replace("_", " ")
+            it.uppercase().replace("_", " ")
         }.toTypedArray()
         sourcePreference.setDefaultValue("yugen")
         sourcePreference.summaryProvider = Preference.SummaryProvider<ListPreference> { preference ->
-            val newValue = preference.value
-            "Source set to ${newValue?.uppercase()?.replace("_", " ")}"
+                preference.value?.uppercase()?.replace("_", " ")
         }
-//        preferenceScreen.addPreference(sourceCategory)
         sourceCategory?.addPreference(sourcePreference)
 
 

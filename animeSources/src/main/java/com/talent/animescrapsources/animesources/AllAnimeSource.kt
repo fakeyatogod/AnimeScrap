@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets
 class AllAnimeSource : AnimeSource {
 
     private val mainAPIUrl = "https://api.allanime.day/api"
-    private val referer = "https://allanime.to/"
+    private val referer = "https://allanime2.com/"
     override suspend fun animeDetails(contentLink: String): AnimeDetails =
         withContext(Dispatchers.IO) {
             val hash = "9d7439c90f203e534ca778c4901f9aa2d3ad42c06243ab2c5e6b79612af32028"
