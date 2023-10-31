@@ -7,7 +7,7 @@
 
         <variable
             name="animeInfo"
-            type="com.talent.animescrap.model.SimpleAnime" />
+            type="com.talent.animescrap_common.model.SimpleAnime" />
 
         <variable
             name="clickListener"

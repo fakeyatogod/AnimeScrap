@@ -35,7 +35,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentPlayerBinding
-import com.talent.animescrap.model.AnimePlayingDetails
+import com.talent.animescrap_common.model.AnimePlayingDetails
 import com.talent.animescrap.ui.viewmodels.PlayerViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint

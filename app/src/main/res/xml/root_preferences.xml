@@ -21,14 +21,15 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/source_cat_title">
-        <ListPreference
-            app:defaultValue="yugen"
-            app:entries="@array/sources_entries"
-            app:entryValues="@array/sources_values"
-            app:key="source"
-            app:title="@string/source_list_pref_title"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory app:title="@string/source_cat_title"
+        app:key="source_pref_category">
+<!--        <ListPreference-->
+<!--            app:defaultValue="yugen"-->
+<!--            app:entries="@array/sources_entries"-->
+<!--            app:entryValues="@array/sources_values"-->
+<!--            app:key="source"-->
+<!--            app:title="@string/source_list_pref_title"-->
+<!--            app:useSimpleSummaryProvider="true" />-->
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/player_cat_title">

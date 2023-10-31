@@ -90,7 +90,7 @@
         tools:layout="@layout/fragment_player">
         <argument
             android:name="animePlayingDetails"
-            app:argType="com.talent.animescrap.model.AnimePlayingDetails"
+            app:argType="com.talent.animescrap_common.model.AnimePlayingDetails"
             app:nullable="true" />
     </fragment>
 </navigation>

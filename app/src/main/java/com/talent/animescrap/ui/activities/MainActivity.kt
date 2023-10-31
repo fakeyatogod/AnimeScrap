@@ -30,8 +30,8 @@ import com.google.android.material.navigationrail.NavigationRailView
 import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.ActivityMainBinding
-import com.talent.animescrap.model.UpdateDetails
 import com.talent.animescrap.ui.viewmodels.UpdateViewModel
+import com.talent.animescrap_common.model.UpdateDetails
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -173,12 +173,10 @@ class MainActivity : AppCompatActivity() {
             return@setOnMenuItemClickListener true
         }
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
-                || destination.id == R.id.navigation_settings || destination.id == R.id.navigation_player
-            ) {
-                search.isVisible = false
-                settings.isVisible = false
-            }
+           val notThis = destination.id == R.id.navigation_anime || destination.id == R.id.navigation_search
+                   || destination.id == R.id.navigation_settings || destination.id == R.id.navigation_player
+                search.isVisible = !notThis
+                settings.isVisible = !notThis
         }
         return super.onCreateOptionsMenu(menu)
     }

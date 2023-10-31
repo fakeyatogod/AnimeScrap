@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.talent.animescrap.BuildConfig
-import com.talent.animescrap.model.UpdateDetails
+import com.talent.animescrap_common.model.UpdateDetails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

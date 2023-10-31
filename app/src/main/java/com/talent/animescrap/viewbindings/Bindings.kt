@@ -7,7 +7,7 @@ import coil.load
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
 import com.talent.animescrap.R
-import com.talent.animescrap.utils.Utils
+import com.talent.animescrap_common.utils.Utils
 
 private val shimmer =
     Shimmer.AlphaHighlightBuilder()// The attributes for a ShimmerDrawable is set by this builder
