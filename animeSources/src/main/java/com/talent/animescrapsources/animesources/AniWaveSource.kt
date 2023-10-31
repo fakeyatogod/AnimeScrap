@@ -82,8 +82,11 @@ class AniWaveSource : AnimeSource {
         animeEpCode: String,
         extras: List<String>?
     ): AnimeStreamLink {
-//        0=sub , 1=softsub, 3=dub
-        val dataId = animeEpCode.split(",").first()
+        // 0=sub , 1=soft-sub, 2=dub
+        var index = 0
+        if(extras?.first() == "Dub") index = 2
+
+        val dataId = animeEpCode.split(",")[index]
         val vrf = getVrf(dataId)
         val servers =
             Jsoup.parseBodyFragment(getJson("$mainUrl/ajax/server/list/$dataId?vrf=$vrf")!!.asJsonObject["result"].asString)
