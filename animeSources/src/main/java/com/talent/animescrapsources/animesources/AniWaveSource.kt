@@ -44,16 +44,15 @@ class AniWaveSource : AnimeSource {
         val json = getJson("$apiUrl/vrf?query=${dataId}&apikey=chayce")
         return json!!.asJsonObject["url"].asString
     }
+
     private fun decodeVrf(dataId: String): String {
         val json = getJson("$apiUrl/decrypt?query=${dataId}&apikey=chayce")
         return json!!.asJsonObject["url"].asString
     }
 
-
-    override suspend fun searchAnime(searchedText: String): ArrayList<SimpleAnime> {
-
+    private fun getAnimeList(url: String): ArrayList<SimpleAnime> {
         val animeList = arrayListOf<SimpleAnime>()
-        val doc = getJsoup("$mainUrl/filter?keyword=$searchedText")
+        val doc = getJsoup(url)
         doc.select("#list-items .item").forEach { item ->
             animeList.add(
                 SimpleAnime(
@@ -66,38 +65,17 @@ class AniWaveSource : AnimeSource {
         return animeList
     }
 
-    override suspend fun latestAnime(): ArrayList<SimpleAnime> {
-        val animeList = arrayListOf<SimpleAnime>()
-        val url = "$mainUrl/ajax/home/widget/updated-sub?page=1"
-        val latestHtml = getJson(url)!!.asJsonObject["result"].asString
-        val doc = Jsoup.parseBodyFragment(latestHtml)
-        doc.getElementsByClass("item").forEach { item ->
-            animeList.add(
-                SimpleAnime(
-                    item.select(".info a").attr("data-jp"),
-                    item.getElementsByTag("img").attr("src"),
-                    item.getElementsByTag("a").attr("href")
-                )
-            )
-        }
-        return animeList
-    }
+    override suspend fun searchAnime(searchedText: String): ArrayList<SimpleAnime> =
+        getAnimeList("$mainUrl/filter?keyword=$searchedText")
 
-    override suspend fun trendingAnime(): ArrayList<SimpleAnime> {
-        val animeList = arrayListOf<SimpleAnime>()
-        val url = "$mainUrl/home/"
-        val doc = getJsoup(url)
-        doc.select("#top-anime .tab-content").first()!!.select(".item").forEach { item ->
-            animeList.add(
-                SimpleAnime(
-                    item.select(".name").attr("data-jp"),
-                    item.getElementsByTag("img").attr("src"),
-                    item.attr("href")
-                )
-            )
-        }
-        return animeList
-    }
+    override suspend fun latestAnime(): ArrayList<SimpleAnime> =
+        getAnimeList(
+            "$mainUrl/filter?keyword=&country%5B%5D=120822&language%5B%5D=sub&sort=recently_updated"
+        )
+
+    override suspend fun trendingAnime(): ArrayList<SimpleAnime> = getAnimeList(
+        "$mainUrl/filter?keyword=&country%5B%5D=120822&language%5B%5D=sub&sort=trending"
+    )
 
     override suspend fun streamLink(
         animeUrl: String,
@@ -111,12 +89,16 @@ class AniWaveSource : AnimeSource {
             Jsoup.parseBodyFragment(getJson("$mainUrl/ajax/server/list/$dataId?vrf=$vrf")!!.asJsonObject["result"].asString)
         val dataLinkId = servers.select(".servers .type ul li")[0]!!.attr("data-link-id")
         val vrf2 = getVrf(dataLinkId)
-        val linkEncoded = getJson("$mainUrl/ajax/server/$dataLinkId?vrf=$vrf2")!!.asJsonObject["result"].asJsonObject["url"].asString
+        val linkEncoded =
+            getJson("$mainUrl/ajax/server/$dataLinkId?vrf=$vrf2")!!.asJsonObject["result"].asJsonObject["url"].asString
         val embedLink = decodeVrf(linkEncoded)
 //        println(embedLink)
         val fileURL = getFileUrl(embedLink)
 //        println(fileURL)
-        val link = getJson(fileURL, mapOf("referer" to embedLink))!!.asJsonObject["result"].asJsonObject["sources"].asJsonArray.first().asJsonObject["file"].asString
+        val link = getJson(
+            fileURL,
+            mapOf("referer" to embedLink)
+        )!!.asJsonObject["result"].asJsonObject["sources"].asJsonArray.first().asJsonObject["file"].asString
 //        println(link)
         return AnimeStreamLink(link, "", true)
     }
@@ -130,8 +112,9 @@ class AniWaveSource : AnimeSource {
         val fuToken = getFuToken(sourceUrl)
         val id = sourceUrl.split("/e/")[1].split('?')[0]
 
-        val response = postJson(url = "$apiUrl/rawVizcloud?query=$id&apikey=lagrapps",
-            payload = mapOf("query" to id,"futoken" to fuToken)
+        val response = postJson(
+            url = "$apiUrl/rawVizcloud?query=$id&apikey=lagrapps",
+            payload = mapOf("query" to id, "futoken" to fuToken)
         )
         val rawURL = response!!.asJsonObject["rawURL"].asString
         return "$rawURL?${sourceUrl.split('?')[1]}"
