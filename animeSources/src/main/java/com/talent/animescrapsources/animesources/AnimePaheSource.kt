@@ -1,27 +1,29 @@
 package com.talent.animescrapsources.animesources
 
-import android.content.Context
-import com.talent.animescrap_common.sourceutils.CloudflareInterceptor
 import com.talent.animescrap_common.model.AnimeDetails
 import com.talent.animescrap_common.model.AnimeStreamLink
 import com.talent.animescrap_common.model.SimpleAnime
 import com.talent.animescrap_common.source.AnimeSource
+import com.talent.animescrap_common.sourceutils.DdosGuardInterceptor
 import com.talent.animescrap_common.utils.Utils.getJson
 import com.talent.animescrap_common.utils.Utils.httpClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.*
+import okhttp3.CacheControl
+import okhttp3.FormBody
+import okhttp3.Headers
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.jsoup.Jsoup
 import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
-class AnimePaheSource(context: Context) : AnimeSource {
-
-
-    init {
-        httpClient = httpClient.newBuilder().addInterceptor(CloudflareInterceptor(context))
-            .build()
-    }
+class AnimePaheSource : AnimeSource {
+init {
+    httpClient = httpClient.newBuilder().addInterceptor(DdosGuardInterceptor(httpClient))
+        .build()
+}
 
     private var cookies: String = ""
     private val kwikParamsRegex = Regex("""\("(\w+)",\d+,"(\w+)",(\d+),(\d+),\d+\)""")
