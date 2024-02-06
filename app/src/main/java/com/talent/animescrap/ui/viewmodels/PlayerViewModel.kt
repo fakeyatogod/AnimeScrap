@@ -29,6 +29,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
+import com.talent.animescrap_common.utils.Utils.getJsonFromAnime
+import com.google.gson.JsonElement
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
@@ -52,6 +54,7 @@ class PlayerViewModel @Inject constructor(
 
     private val _animeStreamLink: MutableLiveData<AnimeStreamLink> = MutableLiveData()
     private val animeStreamLink: LiveData<AnimeStreamLink> = _animeStreamLink
+    private val jsonResult: MutableLiveData<JsonElement> = MutableLiveData()
 
     var qualityTrackGroup: Tracks.Group? = null
     private var qualityMapUnsorted: MutableMap<String, Int> = mutableMapOf()
@@ -184,6 +187,32 @@ class PlayerViewModel @Inject constructor(
         mediaSession.release()
     }
 
+    fun getInfo(episodeName: String , episodeNumber: String){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try{
+                    jsonResult.postValue(getJsonFromAnime(episodeName , episodeNumber))
+                }catch (e: Exception){
+                    Toast.makeText(app, "No skip allowed", Toast.LENGTH_SHORT).show()
+                }
+            }
+            try{
+                val jsonInterval = jsonResult.value!!.asJsonObject["results"].asJsonArray[0].asJsonObject["interval"].asJsonObject
+                val startTime = jsonInterval["startTime"].asLong
+                val endTime = jsonInterval["endTime"].asLong
+                val currentPosition = player.getCurrentPosition()
+                if ((currentPosition / 1000) in startTime..endTime){
+                    player.seekTo(endTime * 1000)
+                    Toast.makeText(app, "Opening was skipped", Toast.LENGTH_SHORT).show()
+                }else{
+                    // Toast
+                    Toast.makeText(app, "No skip allowed", Toast.LENGTH_SHORT).show()
+                }
+            }catch (e: Exception){
+                Toast.makeText(app, "No skip allowed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
     private fun prepareMediaSource() {
         if (animeStreamLink.value == null) return
         var mediaSource: MediaSource
