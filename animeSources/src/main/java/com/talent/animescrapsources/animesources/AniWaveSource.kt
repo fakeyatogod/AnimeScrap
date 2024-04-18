@@ -125,7 +125,7 @@ class AniWaveSource : AnimeSource {
         val u = "$mainUrl/mediainfo/${a.joinToString(",")}?${url.substringAfter("?")}"
         val response = postJson(
             url = "$apiUrl/rawVizcloud?query=$k&apikey=lagrapps",
-            payload = mapOf("query" to id, "futoken" to fuToken)
+            payload = mapOf("query" to u, "futoken" to fuToken)
         )
         val rawURL = response!!.asJsonObject["rawURL"].asString
         return "$rawURL?${sourceUrl.split('?')[1]}"

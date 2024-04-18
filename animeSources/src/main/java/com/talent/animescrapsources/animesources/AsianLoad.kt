@@ -9,7 +9,7 @@ import com.talent.animescrap_common.utils.Utils.get
 import org.jsoup.Jsoup
 
 class AsianLoad : AnimeSource {
-    private val mainUrl = "https://asianload.cc"
+    private val mainUrl = "https://pladrac.net"
     override suspend fun animeDetails(contentLink: String): AnimeDetails {
         val url = "$mainUrl${contentLink}"
         val doc = Jsoup.parse(get(url))

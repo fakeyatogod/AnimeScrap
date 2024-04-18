@@ -10,7 +10,7 @@ class SourceSelector(context: Context) {
         "allanime" to AllAnimeSource(),
         "animepahe" to AnimePaheSource(),
         "kawaiifu" to KawaiifuSource(context),
-        "aniwave" to AniWaveSource(),
+//        "aniwave" to AniWaveSource(),
         "kiss_kh" to KissKhSource(),
         "asian_load" to AsianLoad(),
         "my_asian_tv" to MyAsianTvSource(),
