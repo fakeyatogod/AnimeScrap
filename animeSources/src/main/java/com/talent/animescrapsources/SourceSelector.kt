@@ -8,7 +8,7 @@ class SourceSelector(context: Context) {
     val sourceMap: Map<String, AnimeSource> = mapOf(
         "yugen" to YugenSource(),
         "allanime" to AllAnimeSource(),
-        "animepahe" to AnimePaheSource(context),
+        "animepahe" to AnimePaheSource(),
         "kawaiifu" to KawaiifuSource(context),
         "aniwave" to AniWaveSource(),
         "kiss_kh" to KissKhSource(),

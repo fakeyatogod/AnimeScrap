@@ -219,17 +219,16 @@ class AllAnimeSource : AnimeSource {
     }
 
     private fun allAnimeImage(imageUrl: String) =
-        if (imageUrl.contains("kickassanime")) "https://wp.youtube-anime.com/${
-            imageUrl.replace(
-                "https://",
-                ""
-            )
-        }?w=250"
-        else if (imageUrl.contains("_Show_")) "https://wp.youtube-anime.com/aln.youtube-anime.com/images/${
+        if (imageUrl.contains("_Show_")) "https://wp.youtube-anime.com/aln.youtube-anime.com/images/${
             imageUrl.replaceAfterLast(
                 ".",
                 "css"
             )
         }"
-        else imageUrl
+        else "https://wp.youtube-anime.com/${
+            imageUrl.replace(
+                "https://",
+                ""
+            )
+        }?w=250"
 }
