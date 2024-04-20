@@ -152,7 +152,7 @@ class AllAnimeSource : AnimeSource {
             println("======= =====")
             val sourceUrl = sortedList.first()
             if (sourceUrl.contains("apivtwo")) {
-                val apiUrl = "https://embed.ssbcontent.site"
+                val apiUrl = "https://allanime.day"
                 println(apiUrl)
                 println(
                     "$apiUrl${
