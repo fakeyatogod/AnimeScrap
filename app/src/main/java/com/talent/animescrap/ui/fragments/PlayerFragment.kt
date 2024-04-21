@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.*
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
@@ -36,6 +37,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.talent.animescrap.R
 import com.talent.animescrap.databinding.FragmentPlayerBinding
 import com.talent.animescrap_common.model.AnimePlayingDetails
+import com.talent.animescrap_common.utils.Utils.getJsonFromAnime
 import com.talent.animescrap.ui.viewmodels.PlayerViewModel
 import com.talent.animescrap.widgets.DoubleTapPlayerView
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,6 +61,7 @@ class PlayerFragment : Fragment() {
     private lateinit var subsToggleButton: ToggleButton
     private lateinit var rotateBtn: ImageView
     private lateinit var scaleBtn: ImageView
+    private lateinit var skipTenSeconds: TextView
     private lateinit var prevEpBtn: ImageView
     private lateinit var nextEpBtn: ImageView
     private lateinit var centerText: TextView
@@ -249,9 +252,13 @@ class PlayerFragment : Fragment() {
         prevEpBtn = playerView.findViewById(R.id.prev_ep)
         nextEpBtn = playerView.findViewById(R.id.next_ep)
         subsToggleButton = playerView.findViewById(R.id.subs_toggle_btn)
+        skipTenSeconds = playerView.findViewById(R.id.skip_tensec)
 
         qualityBtn.setOnClickListener {
             showQuality()
+        }
+        skipTenSeconds.setOnClickListener {
+            playerViewModel.getInfo(animePlayingDetails.animeName , animePlayingDetails.animeEpisodeIndex.toString())
         }
         subsToggleButton.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
